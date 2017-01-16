@@ -1,0 +1,23 @@
+{
+	"compilerOptions": {
+		"target": "es5",
+		"lib": [
+			"dom",
+			"es6"
+		],
+		"moduleResolution": "node",
+		"allowSyntheticDefaultImports": true,
+		"experimentalDecorators": true,
+		"noImplicitReturns": true,
+		"noImplicitThis": true,
+		"noUnusedParameters": true,
+		"strictNullChecks": true
+	},
+	"exclude": [
+		"node_modules"
+	],
+	"compileOnSave": false,
+	"awesomeTypescriptLoaderOptions": {
+		"useCache": true
+	}
+}

@@ -1,0 +1,19 @@
+{
+	"name": "frest",
+	"version": "0.1.0",
+	"description": "REST client with Fetch API",
+	"main": "lib/index",
+	"repository": "git+https://github.com/panjiesw/frest.git",
+	"author": "Panjie SW <panjie@panjiesw.com>",
+	"license": "MIT",
+	"optionalDependencies": {
+		"whatwg-fetch": "^2.0.1"
+	},
+	"devDependencies": {
+		"@types/fetch-mock": "^5.8.0",
+		"@types/whatwg-fetch": "^0.0.33",
+		"fetch-mock": "^5.8.1",
+		"tslint": "^4.3.1",
+		"typescript": "^2.1.5"
+	}
+}
