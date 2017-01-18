@@ -1,17 +1,17 @@
 {
 	"compilerOptions": {
-		"target": "es5",
-		"lib": [
-			"dom",
-			"es6"
-		],
+		"target": "es6",
 		"moduleResolution": "node",
 		"allowSyntheticDefaultImports": true,
 		"experimentalDecorators": true,
+		"noImplicitAny": true,
 		"noImplicitReturns": true,
 		"noImplicitThis": true,
+		"noUnusedLocals": true,
 		"noUnusedParameters": true,
-		"strictNullChecks": true
+		"strictNullChecks": true,
+		"outDir": "es6",
+		"rootDir": "src"
 	},
 	"exclude": [
 		"node_modules"
