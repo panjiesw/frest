@@ -29,13 +29,22 @@ export type FrestResponse<T> = {
 };
 
 export interface IFrest {
-	addAfterInterceptor(interceptor: IAfterResponseInterceptor): void;
-	addBeforeInterceptor(interceptor: IBeforeRequestInterceptor): void;
+	addAfterResponseInterceptor(interceptor: IAfterResponseInterceptor): void;
+	addBeforeRequestInterceptor(interceptor: IBeforeRequestInterceptor): void;
 	addErrorInterceptor(interceptor: IErrorInterceptor): void;
-	removeAfterInterceptor(idOrValue: string | IAfterResponseInterceptor): void;
-	removeBeforeInterceptor(idOrValue: string | IBeforeRequestInterceptor): void;
+	removeAfterResponseInterceptor(idOrValue: string | IAfterResponseInterceptor): void;
+	removeBeforeRequestInterceptor(idOrValue: string | IBeforeRequestInterceptor): void;
 	removeErrorInterceptor(id: string | IErrorInterceptor): void;
 	request<T>(request: FrestRequest): Promise<FrestResponse<T>>;
+	post<T>(pathOrConfig: FrestRequest, requestConfig?: IFrestRequestConfig): Promise<FrestResponse<T>>;
+	create<T>(pathOrConfig: FrestRequest, requestConfig?: IFrestRequestConfig): Promise<FrestResponse<T>>;
+	get<T>(pathOrConfig: FrestRequest, requestConfig?: IFrestRequestConfig): Promise<FrestResponse<T>>;
+	read<T>(pathOrConfig: FrestRequest, requestConfig?: IFrestRequestConfig): Promise<FrestResponse<T>>;
+	put<T>(pathOrConfig: FrestRequest, requestConfig?: IFrestRequestConfig): Promise<FrestResponse<T>>;
+	update<T>(pathOrConfig: FrestRequest, requestConfig?: IFrestRequestConfig): Promise<FrestResponse<T>>;
+	patch<T>(pathOrConfig: FrestRequest, requestConfig?: IFrestRequestConfig): Promise<FrestResponse<T>>;
+	delete<T>(pathOrConfig: FrestRequest, requestConfig?: IFrestRequestConfig): Promise<FrestResponse<T>>;
+	destroy<T>(pathOrConfig: FrestRequest, requestConfig?: IFrestRequestConfig): Promise<FrestResponse<T>>;
 }
 
 export type BeforeRequestInterceptorArg = {

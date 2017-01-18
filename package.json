@@ -1,11 +1,36 @@
 {
 	"name": "frest",
-	"version": "0.1.0",
+	"version": "0.1.0-dev.0",
 	"description": "REST client for browser with Fetch",
-	"main": "lib/index",
-	"repository": "git+https://github.com/panjiesw/frest.git",
-	"author": "Panjie SW <panjie@panjiesw.com>",
+	"files": [
+		"es6",
+		"lib"
+	],
 	"license": "MIT",
+	"main": "lib/index",
+	"module": "es6/index",
+	"jsnext:main": "es6/index",
+	"types": "lib/index.d.ts",
+	"homepage": "https://github.com/panjiesw/frest",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/panjiesw/frest.git"
+	},
+	"author": {
+		"name": "Panjie Setiawan Wicaksono",
+		"email": "panjie@panjiesw.com",
+		"url": "http://panjiesw.life"
+	},
+	"bugs": {
+		"url": "https://github.com/panjiesw/frest/issues"
+	},
+	"keywords": [
+		"rest",
+		"client",
+		"browser",
+		"fetch",
+		"whatwg-fetch"
+	],
 	"scripts": {
 		"build": "npm run build:es6 && npm run build:es5",
 		"build:es6": "tsc --declaration --removeComments",

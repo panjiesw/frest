@@ -4,6 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import deepAssign from 'deep-assign';
+import assign from 'object-assign';
 import qs from 'query-string';
 import {
 	FrestConfig,
@@ -48,11 +49,11 @@ export class Frest implements IFrest {
 		}
 	}
 
-	public addAfterInterceptor(interceptor: IAfterResponseInterceptor) {
+	public addAfterResponseInterceptor(interceptor: IAfterResponseInterceptor) {
 		this.interceptors.after.add(interceptor);
 	}
 
-	public addBeforeInterceptor(interceptor: IBeforeRequestInterceptor) {
+	public addBeforeRequestInterceptor(interceptor: IBeforeRequestInterceptor) {
 		this.interceptors.before.add(interceptor);
 	}
 
@@ -60,7 +61,7 @@ export class Frest implements IFrest {
 		this.interceptors.error.add(interceptor);
 	}
 
-	public removeAfterInterceptor(idOrValue: string | IAfterResponseInterceptor) {
+	public removeAfterResponseInterceptor(idOrValue: string | IAfterResponseInterceptor) {
 		if (typeof idOrValue === 'string') {
 			this.interceptors.after = new Set(
 				[...this.interceptors.after].filter((a) => a.id !== idOrValue));
@@ -69,7 +70,7 @@ export class Frest implements IFrest {
 		}
 	}
 
-	public removeBeforeInterceptor(idOrValue: string | IBeforeRequestInterceptor) {
+	public removeBeforeRequestInterceptor(idOrValue: string | IBeforeRequestInterceptor) {
 		if (typeof idOrValue === 'string') {
 			this.interceptors.before = new Set(
 				[...this.interceptors.before].filter((a) => a.id !== idOrValue));
@@ -87,17 +88,59 @@ export class Frest implements IFrest {
 		}
 	}
 
-	public request<T>(requestConfig: FrestRequest): Promise<FrestResponse<T>> {
-		let config: IFrestRequestConfig;
-		if (typeof requestConfig === 'string') {
-			config = { path: [requestConfig] };
-		} else {
-			config = requestConfig;
-		}
-
+	public request<T>(config: IFrestRequestConfig): Promise<FrestResponse<T>> {
 		return this.doBefore(config)
 			.then(this.doRequest)
 			.then(this.doAfter);
+	}
+
+	public post<T>(pathOrConfig: FrestRequest, requestConfig: IFrestRequestConfig = {}): Promise<FrestResponse<T>> {
+		const config = assign<IFrestRequestConfig, IFrestRequestConfig>(
+			this.requestConfig(pathOrConfig, requestConfig), { method: 'POST' });
+		return this.request<T>(config);
+	}
+	public create<T>(pathOrConfig: FrestRequest, requestConfig: IFrestRequestConfig = {}): Promise<FrestResponse<T>> {
+		return this.post<T>(pathOrConfig, requestConfig);
+	}
+
+	public get<T>(pathOrConfig: FrestRequest, requestConfig: IFrestRequestConfig = {}): Promise<FrestResponse<T>> {
+		const config = assign<IFrestRequestConfig, IFrestRequestConfig>(
+			this.requestConfig(pathOrConfig, requestConfig), { method: 'GET' });
+		return this.request<T>(config);
+	}
+	public read<T>(pathOrConfig: FrestRequest, requestConfig: IFrestRequestConfig = {}): Promise<FrestResponse<T>> {
+		return this.get<T>(pathOrConfig, requestConfig);
+	}
+
+	public put<T>(pathOrConfig: FrestRequest, requestConfig: IFrestRequestConfig = {}): Promise<FrestResponse<T>> {
+		const config = assign<IFrestRequestConfig, IFrestRequestConfig>(
+			this.requestConfig(pathOrConfig, requestConfig), { method: 'PUT' });
+		return this.request<T>(config);
+	}
+	public update<T>(pathOrConfig: FrestRequest, requestConfig: IFrestRequestConfig = {}): Promise<FrestResponse<T>> {
+		return this.put<T>(pathOrConfig, requestConfig);
+	}
+
+	public patch<T>(pathOrConfig: FrestRequest, requestConfig: IFrestRequestConfig = {}): Promise<FrestResponse<T>> {
+		const config = assign<IFrestRequestConfig, IFrestRequestConfig>(
+			this.requestConfig(pathOrConfig, requestConfig), { method: 'PATCH' });
+		return this.request<T>(config);
+	}
+
+	public delete<T>(pathOrConfig: FrestRequest, requestConfig: IFrestRequestConfig = {}): Promise<FrestResponse<T>> {
+		const config = assign<IFrestRequestConfig, IFrestRequestConfig>(
+			this.requestConfig(pathOrConfig, requestConfig), { method: 'DELETE' });
+		return this.request<T>(config);
+	}
+	public destroy<T>(pathOrConfig: FrestRequest, requestConfig: IFrestRequestConfig = {}): Promise<FrestResponse<T>> {
+		return this.delete<T>(pathOrConfig, requestConfig);
+	}
+
+	private requestConfig(pathOrConfig: FrestRequest, requestConfig: IFrestRequestConfig): IFrestRequestConfig {
+		if (typeof pathOrConfig === 'string') {
+			return assign<IFrestRequestConfig, IFrestRequestConfig>(requestConfig, { path: pathOrConfig });
+		}
+		return pathOrConfig;
 	}
 
 	private doBefore(config: IFrestRequestConfig) {
