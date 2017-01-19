@@ -21,7 +21,7 @@ export interface IFrestRequestConfig extends RequestInit {
 	fetch?: typeof window.fetch;
 }
 
-export type FrestRequest = string | IFrestRequestConfig;
+export type FrestRequest = string | string[] | IFrestRequestConfig;
 
 export type FrestResponse<T> = {
 	origin: Response;
@@ -29,13 +29,16 @@ export type FrestResponse<T> = {
 };
 
 export interface IFrest {
+	config: IFrestConfig;
+	base: string;
+	fetchFn: typeof window.fetch;
 	addAfterResponseInterceptor(interceptor: IAfterResponseInterceptor): void;
 	addBeforeRequestInterceptor(interceptor: IBeforeRequestInterceptor): void;
 	addErrorInterceptor(interceptor: IErrorInterceptor): void;
 	removeAfterResponseInterceptor(idOrValue: string | IAfterResponseInterceptor): void;
 	removeBeforeRequestInterceptor(idOrValue: string | IBeforeRequestInterceptor): void;
 	removeErrorInterceptor(id: string | IErrorInterceptor): void;
-	request<T>(request: FrestRequest): Promise<FrestResponse<T>>;
+	request<T>(request: IFrestRequestConfig): Promise<FrestResponse<T>>;
 	post<T>(pathOrConfig: FrestRequest, requestConfig?: IFrestRequestConfig): Promise<FrestResponse<T>>;
 	create<T>(pathOrConfig: FrestRequest, requestConfig?: IFrestRequestConfig): Promise<FrestResponse<T>>;
 	get<T>(pathOrConfig: FrestRequest, requestConfig?: IFrestRequestConfig): Promise<FrestResponse<T>>;
@@ -47,6 +50,17 @@ export interface IFrest {
 	destroy<T>(pathOrConfig: FrestRequest, requestConfig?: IFrestRequestConfig): Promise<FrestResponse<T>>;
 }
 
+export interface IFrestDefaultFn {
+	<T>(request: IFrestRequestConfig): Promise<FrestResponse<T>>;
+}
+
+export interface IFrestError {
+	message: string;
+	config: IFrestConfig;
+	request: IFrestRequestConfig;
+	response?: FrestResponse<any>;
+}
+
 export type BeforeRequestInterceptorArg = {
 	config: IFrestConfig;
 	request: IFrestRequestConfig;
@@ -54,7 +68,7 @@ export type BeforeRequestInterceptorArg = {
 
 export type AfterResponseInterceptorArg = {
 	config: IFrestConfig;
-	response: FrestResponse<any>
+	response: FrestResponse<any>;
 };
 
 export interface ICommonInterceptor {
@@ -70,7 +84,7 @@ export interface IAfterResponseInterceptor extends ICommonInterceptor {
 }
 
 export interface IErrorInterceptor extends ICommonInterceptor {
-	(): Promise<FrestResponse<any> | null>;
+	(error: IFrestError): Promise<FrestResponse<any> | null>;
 }
 
 export interface IInterceptorSets {

@@ -45,11 +45,9 @@
 	"devDependencies": {
 		"@types/deep-assign": "^0.1.0",
 		"@types/fetch-mock": "^5.8.0",
-		"@types/invariant": "^2.2.28",
 		"@types/node": "^7.0.0",
 		"@types/object-assign": "^4.0.30",
 		"@types/query-string": "^3.0.31",
-		"@types/warning": "^3.0.0",
 		"@types/whatwg-fetch": "^0.0.33",
 		"babel-cli": "^6.18.0",
 		"babel-preset-env": "^1.1.8",
@@ -61,9 +59,7 @@
 	},
 	"dependencies": {
 		"deep-assign": "^2.0.0",
-		"invariant": "^2.2.2",
 		"object-assign": "^4.1.0",
-		"query-string": "^4.3.1",
-		"warning": "^3.0.0"
+		"query-string": "^4.3.1"
 	}
 }
