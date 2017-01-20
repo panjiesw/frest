@@ -11,13 +11,17 @@
 		"noUnusedParameters": true,
 		"strictNullChecks": true,
 		"outDir": "es6",
-		"rootDir": "src"
+		"baseUrl": ".",
+		"paths": {
+			"frest/*": ["./src/*"]
+		}
 	},
 	"exclude": [
 		"node_modules"
 	],
 	"compileOnSave": false,
 	"awesomeTypescriptLoaderOptions": {
-		"useCache": true
+		"useCache": true,
+		"useBabel": true
 	}
 }

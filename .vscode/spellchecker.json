@@ -1,10 +1,16 @@
 {
     "language": "en_US",
     "ignoreWordsList": [
-        "frest"
+        "ButtonLink",
+        "IconButtonLink",
+        "onlyActiveOnIndex",
+        "frest",
+        "awcache"
     ],
     "documentTypes": [
-        "markdown"
+        "markdown",
+        "latex",
+        "plaintext"
     ],
     "ignoreRegExp": [],
     "ignoreFileExtensions": [],

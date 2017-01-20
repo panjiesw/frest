@@ -1,4 +1,7 @@
 *.log
 node_modules
+.awcache
+coverage
 lib
 es6
+tests.js.map
