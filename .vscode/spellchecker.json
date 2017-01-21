@@ -8,7 +8,8 @@
         "awcache",
         "frest",
         "pids",
-        "wscript"
+        "wscript",
+        "FREST"
     ],
     "documentTypes": [
         "markdown",
