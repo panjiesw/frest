@@ -11,7 +11,6 @@ const CheckerPlugin = atl.CheckerPlugin;
 const TsConfigPathsPlugin = atl.TsConfigPathsPlugin;
 
 module.exports = {
-	bail: true,
 	devtool: process.env.COVER ? 'inline-source-map' : 'eval-source-map',
 	resolve: {
 		unsafeCache: false,

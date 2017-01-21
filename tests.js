@@ -4,6 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 require('core-js/fn/promise');
+require('core-js/fn/array/from');
 require('core-js/fn/set');
 require('whatwg-fetch');
 

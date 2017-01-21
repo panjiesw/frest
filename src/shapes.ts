@@ -20,7 +20,7 @@ export interface IFrestRequestConfig extends RequestInit {
 	query?: any;
 	fetch?: typeof window.fetch;
 	skip?: string[];
-	wrap?: boolean;
+	nowrap?: boolean;
 }
 
 export type FrestRequest = string | string[] | IFrestRequestConfig;

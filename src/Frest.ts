@@ -32,25 +32,18 @@ interface IIntTransform {
 	request: IFrestRequestConfig;
 }
 
-const defaultConfig: IFrestConfig = {
-	base: '',
-	fetch: window.fetch,
-	interceptors: {},
-};
-
 export class Frest implements IFrest {
-	public config = defaultConfig;
-	private interceptors: IInterceptorSets = {
-		after: new Set<IAfterResponseInterceptor>(),
-		before: new Set<IBeforeRequestInterceptor>(),
-		error: new Set<IErrorInterceptor>(),
-	};
+	public config: IFrestConfig;
+	private interceptors: IInterceptorSets;
 
 	constructor(config?: FrestConfig) {
-		if (config) {
-			this.config = deepAssign(defaultConfig, config);
-		}
+		this.config = deepAssign({}, this.defaultConfig(), config);
 		this.config.base = this.trimSlashes(this.config.base);
+		this.interceptors = {
+			after: new Set<IAfterResponseInterceptor>(),
+			before: new Set<IBeforeRequestInterceptor>(),
+			error: new Set<IErrorInterceptor>(),
+		};
 		if (this.config.interceptors.after) {
 			this.interceptors.after = new Set(this.config.interceptors.after);
 		}
@@ -167,6 +160,14 @@ export class Frest implements IFrest {
 		return this.delete<T>(pathOrConfig, requestConfig);
 	}
 
+	private defaultConfig(): IFrestConfig {
+		return {
+			base: '',
+			fetch: window.fetch,
+			interceptors: {},
+		};
+	}
+
 	private requestConfig(pathOrConfig: FrestRequest, requestConfig: IFrestRequestConfig): IFrestRequestConfig {
 		if (typeof pathOrConfig === 'string' || pathOrConfig instanceof Array) {
 			return assign<IFrestRequestConfig, IFrestRequestConfig>(requestConfig, { path: pathOrConfig });
@@ -242,10 +243,10 @@ export class Frest implements IFrest {
 
 	private doTransform = (afterFetch: IIntTransform): Promise<FrestResponse<any>> => {
 		const {response, request} = afterFetch;
-		if (request.wrap) {
-			return Promise.resolve<FrestResponse<any>>(response);
+		if (request.nowrap) {
+			return Promise.resolve<FrestResponse<any>>(response.value);
 		}
-		return Promise.resolve<FrestResponse<any>>(response.value);
+		return Promise.resolve<FrestResponse<any>>(response);
 	}
 
 	private onError = (e: any): any => {
