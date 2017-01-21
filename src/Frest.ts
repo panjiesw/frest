@@ -19,10 +19,16 @@ import {
 	IFrestError,
 	IFrestRequestConfig,
 	IInterceptorSets,
+	WrappedFrestResponse,
 } from './shapes';
 
 interface IIntAfterFetch {
 	response: Response;
+	request: IFrestRequestConfig;
+}
+
+interface IIntTransform {
+	response: WrappedFrestResponse<any>;
 	request: IFrestRequestConfig;
 }
 
@@ -115,6 +121,7 @@ export class Frest implements IFrest {
 		return this.doBefore(config)
 			.then(this.doRequest)
 			.then(this.doAfter)
+			.then(this.doTransform)
 			.catch(this.onError);
 	}
 
@@ -209,7 +216,7 @@ export class Frest implements IFrest {
 			.then<IIntAfterFetch>((response) => ({ response, request }));
 	}
 
-	private doAfter = (afterFetch: IIntAfterFetch): Promise<FrestResponse<any>> => {
+	private doAfter = (afterFetch: IIntAfterFetch): Promise<IIntTransform> => {
 		const {response, request} = afterFetch;
 		if (!response.ok) {
 			return Promise.reject(new FrestError(
@@ -218,18 +225,27 @@ export class Frest implements IFrest {
 				request,
 				{ origin: response, value: null }));
 		}
-		let resp = Promise.resolve<FrestResponse<any>>({ origin: response });
+		let resp: Promise<WrappedFrestResponse<any>> = Promise.resolve({ origin: response });
 		this.interceptors.after.forEach((af) => {
 			resp = resp.then((r) => af({ config: this.config, response: r }));
 		});
-		return resp.catch((e) => {
-			const cause = typeof e === 'string' ? e : e.message ? e.message : e;
-			return Promise.reject(new FrestError(
-				`Error in after response intercepor: ${cause}`,
-				this.config,
-				request,
-				{ origin: response, value: null }));
-		});
+		return resp.then((r) => ({ request, response: r }))
+			.catch((e) => {
+				const cause = typeof e === 'string' ? e : e.message ? e.message : e;
+				return Promise.reject(new FrestError(
+					`Error in after response intercepor: ${cause}`,
+					this.config,
+					request,
+					{ origin: response, value: null }));
+			});
+	}
+
+	private doTransform = (afterFetch: IIntTransform): Promise<FrestResponse<any>> => {
+		const {response, request} = afterFetch;
+		if (request.wrap) {
+			return Promise.resolve<FrestResponse<any>>(response);
+		}
+		return Promise.resolve<FrestResponse<any>>(response.value);
 	}
 
 	private onError = (e: any): any => {
@@ -242,8 +258,8 @@ export class Frest implements IFrest {
 			return Promise.reject(err);
 		}
 
-		let recp: Promise<FrestResponse<any> | null> = Promise.resolve(null);
-		let recovery: FrestResponse<any> | null = null;
+		let recp: Promise<WrappedFrestResponse<any> | null> = Promise.resolve(null);
+		let recovery: WrappedFrestResponse<any> | null = null;
 		[...this.interceptors.error].some((int) => {
 			if (recovery != null) {
 				return true;

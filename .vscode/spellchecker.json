@@ -4,8 +4,11 @@
         "ButtonLink",
         "IconButtonLink",
         "onlyActiveOnIndex",
+        "vscode",
+        "awcache",
         "frest",
-        "awcache"
+        "pids",
+        "wscript"
     ],
     "documentTypes": [
         "markdown",

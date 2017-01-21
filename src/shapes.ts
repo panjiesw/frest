@@ -19,14 +19,18 @@ export interface IFrestRequestConfig extends RequestInit {
 	path?: string | string[];
 	query?: any;
 	fetch?: typeof window.fetch;
+	skip?: string[];
+	wrap?: boolean;
 }
 
 export type FrestRequest = string | string[] | IFrestRequestConfig;
 
-export type FrestResponse<T> = {
+export type WrappedFrestResponse<T> = {
 	origin: Response;
 	value?: T;
 };
+
+export type FrestResponse<T> = (T | null) | WrappedFrestResponse<T>;
 
 export interface IFrest {
 	config: IFrestConfig;
@@ -58,7 +62,7 @@ export interface IFrestError {
 	message: string;
 	config: IFrestConfig;
 	request: IFrestRequestConfig;
-	response?: FrestResponse<any>;
+	response?: WrappedFrestResponse<any>;
 }
 
 export type BeforeRequestInterceptorArg = {
@@ -68,7 +72,7 @@ export type BeforeRequestInterceptorArg = {
 
 export type AfterResponseInterceptorArg = {
 	config: IFrestConfig;
-	response: FrestResponse<any>;
+	response: WrappedFrestResponse<any>;
 };
 
 export interface ICommonInterceptor {
@@ -80,11 +84,11 @@ export interface IBeforeRequestInterceptor extends ICommonInterceptor {
 }
 
 export interface IAfterResponseInterceptor extends ICommonInterceptor {
-	(response: AfterResponseInterceptorArg): Promise<FrestResponse<any>>;
+	(response: AfterResponseInterceptorArg): Promise<WrappedFrestResponse<any>>;
 }
 
 export interface IErrorInterceptor extends ICommonInterceptor {
-	(error: IFrestError): Promise<FrestResponse<any> | null>;
+	(error: IFrestError): Promise<WrappedFrestResponse<any> | null>;
 }
 
 export interface IInterceptorSets {
