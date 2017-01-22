@@ -6,8 +6,15 @@
 import fetchMock from 'fetch-mock';
 import { Frest } from 'frest/Frest';
 import {
+	AfterResponseInterceptorArg,
+	FrestResponse,
+	IFrestError,
 	WrappedFrestResponse,
 } from 'frest/shapes';
+
+function isWrapped<T>(res: FrestResponse<T>): res is WrappedFrestResponse<T> {
+	return (res as WrappedFrestResponse<T>).origin !== undefined;
+}
 
 describe('Frest', () => {
 
@@ -72,7 +79,7 @@ describe('Frest', () => {
 		it('Must call correct endpoint', (done) => {
 			fetchMock.once('test', { status: 200 }, { name: 'test', method: 'GET' });
 			const frest = new Frest();
-			frest.request<WrappedFrestResponse<any>>({ path: 'test', method: 'GET' }).then((res) => {
+			frest.request<any>({ path: 'test', method: 'GET' }).then((res) => {
 				if (res) {
 					expect(fetchMock.called('test')).toBe(true);
 					expect(res.origin.status).toBe(200);
@@ -86,7 +93,7 @@ describe('Frest', () => {
 		it('Must call correct endpoint with base', (done) => {
 			fetchMock.once('http://localhost/test', { status: 200 }, { name: 'test', method: 'GET' });
 			const frest = new Frest({ base: 'http://localhost/' });
-			frest.request<WrappedFrestResponse<any>>({ path: 'test', method: 'GET' }).then((res) => {
+			frest.request<any>({ path: 'test', method: 'GET' }).then((res) => {
 				if (res) {
 					expect(fetchMock.called('test')).toBe(true);
 					expect(res.origin.status).toBe(200);
@@ -101,11 +108,11 @@ describe('Frest', () => {
 			fetchMock.mock('testget', { status: 200 }, { name: 'testget', method: 'GET' })
 				.mock('testread', { status: 200 }, { name: 'testread', method: 'GET' });
 			const frest = new Frest();
-			frest.get<WrappedFrestResponse<any>>('testget').then((res) => {
+			frest.get<any>('testget').then((res) => {
 				if (res) {
 					expect(fetchMock.called('testget')).toBe(true);
 					expect(res.origin.status).toBe(200);
-					return frest.read<WrappedFrestResponse<any>>('testread');
+					return frest.read<any>('testread');
 				}
 				return Promise.reject('testget: no response returned');
 			}).then((res) => {
@@ -124,11 +131,11 @@ describe('Frest', () => {
 				.mock('testcreate', { status: 200 }, { name: 'testcreate', method: 'POST' });
 			const body = JSON.stringify({ foo: 'bar' });
 			const frest = new Frest();
-			frest.post<WrappedFrestResponse<any>>('testpost', { body }).then((res) => {
+			frest.post<any>('testpost', { body }).then((res) => {
 				if (res) {
 					expect(fetchMock.called('testpost')).toBe(true);
 					expect(res.origin.status).toBe(200);
-					return frest.create<WrappedFrestResponse<any>>('testcreate');
+					return frest.create<any>('testcreate');
 				}
 				return Promise.reject('testpost: no response returned');
 			}).then((res) => {
@@ -147,11 +154,11 @@ describe('Frest', () => {
 				.mock('testupdate', { status: 200 }, { name: 'testupdate', method: 'PUT' });
 			const body = JSON.stringify({ foo: 'bar' });
 			const frest = new Frest();
-			frest.put<WrappedFrestResponse<any>>('testput', { body }).then((res) => {
+			frest.put<any>('testput', { body }).then((res) => {
 				if (res) {
 					expect(fetchMock.called('testput')).toBe(true);
 					expect(res.origin.status).toBe(200);
-					return frest.update<WrappedFrestResponse<any>>('testupdate');
+					return frest.update<any>('testupdate');
 				}
 				return Promise.reject('testput: no response returned');
 			}).then((res) => {
@@ -170,11 +177,11 @@ describe('Frest', () => {
 				.mock('testdestroy', { status: 200 }, { name: 'testdestroy', method: 'DELETE' });
 			const body = JSON.stringify({ foo: 'bar' });
 			const frest = new Frest();
-			frest.delete<WrappedFrestResponse<any>>('testdelete', { body }).then((res) => {
+			frest.delete<any>('testdelete', { body }).then((res) => {
 				if (res) {
 					expect(fetchMock.called('testdelete')).toBe(true);
 					expect(res.origin.status).toBe(200);
-					return frest.destroy<WrappedFrestResponse<any>>('testdestroy');
+					return frest.destroy<any>('testdestroy');
 				}
 				return Promise.reject('testdelete: no response returned');
 			}).then((res) => {
@@ -192,7 +199,7 @@ describe('Frest', () => {
 			fetchMock.once('testpatch', { status: 200 }, { name: 'testpatch', method: 'PATCH' });
 			const body = JSON.stringify({ foo: 'bar' });
 			const frest = new Frest();
-			frest.patch<WrappedFrestResponse<any>>('testpatch', { body }).then((res) => {
+			frest.patch<any>('testpatch', { body }).then((res) => {
 				if (res) {
 					expect(fetchMock.called('testpatch')).toBe(true);
 					expect(res.origin.status).toBe(200);
@@ -201,6 +208,105 @@ describe('Frest', () => {
 					done.fail('testpatch: no response returned');
 				}
 			}).catch(done.fail);
+		});
+
+		it('Must handle non ok response', (done) => {
+			fetchMock.once('testerror', { status: 500 }, { name: 'testerror', method: 'GET' });
+			const frest = new Frest();
+			frest.get<any>('testerror').then(() => {
+				done.fail('testerror: error is not thrown');
+			}).catch((err: IFrestError) => {
+				expect(err).toBeDefined();
+				expect(err.response).toBeDefined();
+				expect((err.response as any).origin).toBeDefined();
+				expect((err.response as any).origin.status).toBe(500);
+				done();
+			});
+		});
+	});
+
+	describe('Interceptors', () => {
+		afterEach(fetchMock.restore);
+
+		it('Must be able to intercept request', (done) => {
+			const headers = new Headers();
+			headers.append('x-test', 'test');
+			const path = 'testbefore';
+			const before = jasmine.createSpy('before').and
+				.returnValue(Promise.resolve({ path, headers }));
+
+			fetchMock.once(
+				(url: string, opts: Request) =>
+					url === path && opts.headers.get('x-test') === 'test',
+				{ status: 200 }, { name: path, method: 'GET' });
+
+			const frest = new Frest({ interceptors: { before: [before] } });
+			frest.get<any>(path)
+				.then((_) => {
+					expect(before).toHaveBeenCalledTimes(1);
+					expect(fetchMock.called(path)).toBe(true);
+					done();
+				}).catch(done.fail);
+		});
+
+		it('Must be able to intercept response', (done) => {
+			const path = 'testafter';
+			const after = jasmine.createSpy('after').and
+				.callFake((input: AfterResponseInterceptorArg) => {
+					const promise = new Promise<WrappedFrestResponse<any>>((resolve) => {
+						input.response.origin.json()
+							.then((value) => resolve({ origin: input.response.origin, value }));
+					});
+					return promise;
+				});
+			fetchMock.once(path,
+				{ status: 200, body: { foo: 'bar' } },
+				{ name: path, method: 'POST' });
+
+			const frest = new Frest({interceptors: {after: [after]}});
+			frest.post<any>(path)
+				.then((res) => {
+					expect(after).toHaveBeenCalledTimes(1);
+					expect(fetchMock.called(path)).toBe(true);
+					if (isWrapped(res)) {
+						expect(res.value).toBeTruthy();
+						expect(res.value).toEqual({foo: 'bar'});
+						done();
+					} else {
+						done.fail('invalid response');
+					}
+				})
+				.catch(done.fail);
+		});
+
+		it('Must be able to unwrap response', (done) => {
+			const path = 'testafter';
+			const after = jasmine.createSpy('after').and
+				.callFake((input: AfterResponseInterceptorArg) => {
+					const promise = new Promise<WrappedFrestResponse<any>>((resolve) => {
+						input.response.origin.json()
+							.then((value) => resolve({ origin: input.response.origin, value }));
+					});
+					return promise;
+				});
+			fetchMock.once(path,
+				{ status: 200, body: { foo: 'bar' } },
+				{ name: path, method: 'PUT' });
+
+			const frest = new Frest({interceptors: {after: [after]}});
+			frest.put<any>(path, {nowrap: true})
+				.then((res) => {
+					expect(after).toHaveBeenCalledTimes(1);
+					expect(fetchMock.called(path)).toBe(true);
+					if (!isWrapped(res)) {
+						expect(res).toBeTruthy();
+						expect(res).toEqual({foo: 'bar'});
+						done();
+					} else {
+						done.fail('invalid response');
+					}
+				})
+				.catch(done.fail);
 		});
 	});
 });

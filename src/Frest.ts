@@ -244,7 +244,7 @@ export class Frest implements IFrest {
 	private doTransform = (afterFetch: IIntTransform): Promise<FrestResponse<any>> => {
 		const {response, request} = afterFetch;
 		if (request.nowrap) {
-			return Promise.resolve<FrestResponse<any>>(response.value);
+			return Promise.resolve<any>(response.value);
 		}
 		return Promise.resolve<FrestResponse<any>>(response);
 	}
