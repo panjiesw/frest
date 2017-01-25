@@ -19,6 +19,7 @@ import {
 	IFrestError,
 	IFrestRequestConfig,
 	IInterceptorSets,
+	WrappedFrestResponse,
 } from './shapes';
 
 interface IIntAfterFetch {
@@ -26,25 +27,23 @@ interface IIntAfterFetch {
 	request: IFrestRequestConfig;
 }
 
-const defaultConfig: IFrestConfig = {
-	base: '',
-	fetch: window.fetch,
-	interceptors: {},
-};
+interface IIntTransform {
+	response: WrappedFrestResponse<any>;
+	request: IFrestRequestConfig;
+}
 
 export class Frest implements IFrest {
-	public config = defaultConfig;
-	private interceptors: IInterceptorSets = {
-		after: new Set<IAfterResponseInterceptor>(),
-		before: new Set<IBeforeRequestInterceptor>(),
-		error: new Set<IErrorInterceptor>(),
-	};
+	public config: IFrestConfig;
+	private interceptors: IInterceptorSets;
 
 	constructor(config?: FrestConfig) {
-		if (config) {
-			this.config = deepAssign(defaultConfig, config);
-		}
+		this.config = deepAssign({}, this.defaultConfig(), config);
 		this.config.base = this.trimSlashes(this.config.base);
+		this.interceptors = {
+			after: new Set<IAfterResponseInterceptor>(),
+			before: new Set<IBeforeRequestInterceptor>(),
+			error: new Set<IErrorInterceptor>(),
+		};
 		if (this.config.interceptors.after) {
 			this.interceptors.after = new Set(this.config.interceptors.after);
 		}
@@ -115,6 +114,7 @@ export class Frest implements IFrest {
 		return this.doBefore(config)
 			.then(this.doRequest)
 			.then(this.doAfter)
+			.then(this.doTransform)
 			.catch(this.onError);
 	}
 
@@ -158,6 +158,14 @@ export class Frest implements IFrest {
 	}
 	public destroy<T>(pathOrConfig: FrestRequest, requestConfig: IFrestRequestConfig = {}): Promise<FrestResponse<T>> {
 		return this.delete<T>(pathOrConfig, requestConfig);
+	}
+
+	private defaultConfig(): IFrestConfig {
+		return {
+			base: '',
+			fetch: window.fetch,
+			interceptors: {},
+		};
 	}
 
 	private requestConfig(pathOrConfig: FrestRequest, requestConfig: IFrestRequestConfig): IFrestRequestConfig {
@@ -209,7 +217,7 @@ export class Frest implements IFrest {
 			.then<IIntAfterFetch>((response) => ({ response, request }));
 	}
 
-	private doAfter = (afterFetch: IIntAfterFetch): Promise<FrestResponse<any>> => {
+	private doAfter = (afterFetch: IIntAfterFetch): Promise<IIntTransform> => {
 		const {response, request} = afterFetch;
 		if (!response.ok) {
 			return Promise.reject(new FrestError(
@@ -218,50 +226,60 @@ export class Frest implements IFrest {
 				request,
 				{ origin: response, value: null }));
 		}
-		let resp = Promise.resolve<FrestResponse<any>>({ origin: response });
+		let resp: Promise<WrappedFrestResponse<any>> = Promise.resolve({ origin: response });
 		this.interceptors.after.forEach((af) => {
 			resp = resp.then((r) => af({ config: this.config, response: r }));
 		});
-		return resp.catch((e) => {
-			const cause = typeof e === 'string' ? e : e.message ? e.message : e;
-			return Promise.reject(new FrestError(
-				`Error in after response intercepor: ${cause}`,
-				this.config,
-				request,
-				{ origin: response, value: null }));
-		});
+		return resp.then((r) => ({ request, response: r }))
+			.catch((e) => {
+				const cause = typeof e === 'string' ? e : e.message ? e.message : e;
+				return Promise.reject(new FrestError(
+					`Error in after response intercepor: ${cause}`,
+					this.config,
+					request,
+					{ origin: response, value: null }));
+			});
+	}
+
+	private doTransform = (afterFetch: IIntTransform): Promise<FrestResponse<any>> => {
+		const {response, request} = afterFetch;
+		if (request.nowrap) {
+			return Promise.resolve<any>(response.value);
+		}
+		return Promise.resolve<FrestResponse<any>>(response);
 	}
 
 	private onError = (e: any): any => {
-		let err: IFrestError = e;
-		if (!e.config && !e.request) {
-			err = new FrestError(e.message, this.config, {});
-		}
+		let err: IFrestError = this.toFestError(e);
 
 		if (this.interceptors.error.size === 0) {
 			return Promise.reject(err);
 		}
 
-		let recp: Promise<FrestResponse<any> | null> = Promise.resolve(null);
-		let recovery: FrestResponse<any> | null = null;
-		[...this.interceptors.error].some((int) => {
-			if (recovery != null) {
-				return true;
-			}
-			recp = recp.then((rec) => {
-				if (rec != null) {
-					recovery = rec;
-					return rec;
+		return new Promise<any>((resolve, reject) => {
+			let recp: Promise<WrappedFrestResponse<any> | null> = Promise.resolve(null);
+			let recovery: WrappedFrestResponse<any> | null = null;
+			[...this.interceptors.error].some((int) => {
+				if (recovery != null) {
+					return true;
 				}
-				return int(err);
-			}).catch((ee) => err = ee);
-			return false;
+				recp = recp.then((rec) => {
+					if (rec != null) {
+						recovery = rec;
+						return rec;
+					}
+					return int(err);
+				}).catch((ee) => err = this.toFestError(ee));
+				return false;
+			});
+			recp.then((res) => {
+				if (res) {
+					resolve(res);
+				} else {
+					reject(err);
+				}
+			});
 		});
-
-		if (recovery) {
-			return Promise.resolve(recovery);
-		}
-		return Promise.reject(err);
 	}
 
 	private parseQuery(query: any): string {
@@ -270,7 +288,7 @@ export class Frest implements IFrest {
 			const qq = qs.stringify(q);
 			q = qq.length > 0 ? `?${qq}` : '';
 		} else if (q !== '') {
-			q = `?${q}`;
+			q = q.charAt(0) === '?' ? q : `?${q}`;
 		}
 
 		return q;
@@ -278,5 +296,10 @@ export class Frest implements IFrest {
 
 	private trimSlashes(input: string): string {
 		return input.toString().replace(/(^\/+|\/+$)/g, '');
+	}
+
+	private toFestError(e: any): IFrestError {
+		return !e.config && !e.request ? new FrestError(e.message, this.config, {})
+			: e;
 	}
 }

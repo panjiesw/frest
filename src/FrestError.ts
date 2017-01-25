@@ -4,10 +4,10 @@
 // https://opensource.org/licenses/MIT
 
 import {
-	FrestResponse,
 	IFrestConfig,
 	IFrestError,
 	IFrestRequestConfig,
+	WrappedFrestResponse,
 } from './shapes';
 
 export class FrestError extends Error implements IFrestError {
@@ -15,7 +15,7 @@ export class FrestError extends Error implements IFrestError {
 		message: string,
 		public config: IFrestConfig,
 		public request: IFrestRequestConfig,
-		public response?: FrestResponse<any>) {
+		public response?: WrappedFrestResponse<any>) {
 		super(message);
 	}
 }

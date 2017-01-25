@@ -22,6 +22,7 @@ import {
 	IFrestError,
 	IFrestRequestConfig,
 	IInterceptorSets,
+	WrappedFrestResponse,
 } from './shapes';
 
 const frest: IFrest = new Frest();
@@ -36,6 +37,7 @@ export {
 	Frest,
 	FrestError,
 	FrestResponse,
+	WrappedFrestResponse,
 	IFrest,
 	IFrestRequestConfig,
 	AfterResponseInterceptorArg,
