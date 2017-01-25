@@ -50,23 +50,32 @@ describe('Frest', () => {
 			const after = jasmine.createSpy('after1');
 			const before = jasmine.createSpy('before1');
 			const error = jasmine.createSpy('error1');
+			const after2: any = jasmine.createSpy('after2');
+			after2.id = 'after2';
+			const before2: any = jasmine.createSpy('before2');
+			before2.id = 'before2';
+			const error2: any = jasmine.createSpy('error2');
+			error2.id = 'error2';
 			const config = {
 				interceptors: {
-					after: [after],
-					before: [before],
-					error: [error],
+					after: [after, after2],
+					before: [before, before2],
+					error: [error, error2],
 				},
 			};
 			const frest = new Frest(config);
-			frest.addAfterResponseInterceptor(jasmine.createSpy('after2'));
-			frest.addBeforeRequestInterceptor(jasmine.createSpy('before2'));
-			frest.addErrorInterceptor(jasmine.createSpy('error2'));
-			expect((frest as any).interceptors.after.size).toBe(2);
-			expect((frest as any).interceptors.before.size).toBe(2);
-			expect((frest as any).interceptors.error.size).toBe(2);
+			frest.addAfterResponseInterceptor(jasmine.createSpy('after3'));
+			frest.addBeforeRequestInterceptor(jasmine.createSpy('before3'));
+			frest.addErrorInterceptor(jasmine.createSpy('error3'));
+			expect((frest as any).interceptors.after.size).toBe(3);
+			expect((frest as any).interceptors.before.size).toBe(3);
+			expect((frest as any).interceptors.error.size).toBe(3);
 			frest.removeAfterResponseInterceptor(after);
 			frest.removeBeforeRequestInterceptor(before);
 			frest.removeErrorInterceptor(error);
+			frest.removeAfterResponseInterceptor(after2.id);
+			frest.removeBeforeRequestInterceptor(before2.id);
+			frest.removeErrorInterceptor(error2.id);
 			expect((frest as any).interceptors.after.has(after)).toBe(false);
 			expect((frest as any).interceptors.before.has(before)).toBe(false);
 			expect((frest as any).interceptors.error.has(error)).toBe(false);
@@ -210,6 +219,94 @@ describe('Frest', () => {
 			}).catch(done.fail);
 		});
 
+		it('Must be able to use query', (done) => {
+			fetchMock.mock('testgetq?baz=daz&foo=bar', { status: 200 }, { name: 'testgetq', method: 'GET' })
+				.mock('testreadq?foo=bar&baz=daz', { status: 200 }, { name: 'testreadq', method: 'GET' })
+				.mock('testpostq?foo=bar&baz=daz', { status: 200 }, { name: 'testpostq', method: 'POST' })
+				.mock('testcreateq?baz=daz&foo=bar', { status: 200 }, { name: 'testcreateq', method: 'POST' })
+				.mock('testputq?baz=daz&foo=bar', { status: 200 }, { name: 'testputq', method: 'PUT' })
+				.mock('testupdateq?baz=daz&foo=bar', { status: 200 }, { name: 'testupdateq', method: 'PUT' })
+				.mock('testdeleteq?baz=daz&foo=bar', { status: 200 }, { name: 'testdeleteq', method: 'DELETE' })
+				.mock('testdestroyq?baz=daz&foo=bar', { status: 200 }, { name: 'testdestroyq', method: 'DELETE' })
+				.mock('testpatchq?baz=daz&foo=bar', { status: 200 }, { name: 'testpatchq', method: 'PATCH' });
+			const frest = new Frest();
+
+			Promise.all([
+				frest.get<any>('testgetq', {query: {foo: 'bar', baz: 'daz'}}).then((res) => {
+					if (res) {
+						expect(fetchMock.called('testgetq')).toBe(true);
+						expect(res.origin.status).toBe(200);
+						return;
+					}
+					return Promise.reject('testgetq: no response returned');
+				}),
+				frest.read<any>('testreadq', {query: 'foo=bar&baz=daz'}).then((res) => {
+					if (res) {
+						expect(fetchMock.called('testreadq')).toBe(true);
+						expect(res.origin.status).toBe(200);
+						return;
+					}
+					return Promise.reject('testreadq: no response returned');
+				}),
+				frest.post<any>('testpostq', {query: '?foo=bar&baz=daz'}).then((res) => {
+					if (res) {
+						expect(fetchMock.called('testpostq')).toBe(true);
+						expect(res.origin.status).toBe(200);
+						return;
+					}
+					return Promise.reject('testpostq: no response returned');
+				}),
+				frest.create<any>('testcreateq', {query: {foo: 'bar', baz: 'daz'}}).then((res) => {
+					if (res) {
+						expect(fetchMock.called('testcreateq')).toBe(true);
+						expect(res.origin.status).toBe(200);
+						return;
+					}
+					return Promise.reject('testcreateq: no response returned');
+				}),
+				frest.put<any>('testputq', {query: {foo: 'bar', baz: 'daz'}}).then((res) => {
+					if (res) {
+						expect(fetchMock.called('testputq')).toBe(true);
+						expect(res.origin.status).toBe(200);
+						return;
+					}
+					return Promise.reject('testputq: no response returned');
+				}),
+				frest.update<any>('testupdateq', {query: {foo: 'bar', baz: 'daz'}}).then((res) => {
+					if (res) {
+						expect(fetchMock.called('testupdateq')).toBe(true);
+						expect(res.origin.status).toBe(200);
+						return;
+					}
+					return Promise.reject('testupdateq: no response returned');
+				}),
+				frest.delete<any>('testdeleteq', {query: {foo: 'bar', baz: 'daz'}}).then((res) => {
+					if (res) {
+						expect(fetchMock.called('testdeleteq')).toBe(true);
+						expect(res.origin.status).toBe(200);
+						return;
+					}
+					return Promise.reject('testdeleteq: no response returned');
+				}),
+				frest.destroy<any>('testdestroyq', {query: {foo: 'bar', baz: 'daz'}}).then((res) => {
+					if (res) {
+						expect(fetchMock.called('testdestroyq')).toBe(true);
+						expect(res.origin.status).toBe(200);
+						return;
+					}
+					return Promise.reject('testdestroyq: no response returned');
+				}),
+				frest.patch<any>('testpatchq', {query: {foo: 'bar', baz: 'daz'}}).then((res) => {
+					if (res) {
+						expect(fetchMock.called('testpatchq')).toBe(true);
+						expect(res.origin.status).toBe(200);
+						return;
+					}
+					return Promise.reject('testpatchq: no response returned');
+				}),
+			]).then(done).catch(done.fail);
+		});
+
 		it('Must handle non ok response', (done) => {
 			fetchMock.once('testerror', { status: 500 }, { name: 'testerror', method: 'GET' });
 			const frest = new Frest();
@@ -263,14 +360,14 @@ describe('Frest', () => {
 				{ status: 200, body: { foo: 'bar' } },
 				{ name: path, method: 'POST' });
 
-			const frest = new Frest({interceptors: {after: [after]}});
+			const frest = new Frest({ interceptors: { after: [after] } });
 			frest.post<any>(path)
 				.then((res) => {
 					expect(after).toHaveBeenCalledTimes(1);
 					expect(fetchMock.called(path)).toBe(true);
 					if (isWrapped(res)) {
 						expect(res.value).toBeTruthy();
-						expect(res.value).toEqual({foo: 'bar'});
+						expect(res.value).toEqual({ foo: 'bar' });
 						done();
 					} else {
 						done.fail('invalid response');
@@ -293,18 +390,57 @@ describe('Frest', () => {
 				{ status: 200, body: { foo: 'bar' } },
 				{ name: path, method: 'PUT' });
 
-			const frest = new Frest({interceptors: {after: [after]}});
-			frest.put<any>(path, {nowrap: true})
+			const frest = new Frest({ interceptors: { after: [after] } });
+			frest.put<any>(path, { nowrap: true })
 				.then((res) => {
 					expect(after).toHaveBeenCalledTimes(1);
 					expect(fetchMock.called(path)).toBe(true);
 					if (!isWrapped(res)) {
 						expect(res).toBeTruthy();
-						expect(res).toEqual({foo: 'bar'});
+						expect(res).toEqual({ foo: 'bar' });
 						done();
 					} else {
 						done.fail('invalid response');
 					}
+				})
+				.catch(done.fail);
+		});
+
+		it('Must be able to intercept errors', (done) => {
+			const path = 'testerror';
+			const error = jasmine.createSpy('error').and
+				.returnValue(Promise.resolve(null));
+			const before = jasmine.createSpy('before').and
+				.returnValue(Promise.reject('some error'));
+
+			const frest = new Frest({ interceptors: { before: [before], error: [error] } });
+			frest.request<any>(path)
+				.then((_) => {
+					done.fail('Error is not thrown');
+				})
+				.catch((err) => {
+					expect(err).toBeDefined();
+					expect(error).toHaveBeenCalledTimes(1);
+					expect(err.message).toContain('some error');
+					done();
+				});
+		});
+
+		it('Must be able to intercept errors & recover', (done) => {
+			const path = 'testerror';
+			const error = jasmine.createSpy('error').and
+				.returnValue(Promise.resolve({ foo: 'bar' }));
+			const after = jasmine.createSpy('before').and
+				.returnValue(Promise.reject('some error'));
+			fetchMock.once(path, { status: 200 }, { name: path, method: 'GET' });
+
+			const frest = new Frest({ interceptors: { after: [after], error: [error] } });
+			frest.get<any>(path)
+				.then((res) => {
+					expect(fetchMock.called(path)).toBe(true);
+					expect(error).toHaveBeenCalledTimes(1);
+					expect(res.foo).toBe('bar');
+					done();
 				})
 				.catch(done.fail);
 		});

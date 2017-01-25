@@ -250,35 +250,36 @@ export class Frest implements IFrest {
 	}
 
 	private onError = (e: any): any => {
-		let err: IFrestError = e;
-		if (!e.config && !e.request) {
-			err = new FrestError(e.message, this.config, {});
-		}
+		let err: IFrestError = this.toFestError(e);
 
 		if (this.interceptors.error.size === 0) {
 			return Promise.reject(err);
 		}
 
-		let recp: Promise<WrappedFrestResponse<any> | null> = Promise.resolve(null);
-		let recovery: WrappedFrestResponse<any> | null = null;
-		[...this.interceptors.error].some((int) => {
-			if (recovery != null) {
-				return true;
-			}
-			recp = recp.then((rec) => {
-				if (rec != null) {
-					recovery = rec;
-					return rec;
+		return new Promise<any>((resolve, reject) => {
+			let recp: Promise<WrappedFrestResponse<any> | null> = Promise.resolve(null);
+			let recovery: WrappedFrestResponse<any> | null = null;
+			[...this.interceptors.error].some((int) => {
+				if (recovery != null) {
+					return true;
 				}
-				return int(err);
-			}).catch((ee) => err = ee);
-			return false;
+				recp = recp.then((rec) => {
+					if (rec != null) {
+						recovery = rec;
+						return rec;
+					}
+					return int(err);
+				}).catch((ee) => err = this.toFestError(ee));
+				return false;
+			});
+			recp.then((res) => {
+				if (res) {
+					resolve(res);
+				} else {
+					reject(err);
+				}
+			});
 		});
-
-		if (recovery) {
-			return Promise.resolve(recovery);
-		}
-		return Promise.reject(err);
 	}
 
 	private parseQuery(query: any): string {
@@ -287,7 +288,7 @@ export class Frest implements IFrest {
 			const qq = qs.stringify(q);
 			q = qq.length > 0 ? `?${qq}` : '';
 		} else if (q !== '') {
-			q = `?${q}`;
+			q = q.charAt(0) === '?' ? q : `?${q}`;
 		}
 
 		return q;
@@ -295,5 +296,10 @@ export class Frest implements IFrest {
 
 	private trimSlashes(input: string): string {
 		return input.toString().replace(/(^\/+|\/+$)/g, '');
+	}
+
+	private toFestError(e: any): IFrestError {
+		return !e.config && !e.request ? new FrestError(e.message, this.config, {})
+			: e;
 	}
 }
