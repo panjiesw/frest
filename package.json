@@ -1,6 +1,6 @@
 {
 	"name": "frest",
-	"version": "0.3.0-dev.0",
+	"version": "0.3.0",
 	"description": "REST client for browser with Fetch",
 	"files": [
 		"es6",
