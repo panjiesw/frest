@@ -80,6 +80,21 @@ describe('Frest', () => {
 			expect((frest as any).interceptors.before.has(before)).toBe(false);
 			expect((frest as any).interceptors.error.has(error)).toBe(false);
 		});
+
+		it('Must set base', () => {
+			const frest = new Frest();
+			frest.base = 'test';
+			expect(frest.config.base).toBe('test');
+			expect(frest.base).toBe(frest.config.base);
+		});
+
+		it('Must set custom fetch', () => {
+			const f = jasmine.createSpy('fetch');
+			const frest = new Frest();
+			frest.fetchFn = f;
+			expect(frest.config.fetch).toBe(f);
+			expect(frest.fetchFn).toBe(frest.config.fetch);
+		});
 	});
 
 	describe('REST Functionality', () => {
@@ -103,6 +118,20 @@ describe('Frest', () => {
 			fetchMock.once('http://localhost/test', { status: 200 }, { name: 'test', method: 'GET' });
 			const frest = new Frest({ base: 'http://localhost/' });
 			frest.request<any>({ path: 'test', method: 'GET' }).then((res) => {
+				if (res) {
+					expect(fetchMock.called('test')).toBe(true);
+					expect(res.origin.status).toBe(200);
+					done();
+				} else {
+					done.fail('No response returned');
+				}
+			}).catch(done.fail);
+		});
+
+		it('Must call correct endpoint with array path', (done) => {
+			fetchMock.once('test/test2', { status: 200 }, { name: 'test', method: 'GET' });
+			const frest = new Frest();
+			frest.request<any>({ path: ['test', 'test2'], method: 'GET' }).then((res) => {
 				if (res) {
 					expect(fetchMock.called('test')).toBe(true);
 					expect(res.origin.status).toBe(200);
@@ -305,6 +334,20 @@ describe('Frest', () => {
 					return Promise.reject('testpatchq: no response returned');
 				}),
 			]).then(done).catch(done.fail);
+		});
+
+		it('Must call correct endpoint with config', (done) => {
+			fetchMock.once('http://localhost/test', { status: 200 }, { name: 'test', method: 'GET' });
+			const frest = new Frest({ base: 'http://localhost/' });
+			frest.get<any>({ path: 'test' }).then((res) => {
+				if (res) {
+					expect(fetchMock.called('test')).toBe(true);
+					expect(res.origin.status).toBe(200);
+					done();
+				} else {
+					done.fail('No response returned');
+				}
+			}).catch(done.fail);
 		});
 
 		it('Must handle non ok response', (done) => {
