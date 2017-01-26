@@ -1,6 +1,6 @@
 {
 	"name": "frest",
-	"version": "0.2.0",
+	"version": "0.3.0-dev.0",
 	"description": "REST client for browser with Fetch",
 	"files": [
 		"es6",
@@ -35,6 +35,7 @@
 		"build": "npm run build:es6 && npm run build:es5",
 		"build:es6": "tsc -p tsconfig.build.json",
 		"build:es5": "babel es6 -d lib",
+		"build:umd": "tsc -p tsconfig.build.json --module umd --outFile umd.js",
 		"clean": "del es6 lib",
 		"clean:cache": "del .awcache",
 		"codecov": "codecov",

@@ -3,7 +3,6 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import assign from 'object-assign';
 import { Frest } from './Frest';
 import { FrestError } from './FrestError';
 import {
@@ -18,7 +17,6 @@ import {
 	IErrorInterceptor,
 	IFrest,
 	IFrestConfig,
-	IFrestDefaultFn,
 	IFrestError,
 	IFrestRequestConfig,
 	IInterceptorSets,
@@ -27,11 +25,7 @@ import {
 
 const frest: IFrest = new Frest();
 
-function defaultFrestFn<T>(request: IFrestRequestConfig): Promise<FrestResponse<T>> {
-	return frest.request<T>(request);
-};
-
-export default assign<IFrestDefaultFn, IFrest>(defaultFrestFn, frest);
+export default frest;
 
 export {
 	Frest,
