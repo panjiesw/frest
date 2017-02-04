@@ -3,7 +3,6 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import deepAssign from 'deep-assign';
 import assign from 'object-assign';
 import qs from 'query-string';
 import { FrestError } from './FrestError';
@@ -37,7 +36,7 @@ export class Frest implements IFrest {
 	private interceptors: IInterceptorSets;
 
 	constructor(config?: FrestConfig) {
-		this.config = deepAssign({}, this.defaultConfig(), config);
+		this.config = assign({}, this.defaultConfig(), config);
 		this.config.base = this.trimSlashes(this.config.base);
 		this.interceptors = {
 			after: new Set<IAfterResponseInterceptor>(),

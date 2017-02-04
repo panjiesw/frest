@@ -10,10 +10,10 @@
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"strictNullChecks": true,
-		"outDir": "es6",
+		"outDir": ".tmp",
 		"baseUrl": ".",
 		"paths": {
-			"frest/*": ["./src/*"]
+			"frest/*": ["./src/frest/*"]
 		}
 	},
 	"exclude": [

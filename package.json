@@ -1,16 +1,10 @@
 {
-  "name": "frest",
+  "name": "frest-src",
+  "private": true,
   "version": "0.4.0-dev.0",
   "description": "REST client for browser with Fetch",
-  "files": [
-    "es6",
-    "lib"
-  ],
   "license": "MIT",
-  "main": "lib/index",
-  "module": "es6/index",
-  "jsnext:main": "es6/index",
-  "types": "lib/index.d.ts",
+  "main": "index.js",
   "homepage": "https://github.com/panjiesw/frest",
   "repository": {
     "type": "git",
@@ -34,26 +28,25 @@
   "scripts": {
     "build": "npm run build:es6 && npm run build:es5",
     "build:es6": "tsc -p tsconfig.build.json",
-    "build:es5": "babel es6 -d lib",
+    "build:es5": "babel .tmp -d .build",
     "build:umd": "tsc -p tsconfig.build.json --module umd --outFile umd.js",
-    "clean": "del es6 lib",
-    "clean:cache": "del .awcache",
+    "clean": "del .tmp .build coverage .awcache tests.js.map",
     "codecov": "codecov",
     "coverage": "npm run coverage:remap && npm run coverage:report",
     "coverage:remap": "remap-istanbul -i coverage/coverage.json -o coverage/coverage-remapped.json -t json -e node_modules",
-    "coverage:report": "node tools/coverage.js",
-    "lint": "tslint -e './node_modules/**/*' -e './lib/**/*' -e './es6/**/*' -e './**/*.d.ts' './**/*.ts'",
+    "coverage:report": "node scripts/coverage.js",
+    "dist": "node scripts/dist.js frest",
+    "lint": "tslint -e './node_modules/**/*' -e './.build/**/*' -e './.tmp/**/*' -e './**/*.d.ts' './**/*.ts'",
     "test": "cross-env NODE_ENV=test COVER=true karma start",
     "watch": "cross-env NODE_ENV=test karma start --auto-watch --no-single-run",
     "prebuild": "npm run lint && npm run clean",
-    "postbuild": "cpx './es6/**/*.d.ts' './lib'",
+    "postbuild": "cpx './.tmp/**/*.d.ts' './.build'",
     "posttest": "npm run coverage"
   },
   "optionalDependencies": {
     "whatwg-fetch": "^2.0.1"
   },
   "devDependencies": {
-    "@types/deep-assign": "^0.1.0",
     "@types/fetch-mock": "^5.8.0",
     "@types/jasmine": "^2.5.41",
     "@types/karma": "^0.13.33",
@@ -88,7 +81,6 @@
     "webpack": "^2.2.0"
   },
   "dependencies": {
-    "deep-assign": "^2.0.0",
     "object-assign": "^4.1.0",
     "query-string": "^4.3.1"
   }

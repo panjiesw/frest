@@ -1,0 +1,34 @@
+{
+  "name": "frest-src",
+  "version": "0.4.0-dev.0",
+  "description": "REST client for browser with Fetch",
+  "license": "MIT",
+  "main": "index.js",
+  "homepage": "https://github.com/panjiesw/frest",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/panjiesw/frest.git"
+  },
+  "author": {
+    "name": "Panjie Setiawan Wicaksono",
+    "email": "panjie@panjiesw.com",
+    "url": "http://panjiesw.life"
+  },
+  "bugs": {
+    "url": "https://github.com/panjiesw/frest/issues"
+  },
+  "keywords": [
+    "rest",
+    "client",
+    "browser",
+    "fetch",
+    "whatwg-fetch"
+  ],
+  "optionalDependencies": {
+    "whatwg-fetch": "^2.0.1"
+  },
+  "dependencies": {
+    "object-assign": "^4.1.0",
+    "query-string": "^4.3.1"
+  }
+}

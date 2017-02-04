@@ -26,8 +26,8 @@
 	"tslint.enable": true,
 	"tslint.ignoreDefinitionFiles": true,
 	"tslint.exclude": [
-		"./lib",
-		"./es6"
+		"./.build",
+		"./.tmp"
 	],
 	"typescript.tsdk": "./node_modules/typescript/lib",
 	"typescript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,

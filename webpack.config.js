@@ -20,7 +20,7 @@ module.exports = {
 			'node_modules'
 		],
 		alias: {
-			frest: path.join(__dirname, 'src')
+			frest: path.join(__dirname, 'src', 'frest'),
 		}
 	},
 	module: {
@@ -30,8 +30,7 @@ module.exports = {
 				loader: 'awesome-typescript-loader',
 				exclude: [
 					/node_modules/,
-					path.resolve(__dirname, 'lib'),
-					path.resolve(__dirname, 'es6')
+					path.resolve(__dirname, 'build'),
 				]
 			}
 		]
