@@ -8,21 +8,20 @@ const path = require('path');
 const cpx = require('cpx');
 // const rootPkg = require('../package.json');
 
-const allowed = ['frest', 'frest-interceptos-json'];
+const packages = ['frest', 'frest-interceptor-json'];
 // const packageJsons = {
 // 	frest: {}
 // };
-const package = process.argv[2];
+// const package = process.argv[2];
 
-if (package.length < 3) {
-	console.error('usage: node scripts/dist.js <package>');
-	return;
-} else if (allowed.indexOf(package) < 0) {
-	console.error('package not in allowed');
-	return;
-}
+// if (package.length < 3) {
+// 	console.error('usage: node scripts/dist.js <package>');
+// 	return;
+// } else if (allowed.indexOf(package) < 0) {
+// 	console.error('package not in allowed');
+// 	return;
+// }
 
-const buildDir = path.resolve(process.cwd(), '.build', package);
 // const pkg = path.resolve(buildDir, 'package.json');
 // const pkgJson = JSON.stringify(
 // 	Object.assign({},
@@ -39,9 +38,12 @@ const buildDir = path.resolve(process.cwd(), '.build', package);
 // 	fs.writeFileSync(pkg, pkgJson, { encoding: 'UTF-8' });
 // };
 
-const copyFiles = () => {
+const copyFiles = (package) => {
+	const buildDir = path.resolve(process.cwd(), '.build', package);
 	cpx.copySync(`./packages/${package}/+(README.md|LICENSE|package.json)`, buildDir);
 }
 
+packages.forEach(copyFiles)
+
 // writePkg();
-copyFiles();
+// copyFiles();

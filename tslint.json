@@ -5,6 +5,9 @@
 			true,
 			"tabs"
 		],
-		"quotemark": [true, "single", "avoid-escape"]
+		"quotemark": [true, "single", "avoid-escape"],
+		"no-unused-variable": [
+			true
+		]
 	}
 }

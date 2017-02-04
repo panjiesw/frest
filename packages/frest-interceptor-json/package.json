@@ -1,0 +1,33 @@
+{
+	"name": "frest-interceptor-json",
+	"version": "0.1.0-dev.0",
+	"description": "A set of JSON interceptors for Frest",
+	"license": "MIT",
+	"main": "index.js",
+	"homepage": "https://github.com/panjiesw/frest",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/panjiesw/frest.git"
+  },
+  "author": {
+    "name": "Panjie Setiawan Wicaksono",
+    "email": "panjie@panjiesw.com",
+    "url": "http://panjiesw.life"
+  },
+  "bugs": {
+    "url": "https://github.com/panjiesw/frest/issues"
+  },
+	"keywords": [
+		"rest",
+		"client",
+		"browser",
+		"fetch",
+		"whatwg-fetch",
+		"frest",
+		"json",
+		"interceptor"
+	],
+	"peerDependencies": {
+		"frest": ">=0.3.0"
+	}
+}
