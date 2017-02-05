@@ -17,13 +17,10 @@ import { ID_AFTER, ID_BEFORE, ID_ERROR } from './ids';
 
 export {
 	IJSONAfterResponseOption,
-}
-
-export default {
 	after,
 	before,
 	error,
 	ID_AFTER,
 	ID_BEFORE,
 	ID_ERROR,
-};
+}

@@ -3,7 +3,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-const webpackConfig = require('./webpack.config');
+const webpackConfig = require('./webpack.config')({t: true});
 
 module.exports = function(config) {
 	const conf = {

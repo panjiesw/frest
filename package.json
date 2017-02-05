@@ -26,10 +26,9 @@
     "whatwg-fetch"
   ],
   "scripts": {
-    "build": "npm run build:es6 && npm run build:es5",
+    "build": "npm run build:es6 && npm run build:es5 && npm run umd && node scripts/umd-hack.js",
     "build:es6": "tsc -p tsconfig.build.json",
     "build:es5": "babel .tmp -d .build",
-    "build:umd": "tsc -p tsconfig.build.json --module umd --outFile umd.js",
     "clean": "del .tmp .build coverage .awcache tests.js.map",
     "codecov": "codecov",
     "copy": "node scripts/copy-pkg.js",
@@ -38,6 +37,7 @@
     "coverage:report": "node scripts/coverage.js",
     "lint": "tslint -e './node_modules/**/*' -e './.build/**/*' -e './.tmp/**/*' -e './**/*.d.ts' './**/*.ts'",
     "test": "cross-env NODE_ENV=test COVER=true karma start",
+    "umd": "webpack --env.p --progress && webpack --env.p --env.m --progress --profile --optimize-minimize",
     "watch": "cross-env NODE_ENV=test karma start --auto-watch --no-single-run",
     "prebuild": "npm run lint && npm run clean",
     "postbuild": "cpx './.tmp/**/*.d.ts' './.build'",
@@ -58,6 +58,7 @@
     "awesome-typescript-loader": "^3.0.0-beta.18",
     "babel-cli": "^6.18.0",
     "babel-preset-env": "^1.1.8",
+    "camelcase": "^4.0.0",
     "codecov": "^1.0.1",
     "core-js": "^2.4.1",
     "cpx": "^1.5.0",
@@ -76,12 +77,29 @@
     "karma-spec-reporter": "^0.0.26",
     "karma-webpack": "^2.0.1",
     "remap-istanbul": "^0.8.4",
+    "replace-in-file": "^2.2.2",
     "tslint": "^4.3.1",
     "typescript": "^2.1.5",
-    "webpack": "^2.2.0"
+    "webpack": "^2.2.0",
+    "webpack-merge": "^2.6.1"
   },
   "dependencies": {
     "object-assign": "^4.1.0",
     "query-string": "^4.3.1"
+  },
+  "babel": {
+    "presets": [
+      [
+        "env",
+        {
+          "targets": {
+            "browsers": [
+              "last 2 versions",
+              "> 5%"
+            ]
+          }
+        }
+      ]
+    ]
   }
 }

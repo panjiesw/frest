@@ -1,5 +1,5 @@
 {
-  "name": "frest-src",
+  "name": "frest",
   "version": "0.4.0-dev.0",
   "description": "REST client for browser with Fetch",
   "license": "MIT",

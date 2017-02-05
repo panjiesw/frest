@@ -28,6 +28,7 @@ const frest: IFrest = new Frest();
 export default frest;
 
 export {
+	frest,
 	Frest,
 	FrestError,
 	FrestResponse,
