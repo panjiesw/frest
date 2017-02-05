@@ -1,6 +1,6 @@
 {
   "name": "frest",
-  "version": "0.4.0",
+  "version": "0.5.0-dev.0",
   "description": "REST client for browser with Fetch",
   "license": "MIT",
   "main": "index.js",
