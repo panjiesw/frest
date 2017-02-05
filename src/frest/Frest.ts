@@ -268,7 +268,9 @@ export class Frest implements IFrest {
 						return rec;
 					}
 					return int(err);
-				}).catch((ee) => err = this.toFestError(ee));
+				}).catch((ee) => {
+					err = this.toFestError(ee);
+				});
 				return false;
 			});
 			recp.then((res) => {

@@ -20,6 +20,7 @@ const error: () => IErrorInterceptor = () => {
 				if (ct && ct.indexOf('application/json') >= 0 && !bodyUsed) {
 					response.origin.json().then((value) => {
 						response.value = value;
+						err.response = response;
 						reject(err);
 					});
 					return;

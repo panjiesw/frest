@@ -8,6 +8,9 @@
 		"quotemark": [true, "single", "avoid-escape"],
 		"no-unused-variable": [
 			true
+		],
+		"ordered-imports": [
+			false
 		]
 	}
 }

@@ -21,6 +21,7 @@ export interface IFrestRequestConfig extends RequestInit {
 	fetch?: typeof window.fetch;
 	skip?: string[];
 	nowrap?: boolean;
+	body?: any;
 }
 
 export type FrestRequest = string | string[] | IFrestRequestConfig;

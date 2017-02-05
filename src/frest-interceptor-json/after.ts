@@ -18,7 +18,7 @@ const after: (options?: IJSONAfterResponseOption) => IAfterResponseInterceptor =
 	(options: IJSONAfterResponseOption = {}) => {
 		const interceptor: IAfterResponseInterceptor = (input: AfterResponseInterceptorArg) =>
 			new Promise<WrappedFrestResponse<any>>((resolve, reject) => {
-				const {origin} = input.response;
+				const {origin, value: originValue} = input.response;
 				const {headers, bodyUsed, status} = origin;
 				const ct = headers.get('Content-Type');
 				if (!bodyUsed) {
@@ -34,8 +34,10 @@ const after: (options?: IJSONAfterResponseOption) => IAfterResponseInterceptor =
 									reject(err);
 								}
 							});
+						return;
 					}
 				}
+				resolve({origin, value: originValue});
 			});
 
 		Object.defineProperty(interceptor, 'id', { value: ID_AFTER });
