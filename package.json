@@ -26,7 +26,7 @@
     "whatwg-fetch"
   ],
   "scripts": {
-    "build": "npm run build:es6 && npm run build:es5 && npm run umd && node scripts/umd-hack.js",
+    "build": "npm run build:es6 && npm run build:es5 && npm run copy && npm run umd && node scripts/umd-hack.js",
     "build:es6": "tsc -p tsconfig.build.json",
     "build:es5": "babel .tmp -d .build",
     "clean": "del .tmp .build coverage .awcache tests.js.map",
