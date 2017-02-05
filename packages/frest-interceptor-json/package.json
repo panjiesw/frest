@@ -1,6 +1,6 @@
 {
 	"name": "frest-interceptor-json",
-	"version": "0.1.0",
+	"version": "0.2.0-dev.0",
 	"description": "A set of JSON interceptors for Frest",
 	"license": "MIT",
 	"main": "index.js",
