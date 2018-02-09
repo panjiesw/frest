@@ -4,18 +4,19 @@
 // https://opensource.org/licenses/MIT
 
 import {
-	IFrestConfig,
-	IFrestError,
-	IFrestRequestConfig,
-	IWrappedFrestResponse,
+  IFrestConfig,
+  IFrestError,
+  IFrestRequestConfig,
+  IWrappedFrestResponse,
 } from './shapes';
 
 export class FrestError extends Error implements IFrestError {
-	constructor(
-		message: string,
-		public config: IFrestConfig,
-		public request: IFrestRequestConfig,
-		public response?: IWrappedFrestResponse<any>) {
-		super(message);
-	}
+  constructor(
+    message: string,
+    public config: IFrestConfig,
+    public request: IFrestRequestConfig,
+    public response?: IWrappedFrestResponse<any>,
+  ) {
+    super(message);
+  }
 }

@@ -1,18 +1,18 @@
 {
-	"extends": "../../tsconfig.json",
-	"compilerOptions": {
-		"declaration": true,
-		"removeComments": true,
-		"rootDir": "src",
-		"outDir": "build",
-		"declarationDir": "lib"
-	},
-	"exclude": [
-		"../../node_modules",
-		"node_modules",
-		"build",
-		"es",
-		"lib",
-		"umd",
-	]
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "declaration": true,
+    "removeComments": true,
+    "rootDir": "src",
+    "outDir": "build",
+    "declarationDir": "lib"
+  },
+  "exclude": [
+    "../../node_modules",
+    "node_modules",
+    "build",
+    "es",
+    "lib",
+    "umd"
+  ]
 }

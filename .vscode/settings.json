@@ -2,7 +2,7 @@
 {
 	"css.validate": false,
 	"editor.tabSize": 2,
-	"editor.insertSpaces": false,
+	"editor.insertSpaces": true,
 	"editor.detectIndentation": true,
 	"editor.renderWhitespace": "boundary",
 	"editor.rulers": [
@@ -33,5 +33,9 @@
 	"typescript.tsdk": "./node_modules/typescript/lib",
 	"typescript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
 	"javascript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
-	"xo.enable": false
+	"xo.enable": false,
+	"prettier.singleQuote": true,
+	"prettier.useTabs": false,
+	"prettier.trailingComma": "all",
+	"prettier.printWidth": 80
 }

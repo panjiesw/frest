@@ -1,9 +1,12 @@
 {
-	"extends": "tslint:recommended",
+	"extends": [
+		"tslint:latest",
+		"tslint-config-prettier"
+	],
 	"rules": {
 		"indent": [
 			true,
-			"tabs"
+			"spaces"
 		],
 		"quotemark": [true, "single", "avoid-escape"],
 		"no-unused-variable": [
