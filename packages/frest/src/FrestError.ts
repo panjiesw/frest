@@ -7,7 +7,7 @@ import {
 	IFrestConfig,
 	IFrestError,
 	IFrestRequestConfig,
-	WrappedFrestResponse,
+	IWrappedFrestResponse,
 } from './shapes';
 
 export class FrestError extends Error implements IFrestError {
@@ -15,7 +15,7 @@ export class FrestError extends Error implements IFrestError {
 		message: string,
 		public config: IFrestConfig,
 		public request: IFrestRequestConfig,
-		public response?: WrappedFrestResponse<any>) {
+		public response?: IWrappedFrestResponse<any>) {
 		super(message);
 	}
 }

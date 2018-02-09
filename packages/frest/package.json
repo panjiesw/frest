@@ -3,7 +3,9 @@
   "version": "0.5.0-dev.0",
   "description": "REST client for browser with Fetch",
   "license": "MIT",
-  "main": "index.js",
+  "main": "lib/index.js",
+  "module": "es/index.js",
+  "typings": "lib/index.d.ts",
   "homepage": "https://github.com/panjiesw/frest",
   "repository": {
     "type": "git",
@@ -24,11 +26,39 @@
     "fetch",
     "whatwg-fetch"
   ],
-  "optionalDependencies": {
-    "whatwg-fetch": "^2.0.1"
+  "files": [
+    "es/",
+    "lib/",
+    "umd/"
+  ],
+  "scripts": {
+    "b:b": "tsc",
+    "b:es": "babel build -d es",
+    "b:lib": "cross-env BABEL_ENV=lib babel build -d lib",
+    "build": "run-s clean b:*",
+    "clean": "del-cli build es lib"
+  },
+  "devDependencies": {
+    "@types/node": "8.9.1",
+    "@types/object-assign": "^4.0.30",
+    "@types/query-string": "^5.0.1",
+    "ava": "^0.25.0",
+    "babel-cli": "^6.26.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.6.1",
+    "cross-env": "^5.1.3",
+    "del-cli": "^1.1.0",
+    "fetch-mock": "^6.0.0",
+    "npm-run-all": "^4.1.2",
+    "nyc": "^11.4.1",
+    "tslint": "^5.9.1",
+    "typescript": "^2.7.1"
   },
   "dependencies": {
-    "object-assign": "^4.1.0",
-    "query-string": "^4.3.1"
+    "object-assign": "^4.1.1",
+    "query-string": "^5.1.0"
+  },
+  "optionalDependencies": {
+    "whatwg-fetch": "^2.0.3"
   }
 }

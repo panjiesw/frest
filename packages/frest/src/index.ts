@@ -6,8 +6,8 @@
 import { Frest } from './Frest';
 import { FrestError } from './FrestError';
 import {
-	AfterResponseInterceptorArg,
-	BeforeRequestInterceptorArg,
+	IAfterResponseInterceptorArg,
+	IBeforeRequestInterceptorArg,
 	FrestConfig,
 	FrestRequest,
 	FrestResponse,
@@ -20,7 +20,7 @@ import {
 	IFrestError,
 	IFrestRequestConfig,
 	IInterceptorSets,
-	WrappedFrestResponse,
+	IWrappedFrestResponse,
 } from './shapes';
 
 const frest: IFrest = new Frest();
@@ -32,11 +32,11 @@ export {
 	Frest,
 	FrestError,
 	FrestResponse,
-	WrappedFrestResponse,
+	IWrappedFrestResponse,
 	IFrest,
 	IFrestRequestConfig,
-	AfterResponseInterceptorArg,
-	BeforeRequestInterceptorArg,
+	IAfterResponseInterceptorArg,
+	IBeforeRequestInterceptorArg,
 	FrestConfig,
 	FrestRequest,
 	IAfterResponseInterceptor,
@@ -46,4 +46,4 @@ export {
 	IFrestConfig,
 	IFrestError,
 	IInterceptorSets,
-}
+};

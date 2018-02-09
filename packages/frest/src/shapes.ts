@@ -26,12 +26,12 @@ export interface IFrestRequestConfig extends RequestInit {
 
 export type FrestRequest = string | string[] | IFrestRequestConfig;
 
-export type WrappedFrestResponse<T> = {
+export interface IWrappedFrestResponse<T> {
 	origin: Response;
 	value?: T;
-};
+}
 
-export type FrestResponse<T> = (T | null) | WrappedFrestResponse<T>;
+export type FrestResponse<T> = (T | null) | IWrappedFrestResponse<T>;
 
 export interface IFrest {
 	config: IFrestConfig;
@@ -55,41 +55,39 @@ export interface IFrest {
 	destroy<T>(pathOrConfig: FrestRequest, requestConfig?: IFrestRequestConfig): Promise<FrestResponse<T>>;
 }
 
-export interface IFrestDefaultFn {
-	<T>(request: IFrestRequestConfig): Promise<FrestResponse<T>>;
-}
+export type FrestDefaultFn = <T>(request: IFrestRequestConfig) => Promise<FrestResponse<T>>;
 
 export interface IFrestError {
 	message: string;
 	config: IFrestConfig;
 	request: IFrestRequestConfig;
-	response?: WrappedFrestResponse<any>;
+	response?: IWrappedFrestResponse<any>;
 }
 
-export type BeforeRequestInterceptorArg = {
+export interface IBeforeRequestInterceptorArg {
 	config: IFrestConfig;
 	request: IFrestRequestConfig;
-};
+}
 
-export type AfterResponseInterceptorArg = {
+export interface IAfterResponseInterceptorArg {
 	config: IFrestConfig;
-	response: WrappedFrestResponse<any>;
-};
+	response: IWrappedFrestResponse<any>;
+}
 
 export interface ICommonInterceptor {
 	id?: string;
 }
 
 export interface IBeforeRequestInterceptor extends ICommonInterceptor {
-	(input: BeforeRequestInterceptorArg): Promise<IFrestRequestConfig>;
+	(input: IBeforeRequestInterceptorArg): Promise<IFrestRequestConfig>;
 }
 
 export interface IAfterResponseInterceptor extends ICommonInterceptor {
-	(response: AfterResponseInterceptorArg): Promise<WrappedFrestResponse<any>>;
+	(response: IAfterResponseInterceptorArg): Promise<IWrappedFrestResponse<any>>;
 }
 
 export interface IErrorInterceptor extends ICommonInterceptor {
-	(error: IFrestError): Promise<WrappedFrestResponse<any> | null>;
+	(error: IFrestError): Promise<IWrappedFrestResponse<any> | null>;
 }
 
 export interface IInterceptorSets {

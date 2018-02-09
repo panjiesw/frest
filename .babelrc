@@ -1,0 +1,30 @@
+{
+	"presets": [
+		[
+			"env",
+			{
+				"modules": false
+			}
+		]
+	],
+  "plugins": [
+    [
+      "transform-runtime",
+      {
+        "polyfill": false
+      }
+    ]
+  ],
+  "env": {
+    "lib": {
+      "presets": [
+				[
+					"env",
+					{
+						"modules": "commonjs"
+					}
+				]
+			]
+    }
+  }
+}

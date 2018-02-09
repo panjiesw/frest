@@ -18,7 +18,7 @@ import {
 	IFrestError,
 	IFrestRequestConfig,
 	IInterceptorSets,
-	WrappedFrestResponse,
+	IWrappedFrestResponse,
 } from './shapes';
 
 interface IIntAfterFetch {
@@ -27,7 +27,7 @@ interface IIntAfterFetch {
 }
 
 interface IIntTransform {
-	response: WrappedFrestResponse<any>;
+	response: IWrappedFrestResponse<any>;
 	request: IFrestRequestConfig;
 }
 
@@ -225,7 +225,7 @@ export class Frest implements IFrest {
 				request,
 				{ origin: response, value: null }));
 		}
-		let resp: Promise<WrappedFrestResponse<any>> = Promise.resolve({ origin: response });
+		let resp: Promise<IWrappedFrestResponse<any>> = Promise.resolve({ origin: response });
 		this.interceptors.after.forEach((af) => {
 			resp = resp.then((r) => af({ config: this.config, response: r }));
 		});
@@ -256,8 +256,8 @@ export class Frest implements IFrest {
 		}
 
 		return new Promise<any>((resolve, reject) => {
-			let recp: Promise<WrappedFrestResponse<any> | null> = Promise.resolve(null);
-			let recovery: WrappedFrestResponse<any> | null = null;
+			let recp: Promise<void | IWrappedFrestResponse<any> | null> = Promise.resolve(null);
+			let recovery: IWrappedFrestResponse<any> | null = null;
 			[...this.interceptors.error].some((int) => {
 				if (recovery != null) {
 					return true;

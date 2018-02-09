@@ -1,12 +1,10 @@
 {
   "name": "frest-src",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "REST client for browser with Fetch",
   "license": "MIT",
-  "workspaces": [
-		"packages/*"
-	],
+  "main": "index.js",
   "homepage": "https://github.com/panjiesw/frest",
   "repository": {
     "type": "git",
@@ -45,13 +43,63 @@
     "postbuild": "cpx './.tmp/**/*.d.ts' './.build'",
     "posttest": "npm run coverage"
   },
+  "optionalDependencies": {
+    "whatwg-fetch": "^2.0.1"
+  },
   "devDependencies": {
-    "husky": "^0.14.3",
-    "lerna": "^2.8.0",
-    "lint-staged": "^6.1.0",
-    "prettier": "^1.10.2",
-    "tslint": "^5.9.1",
-    "tslint-config-prettier": "^1.7.0",
-    "typescript": "^2.7.1"
+    "@types/fetch-mock": "^5.8.0",
+    "@types/jasmine": "^2.5.41",
+    "@types/karma": "^0.13.33",
+    "@types/node": "^7.0.0",
+    "@types/object-assign": "^4.0.30",
+    "@types/query-string": "^3.0.31",
+    "@types/webpack": "^2.2.2",
+    "@types/whatwg-fetch": "^0.0.33",
+    "awesome-typescript-loader": "^3.0.0-beta.18",
+    "babel-cli": "^6.18.0",
+    "babel-preset-env": "^1.1.8",
+    "camelcase": "^4.0.0",
+    "codecov": "^1.0.1",
+    "core-js": "^2.4.1",
+    "cpx": "^1.5.0",
+    "cross-env": "^3.1.4",
+    "del-cli": "^0.2.1",
+    "fetch-mock": "^5.8.1",
+    "istanbul": "^0.4.5",
+    "jasmine-core": "^2.5.2",
+    "karma": "^1.4.0",
+    "karma-cli": "^1.0.1",
+    "karma-coverage": "^1.1.1",
+    "karma-jasmine": "^1.1.0",
+    "karma-phantomjs-launcher": "^1.0.2",
+    "karma-sourcemap-loader": "^0.3.7",
+    "karma-sourcemap-writer": "^0.1.2",
+    "karma-spec-reporter": "^0.0.26",
+    "karma-webpack": "^2.0.1",
+    "remap-istanbul": "^0.8.4",
+    "replace-in-file": "^2.2.2",
+    "tslint": "^4.3.1",
+    "typescript": "^2.1.5",
+    "webpack": "^2.2.0",
+    "webpack-merge": "^2.6.1"
+  },
+  "dependencies": {
+    "object-assign": "^4.1.0",
+    "query-string": "^4.3.1"
+  },
+  "babel": {
+    "presets": [
+      [
+        "env",
+        {
+          "targets": {
+            "browsers": [
+              "last 2 versions",
+              "> 5%"
+            ]
+          }
+        }
+      ]
+    ]
   }
 }
