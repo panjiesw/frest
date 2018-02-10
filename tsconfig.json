@@ -14,8 +14,10 @@
 		"noImplicitReturns": true,
 		"noImplicitThis": true,
 		"noUnusedParameters": true,
+		"noUnusedLocals": true,
 		"strictNullChecks": true,
-		"importHelpers": true
+		"importHelpers": true,
+		"esModuleInterop": true
 	},
 	"exclude": [
 		"node_modules"

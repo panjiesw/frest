@@ -1,6 +1,7 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "sourceMap": true,
     "declaration": true,
     "removeComments": true,
     "module": "commonjs",
@@ -13,6 +14,7 @@
     "build",
     "es",
     "lib",
-    "umd"
+    "umd",
+    "webpack.config.js"
   ]
 }

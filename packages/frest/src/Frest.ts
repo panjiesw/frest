@@ -233,8 +233,14 @@ export class Frest implements IFrest {
     return this.delete<T>(pathOrConfig, requestConfig);
   }
 
+  public isWrapped<T = any>(
+    res: TFrestResponse<T>,
+  ): res is IWrappedFrestResponse<T> {
+    return (res as IWrappedFrestResponse).origin !== undefined;
+  }
+
   private findInterceptor(arr: ICommonInterceptor[], id?: string): number {
-    let found  = false;
+    let found = false;
     let i = 0;
     while (i < arr.length) {
       found = arr[i].id === id;
@@ -283,11 +289,21 @@ export class Frest implements IFrest {
   private doBefore(config: IFrestRequestConfig) {
     return new Promise<IFrestRequestConfig>((resolve, reject) => {
       let requestPromise = Promise.resolve<IFrestRequestConfig>(config);
-      this.interceptors.before.forEach(requestInterceptor => {
-        requestPromise = requestPromise.then(r =>
-          requestInterceptor({ config: this._config, request: r }),
-        );
-      });
+      for (const requestInterceptor of this.interceptors.before) {
+        requestPromise = requestPromise.then(requestConfig => {
+          if (!requestConfig) {
+            throw new Error(
+              `interceptor id ${
+                requestInterceptor.id
+              } didn't return request config`,
+            );
+          }
+          return requestInterceptor({
+            config: this._config,
+            requestConfig,
+          });
+        });
+      }
 
       requestPromise.then(resolve).catch(e => {
         const cause = typeof e === 'string' ? e : e.message ? e.message : e;
@@ -342,18 +358,28 @@ export class Frest implements IFrest {
           }`,
           this._config,
           request,
-          { origin: response, value: null },
+          { origin: response },
         ),
       );
     }
     let responsePromise: Promise<IWrappedFrestResponse<T>> = Promise.resolve({
       origin: response,
     });
-    this.interceptors.after.forEach(responseInterceptor => {
-      responsePromise = responsePromise.then(r =>
-        responseInterceptor({ config: this._config, response: r }),
-      );
-    });
+    for (const responseInterceptor of this.interceptors.after) {
+      responsePromise = responsePromise.then(wrappedResponse => {
+        if (!wrappedResponse) {
+          throw new Error(
+            `interceptor id ${
+              responseInterceptor.id
+            } didn't return original wrapped response`,
+          );
+        }
+        return responseInterceptor({
+          config: this._config,
+          wrappedResponse,
+        });
+      });
+    }
     return responsePromise.then(r => ({ request, response: r })).catch(e => {
       const cause = typeof e === 'string' ? e : e.message ? e.message : e;
       return Promise.reject(
@@ -361,7 +387,7 @@ export class Frest implements IFrest {
           `Error in after response intercepor: ${cause}`,
           this._config,
           request,
-          { origin: response, value: null },
+          { origin: response },
         ),
       );
     });

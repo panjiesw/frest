@@ -13,6 +13,7 @@
 			true
 		],
 		"ordered-imports": false,
-		"variable-name": false
+		"variable-name": false,
+		"no-implicit-dependencies": false
 	}
 }

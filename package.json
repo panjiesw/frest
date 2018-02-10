@@ -5,8 +5,8 @@
   "description": "REST client for browser with Fetch",
   "license": "MIT",
   "workspaces": [
-		"packages/*"
-	],
+    "packages/*"
+  ],
   "homepage": "https://github.com/panjiesw/frest",
   "repository": {
     "type": "git",
@@ -28,29 +28,15 @@
     "whatwg-fetch"
   ],
   "scripts": {
-    "build": "npm run build:es6 && npm run build:es5 && npm run copy && npm run umd && node scripts/umd-hack.js",
-    "build:es6": "tsc -p tsconfig.build.json",
-    "build:es5": "babel .tmp -d .build",
-    "clean": "del .tmp .build coverage .awcache tests.js.map",
-    "codecov": "codecov",
-    "copy": "node scripts/copy-pkg.js",
-    "coverage": "npm run coverage:remap && npm run coverage:report",
-    "coverage:remap": "remap-istanbul -i coverage/coverage.json -o coverage/coverage-remapped.json -t json -e node_modules",
-    "coverage:report": "node scripts/coverage.js",
-    "lint": "tslint -e './node_modules/**/*' -e './.build/**/*' -e './.tmp/**/*' -e './**/*.d.ts' './**/*.ts'",
-    "test": "cross-env NODE_ENV=test COVER=true karma start",
-    "umd": "webpack --env.p --progress && webpack --env.p --env.m --progress --profile --optimize-minimize",
-    "watch": "cross-env NODE_ENV=test karma start --auto-watch --no-single-run",
-    "prebuild": "npm run lint && npm run clean",
-    "postbuild": "cpx './.tmp/**/*.d.ts' './.build'",
-    "posttest": "npm run coverage",
-
-    "format:ts": "prettier --trailing-comma all --single-quote --write \"packages/*/*.js\" \"packages/*/*.ts\" \"packages/*/src/**/*.{ts,tsx}\""
+    "format:ts": "prettier --trailing-comma all --single-quote --write \"packages/*/*.js\" \"packages/*/*.ts\" \"packages/*/src/**/*.{ts,tsx}\"",
+    "t:frest": "lerna run --scope=frest test",
+    "test": "run-p t:*"
   },
   "devDependencies": {
     "husky": "^0.14.3",
     "lerna": "^2.8.0",
     "lint-staged": "^6.1.0",
+    "npm-run-all": "^4.1.2",
     "prettier": "^1.10.2",
     "tslint": "^5.9.1",
     "tslint-config-prettier": "^1.7.0",

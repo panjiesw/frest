@@ -35,10 +35,35 @@
     "b:es": "tsc",
     "b:lib": "tsc -p tsconfig.lib.json",
     "b:umd": "webpack --profile --display-modules --display-reasons",
-    "build": "run-s clean b:*",
-    "clean": "del-cli es lib umd"
+    "build": "run-s del b:*",
+    "d:unit": "del-cli lib .nyc_output coverage",
+    "del": "del-cli es lib umd .nyc_output coverage node_modules/.cache",
+    "t:a": "cross-env NODE_ENV=test nyc ava --tap | faucet",
+    "test": "run-s unit report",
+    "unit": "run-s d:unit b:lib t:a",
+    "report": "nyc report",
+    "w:lib": "yarn b:lib -w",
+    "w:a": "ava --watch",
+    "start": "run-p w:lib w:a"
+  },
+  "ava": {
+    "concurrency": 5,
+    "files": [
+      "lib/__tests__/**/*.js"
+    ],
+    "require": [
+      "./src/__tests__/_helpers.js"
+    ]
+  },
+  "nyc": {
+    "reporter": [
+      "text",
+      "lcov",
+      "cobertura"
+    ]
   },
   "devDependencies": {
+    "@types/fetch-mock": "^5.12.2",
     "@types/node": "8.9.1",
     "@types/object-assign": "^4.0.30",
     "@types/query-string": "^5.0.1",

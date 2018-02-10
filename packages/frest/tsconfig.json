@@ -2,6 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "removeComments": true,
+    "sourceMap": true,
     "rootDir": "src",
     "outDir": "es"
   },
@@ -11,6 +12,7 @@
     "build",
     "es",
     "lib",
-    "umd"
+    "umd",
+    "webpack.config.js"
   ]
 }

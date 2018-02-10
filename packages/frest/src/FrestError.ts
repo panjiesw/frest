@@ -15,7 +15,7 @@ export class FrestError extends Error implements IFrestError {
     message: string,
     public config: IFrestConfig,
     public request: IFrestRequestConfig,
-    public response?: IWrappedFrestResponse<any>,
+    public wrappedResponse?: IWrappedFrestResponse<any>,
   ) {
     super(message);
   }

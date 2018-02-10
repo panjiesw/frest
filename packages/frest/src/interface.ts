@@ -47,12 +47,13 @@ export interface IWrappedFrestResponse<T = any> {
   value?: T;
 }
 
-export type TFrestResponse<T = any> = (T | null) | IWrappedFrestResponse<T>;
+export type TFrestResponse<T = any> = (T | undefined) | IWrappedFrestResponse<T>;
 
 export interface IFrest {
   readonly base: string;
   readonly config: IFrestConfig;
   readonly fetchFn: typeof fetch;
+  isWrapped<T = any>(res: TFrestResponse<T>): res is IWrappedFrestResponse<T>;
   mergeConfig(config: Partial<IFrestConfig>): void;
   addAfterResponseInterceptor(interceptor: IAfterResponseInterceptor): void;
   addBeforeRequestInterceptor(interceptor: IBeforeRequestInterceptor): void;
@@ -110,17 +111,17 @@ export interface IFrestError {
   message: string;
   config: IFrestConfig;
   request: IFrestRequestConfig;
-  response?: IWrappedFrestResponse<any>;
+  wrappedResponse?: IWrappedFrestResponse<any>;
 }
 
 export interface IBeforeRequestInterceptorArg {
   config: IFrestConfig;
-  request: IFrestRequestConfig;
+  requestConfig: IFrestRequestConfig;
 }
 
 export interface IAfterResponseInterceptorArg {
   config: IFrestConfig;
-  response: IWrappedFrestResponse<any>;
+  wrappedResponse: IWrappedFrestResponse<any>;
 }
 
 export interface ICommonInterceptor {

@@ -1,3 +1,4 @@
+// @ts-nocheck
 const nodeFetch = require('node-fetch');
 const formData = require('form-data');
 const browserEnv = require('browser-env');
