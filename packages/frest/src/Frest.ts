@@ -7,9 +7,9 @@ import assign from 'object-assign';
 import qs from 'query-string';
 import { FrestError } from './FrestError';
 import {
-  FrestConfig,
-  FrestRequest,
-  FrestResponse,
+  TFrestConfig,
+  TFrestRequest,
+  TFrestResponse,
   IAfterResponseInterceptor,
   IBeforeRequestInterceptor,
   IErrorInterceptor,
@@ -19,78 +19,97 @@ import {
   IFrestRequestConfig,
   IInterceptorSets,
   IWrappedFrestResponse,
-} from './shapes';
+  ICommonInterceptor,
+} from './interface';
 
-interface IIntAfterFetch {
+interface IInternalAfterFetch {
   response: Response;
   request: IFrestRequestConfig;
 }
 
-interface IIntTransform {
+interface IInternalTransform {
   response: IWrappedFrestResponse<any>;
   request: IFrestRequestConfig;
 }
 
+export const FREST_DEFAULT_CONFIG: IFrestConfig = {
+  base: '',
+  fetch,
+  headers: new Headers(),
+  interceptors: {},
+  method: 'GET',
+};
+
 export class Frest implements IFrest {
-  public config: IFrestConfig;
+  private _config: IFrestConfig;
   private interceptors: IInterceptorSets;
 
-  constructor(config?: FrestConfig) {
-    this.config = assign({}, this.defaultConfig(), config);
-    this.config.base = this.trimSlashes(this.config.base);
+  constructor(config?: TFrestConfig) {
+    if (config && typeof config === 'string') {
+      this._config = assign({}, FREST_DEFAULT_CONFIG, { base: config });
+    } else if (config && typeof config === 'object') {
+      this._config = assign({}, FREST_DEFAULT_CONFIG, config);
+    } else {
+      this._config = assign({}, FREST_DEFAULT_CONFIG);
+    }
+    this._config.base = this.trimSlashes(this._config.base);
     this.interceptors = {
-      after: new Set<IAfterResponseInterceptor>(),
-      before: new Set<IBeforeRequestInterceptor>(),
-      error: new Set<IErrorInterceptor>(),
+      after: [],
+      before: [],
+      error: [],
     };
-    if (this.config.interceptors.after) {
-      this.interceptors.after = new Set(this.config.interceptors.after);
+    if (this._config.interceptors.after) {
+      this.interceptors.after = this._config.interceptors.after;
     }
-    if (this.config.interceptors.before) {
-      this.interceptors.before = new Set(this.config.interceptors.before);
+    if (this._config.interceptors.before) {
+      this.interceptors.before = this._config.interceptors.before;
     }
-    if (this.config.interceptors.error) {
-      this.interceptors.error = new Set(this.config.interceptors.error);
+    if (this._config.interceptors.error) {
+      this.interceptors.error = this._config.interceptors.error;
     }
   }
 
-  public set base(base: string) {
-    this.config.base = base;
+  public get config(): IFrestConfig {
+    return this._config;
   }
 
   public get base(): string {
-    return this.config.base;
+    return this._config.base;
   }
 
-  public set fetchFn(fetchFn: typeof window.fetch) {
-    this.config.fetch = fetchFn;
+  public mergeConfig(config: Partial<IFrestConfig>) {
+    this._config = assign({}, this._config, config);
   }
 
   public get fetchFn(): typeof window.fetch {
-    return this.config.fetch;
+    return this._config.fetch;
   }
 
   public addAfterResponseInterceptor(interceptor: IAfterResponseInterceptor) {
-    this.interceptors.after.add(interceptor);
+    this.interceptors.after.push(interceptor);
   }
 
   public addBeforeRequestInterceptor(interceptor: IBeforeRequestInterceptor) {
-    this.interceptors.before.add(interceptor);
+    this.interceptors.before.push(interceptor);
   }
 
   public addErrorInterceptor(interceptor: IErrorInterceptor) {
-    this.interceptors.error.add(interceptor);
+    this.interceptors.error.push(interceptor);
   }
 
   public removeAfterResponseInterceptor(
     idOrValue: string | IAfterResponseInterceptor,
   ) {
     if (typeof idOrValue === 'string') {
-      this.interceptors.after = new Set(
-        [...this.interceptors.after].filter(a => a.id !== idOrValue),
-      );
+      const idx = this.findInterceptor(this.interceptors.after, idOrValue);
+      if (idx > -1) {
+        this.interceptors.after.splice(idx, 1);
+      }
     } else {
-      this.interceptors.after.delete(idOrValue);
+      const idx = this.findInterceptor(this.interceptors.after, idOrValue.id);
+      if (idx > -1) {
+        this.interceptors.after.splice(idx, 1);
+      }
     }
   }
 
@@ -98,144 +117,184 @@ export class Frest implements IFrest {
     idOrValue: string | IBeforeRequestInterceptor,
   ) {
     if (typeof idOrValue === 'string') {
-      this.interceptors.before = new Set(
-        [...this.interceptors.before].filter(a => a.id !== idOrValue),
-      );
+      const idx = this.findInterceptor(this.interceptors.before, idOrValue);
+      if (idx > -1) {
+        this.interceptors.before.splice(idx, 1);
+      }
     } else {
-      this.interceptors.before.delete(idOrValue);
+      const idx = this.findInterceptor(this.interceptors.before, idOrValue.id);
+      if (idx > -1) {
+        this.interceptors.before.splice(idx, 1);
+      }
     }
   }
 
   public removeErrorInterceptor(idOrValue: string | IErrorInterceptor) {
     if (typeof idOrValue === 'string') {
-      this.interceptors.error = new Set(
-        [...this.interceptors.error].filter(a => a.id !== idOrValue),
-      );
+      const idx = this.findInterceptor(this.interceptors.error, idOrValue);
+      if (idx > -1) {
+        this.interceptors.error.splice(idx, 1);
+      }
     } else {
-      this.interceptors.error.delete(idOrValue);
+      const idx = this.findInterceptor(this.interceptors.error, idOrValue.id);
+      if (idx > -1) {
+        this.interceptors.error.splice(idx, 1);
+      }
     }
   }
 
-  public request<T>(config: IFrestRequestConfig): Promise<FrestResponse<T>> {
-    return this.doBefore(config)
-      .then(this.doRequest)
-      .then(this.doAfter)
-      .then(this.doTransform)
-      .catch(this.onError);
-  }
-
-  public post<T>(
-    pathOrConfig: FrestRequest,
-    requestConfig: IFrestRequestConfig = {},
-  ): Promise<FrestResponse<T>> {
-    const config = assign<IFrestRequestConfig, IFrestRequestConfig>(
-      this.requestConfig(pathOrConfig, requestConfig),
-      { method: 'POST' },
-    );
-    return this.request<T>(config);
-  }
-  public create<T>(
-    pathOrConfig: FrestRequest,
-    requestConfig: IFrestRequestConfig = {},
-  ): Promise<FrestResponse<T>> {
-    return this.post<T>(pathOrConfig, requestConfig);
-  }
-
-  public get<T>(
-    pathOrConfig: FrestRequest,
-    requestConfig: IFrestRequestConfig = {},
-  ): Promise<FrestResponse<T>> {
-    const config = assign<IFrestRequestConfig, IFrestRequestConfig>(
+  public request<T = any>(
+    pathOrConfig: TFrestRequest,
+    requestConfig: Partial<IFrestRequestConfig> = {},
+  ): Promise<TFrestResponse<T>> {
+    const config = assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
       this.requestConfig(pathOrConfig, requestConfig),
       { method: 'GET' },
     );
-    return this.request<T>(config);
+    return this.internalRequest<T>(config);
   }
-  public read<T>(
-    pathOrConfig: FrestRequest,
-    requestConfig: IFrestRequestConfig = {},
-  ): Promise<FrestResponse<T>> {
+
+  public post<T = any>(
+    pathOrConfig: TFrestRequest,
+    requestConfig: Partial<IFrestRequestConfig> = {},
+  ): Promise<TFrestResponse<T>> {
+    const config = assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
+      this.requestConfig(pathOrConfig, requestConfig),
+      { method: 'POST' },
+    );
+    return this.internalRequest<T>(config);
+  }
+  public create<T = any>(
+    pathOrConfig: TFrestRequest,
+    requestConfig: Partial<IFrestRequestConfig> = {},
+  ): Promise<TFrestResponse<T>> {
+    return this.post<T>(pathOrConfig, requestConfig);
+  }
+
+  public get<T = any>(
+    pathOrConfig: TFrestRequest,
+    requestConfig: Partial<IFrestRequestConfig> = {},
+  ): Promise<TFrestResponse<T>> {
+    const config = assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
+      this.requestConfig(pathOrConfig, requestConfig),
+      { method: 'GET' },
+    );
+    return this.internalRequest<T>(config);
+  }
+  public read<T = any>(
+    pathOrConfig: TFrestRequest,
+    requestConfig: Partial<IFrestRequestConfig> = {},
+  ): Promise<TFrestResponse<T>> {
     return this.get<T>(pathOrConfig, requestConfig);
   }
 
-  public put<T>(
-    pathOrConfig: FrestRequest,
-    requestConfig: IFrestRequestConfig = {},
-  ): Promise<FrestResponse<T>> {
-    const config = assign<IFrestRequestConfig, IFrestRequestConfig>(
+  public put<T = any>(
+    pathOrConfig: TFrestRequest,
+    requestConfig: Partial<IFrestRequestConfig> = {},
+  ): Promise<TFrestResponse<T>> {
+    const config = assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
       this.requestConfig(pathOrConfig, requestConfig),
       { method: 'PUT' },
     );
-    return this.request<T>(config);
+    return this.internalRequest<T>(config);
   }
-  public update<T>(
-    pathOrConfig: FrestRequest,
-    requestConfig: IFrestRequestConfig = {},
-  ): Promise<FrestResponse<T>> {
+  public update<T = any>(
+    pathOrConfig: TFrestRequest,
+    requestConfig: Partial<IFrestRequestConfig> = {},
+  ): Promise<TFrestResponse<T>> {
     return this.put<T>(pathOrConfig, requestConfig);
   }
 
-  public patch<T>(
-    pathOrConfig: FrestRequest,
-    requestConfig: IFrestRequestConfig = {},
-  ): Promise<FrestResponse<T>> {
-    const config = assign<IFrestRequestConfig, IFrestRequestConfig>(
+  public patch<T = any>(
+    pathOrConfig: TFrestRequest,
+    requestConfig: Partial<IFrestRequestConfig> = {},
+  ): Promise<TFrestResponse<T>> {
+    const config = assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
       this.requestConfig(pathOrConfig, requestConfig),
       { method: 'PATCH' },
     );
-    return this.request<T>(config);
+    return this.internalRequest<T>(config);
   }
 
-  public delete<T>(
-    pathOrConfig: FrestRequest,
-    requestConfig: IFrestRequestConfig = {},
-  ): Promise<FrestResponse<T>> {
-    const config = assign<IFrestRequestConfig, IFrestRequestConfig>(
+  public delete<T = any>(
+    pathOrConfig: TFrestRequest,
+    requestConfig: Partial<IFrestRequestConfig> = {},
+  ): Promise<TFrestResponse<T>> {
+    const config = assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
       this.requestConfig(pathOrConfig, requestConfig),
       { method: 'DELETE' },
     );
-    return this.request<T>(config);
+    return this.internalRequest<T>(config);
   }
-  public destroy<T>(
-    pathOrConfig: FrestRequest,
-    requestConfig: IFrestRequestConfig = {},
-  ): Promise<FrestResponse<T>> {
+  public destroy<T = any>(
+    pathOrConfig: TFrestRequest,
+    requestConfig: Partial<IFrestRequestConfig> = {},
+  ): Promise<TFrestResponse<T>> {
     return this.delete<T>(pathOrConfig, requestConfig);
   }
 
-  private defaultConfig(): IFrestConfig {
-    return {
-      base: '',
-      fetch: window.fetch,
-      interceptors: {},
-    };
+  private findInterceptor(arr: ICommonInterceptor[], id?: string): number {
+    let found  = false;
+    let i = 0;
+    while (i < arr.length) {
+      found = arr[i].id === id;
+      if (found) {
+        return i;
+      }
+      i++;
+    }
+    return -1;
+  }
+
+  private internalRequest<T = any>(
+    requestConfig: IFrestRequestConfig,
+  ): Promise<TFrestResponse<T>> {
+    return this.doBefore(requestConfig)
+      .then(this.doRequest)
+      .then(this.doAfter)
+      .then(this.doTransform)
+      .catch(this.onError(requestConfig));
   }
 
   private requestConfig(
-    pathOrConfig: FrestRequest,
-    requestConfig: IFrestRequestConfig,
+    pathOrConfig: TFrestRequest,
+    requestConfig: Partial<IFrestRequestConfig>,
   ): IFrestRequestConfig {
     if (typeof pathOrConfig === 'string' || pathOrConfig instanceof Array) {
-      return assign<IFrestRequestConfig, IFrestRequestConfig>(requestConfig, {
-        path: pathOrConfig,
-      });
+      return assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
+        {
+          headers: new Headers(),
+          method: 'GET',
+          path: pathOrConfig,
+        },
+        requestConfig,
+      );
     }
-    return pathOrConfig;
+    return assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
+      {
+        headers: new Headers(),
+        method: 'GET',
+        path: '',
+      },
+      pathOrConfig,
+    );
   }
 
   private doBefore(config: IFrestRequestConfig) {
     return new Promise<IFrestRequestConfig>((resolve, reject) => {
-      let reqp = Promise.resolve<IFrestRequestConfig>(config);
-      this.interceptors.before.forEach(i => {
-        reqp = reqp.then(r => i({ config: this.config, request: r }));
+      let requestPromise = Promise.resolve<IFrestRequestConfig>(config);
+      this.interceptors.before.forEach(requestInterceptor => {
+        requestPromise = requestPromise.then(r =>
+          requestInterceptor({ config: this._config, request: r }),
+        );
       });
 
-      reqp.then(resolve).catch(e => {
+      requestPromise.then(resolve).catch(e => {
         const cause = typeof e === 'string' ? e : e.message ? e.message : e;
         reject(
           new FrestError(
             `Error in before request interceptor: ${cause}`,
-            this.config,
+            this._config,
             config,
           ),
         );
@@ -245,7 +304,7 @@ export class Frest implements IFrest {
 
   private doRequest = (
     request: IFrestRequestConfig,
-  ): Promise<IIntAfterFetch> => {
+  ): Promise<IInternalAfterFetch> => {
     let fetchFn: typeof fetch;
     const paths: string[] = request.path
       ? request.path instanceof Array ? request.path : [request.path]
@@ -253,25 +312,27 @@ export class Frest implements IFrest {
 
     if (typeof request.fetch === 'function') {
       fetchFn = request.fetch;
-    } else if (typeof this.config.fetch === 'function') {
-      fetchFn = this.config.fetch;
+    } else if (typeof this._config.fetch === 'function') {
+      fetchFn = this._config.fetch;
     } else {
       return Promise.reject(
-        new FrestError('Fetch API is not available', this.config, request),
+        new FrestError('Fetch API is not available', this._config, request),
       );
     }
 
     const query = this.parseQuery(request.query);
     const fullPath = this.trimSlashes(
-      `${this.config.base}/${paths.map(encodeURI).join('/')}${query}`,
+      `${this._config.base}/${paths.map(encodeURI).join('/')}${query}`,
     );
-    return fetchFn(fullPath, request).then<IIntAfterFetch>(response => ({
+    return fetchFn(fullPath, request).then<IInternalAfterFetch>(response => ({
       request,
       response,
     }));
   };
 
-  private doAfter = (afterFetch: IIntAfterFetch): Promise<IIntTransform> => {
+  private doAfter = <T = any>(
+    afterFetch: IInternalAfterFetch,
+  ): Promise<IInternalTransform> => {
     const { response, request } = afterFetch;
     if (!response.ok) {
       return Promise.reject(
@@ -279,24 +340,26 @@ export class Frest implements IFrest {
           `Non OK HTTP response status: ${response.status} - ${
             response.statusText
           }`,
-          this.config,
+          this._config,
           request,
           { origin: response, value: null },
         ),
       );
     }
-    let resp: Promise<IWrappedFrestResponse<any>> = Promise.resolve({
+    let responsePromise: Promise<IWrappedFrestResponse<T>> = Promise.resolve({
       origin: response,
     });
-    this.interceptors.after.forEach(af => {
-      resp = resp.then(r => af({ config: this.config, response: r }));
+    this.interceptors.after.forEach(responseInterceptor => {
+      responsePromise = responsePromise.then(r =>
+        responseInterceptor({ config: this._config, response: r }),
+      );
     });
-    return resp.then(r => ({ request, response: r })).catch(e => {
+    return responsePromise.then(r => ({ request, response: r })).catch(e => {
       const cause = typeof e === 'string' ? e : e.message ? e.message : e;
       return Promise.reject(
         new FrestError(
           `Error in after response intercepor: ${cause}`,
-          this.config,
+          this._config,
           request,
           { origin: response, value: null },
         ),
@@ -304,25 +367,25 @@ export class Frest implements IFrest {
     });
   };
 
-  private doTransform = (
-    afterFetch: IIntTransform,
-  ): Promise<FrestResponse<any>> => {
-    const { response, request } = afterFetch;
+  private doTransform = <T = any>(
+    transform: IInternalTransform,
+  ): Promise<TFrestResponse<T>> => {
+    const { response, request } = transform;
     if (request.nowrap) {
-      return Promise.resolve<any>(response.value);
+      return Promise.resolve<T>(response.value);
     }
-    return Promise.resolve<FrestResponse<any>>(response);
+    return Promise.resolve<TFrestResponse<T>>(response);
   };
 
-  private onError = (e: any): any => {
-    let err: IFrestError = this.toFestError(e);
+  private onError = (requestConfig: IFrestRequestConfig) => (e: any): any => {
+    let err: IFrestError = this.toFestError(e, requestConfig);
 
-    if (this.interceptors.error.size === 0) {
+    if (this.interceptors.error.length === 0) {
       return Promise.reject(err);
     }
 
     return new Promise<any>((resolve, reject) => {
-      let recp: Promise<void | IWrappedFrestResponse<
+      let promise: Promise<void | IWrappedFrestResponse<
         any
       > | null> = Promise.resolve(null);
       let recovery: IWrappedFrestResponse<any> | null = null;
@@ -330,7 +393,7 @@ export class Frest implements IFrest {
         if (recovery != null) {
           return true;
         }
-        recp = recp
+        promise = promise
           .then(rec => {
             if (rec != null) {
               recovery = rec;
@@ -339,11 +402,11 @@ export class Frest implements IFrest {
             return int(err);
           })
           .catch(ee => {
-            err = this.toFestError(ee);
+            err = this.toFestError(ee, requestConfig);
           });
         return false;
       });
-      recp.then(res => {
+      promise.then(res => {
         if (res) {
           resolve(res);
         } else {
@@ -369,9 +432,9 @@ export class Frest implements IFrest {
     return input.toString().replace(/(^\/+|\/+$)/g, '');
   }
 
-  private toFestError(e: any): IFrestError {
+  private toFestError(e: any, requestConfig: IFrestRequestConfig): IFrestError {
     return !e.config && !e.request
-      ? new FrestError(e.message, this.config, {})
+      ? new FrestError(e.message, this._config, requestConfig)
       : e;
   }
 }

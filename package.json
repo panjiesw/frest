@@ -45,7 +45,7 @@
     "postbuild": "cpx './.tmp/**/*.d.ts' './.build'",
     "posttest": "npm run coverage",
 
-    "format:ts": "prettier --trailing-comma all --single-quote --write \"packages/*/*.ts\" \"packages/*/src/**/*.{ts,tsx}\""
+    "format:ts": "prettier --trailing-comma all --single-quote --write \"packages/*/*.js\" \"packages/*/*.ts\" \"packages/*/src/**/*.{ts,tsx}\""
   },
   "devDependencies": {
     "husky": "^0.14.3",

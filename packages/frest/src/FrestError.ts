@@ -8,7 +8,7 @@ import {
   IFrestError,
   IFrestRequestConfig,
   IWrappedFrestResponse,
-} from './shapes';
+} from './interface';
 
 export class FrestError extends Error implements IFrestError {
   constructor(
