@@ -1,7 +1,7 @@
 import test from 'ava';
 import fetchMock from 'fetch-mock';
 import sinon from 'sinon';
-import { Frest } from '../../';
+import { Frest, IAfterResponseInterceptorArg, IFrestError } from '../../';
 import { BASE } from '../fixtures';
 
 test('constructor interceptors', t => {
@@ -56,7 +56,7 @@ test('add-remove', t => {
 });
 
 test('before request interceptor', async t => {
-  const url = `${BASE}/inttestorder`;
+  const url = `${BASE}/before`;
   const fm = fetchMock.once(url, {});
   const order: string[] = [];
   const int1: any = sinon.stub().callsFake(r => {
@@ -66,6 +66,7 @@ test('before request interceptor', async t => {
   int1.id = 'int1';
   const int2: any = sinon.stub().callsFake(r => {
     order.push('int2');
+    r.requestConfig.foo = 'bar';
     return Promise.resolve(r.requestConfig);
   });
   int2.id = 'int2';
@@ -73,17 +74,109 @@ test('before request interceptor', async t => {
     base: BASE,
     fetch,
     interceptors: {
-      before: [int1]
+      before: [int1],
     },
   });
   frest.addBeforeRequestInterceptor(int2);
 
-  const res = await frest.request<{}>('inttestorder');
+  const res = await frest.request<{}>('before');
   if (frest.isWrapped(res)) {
     t.true(res.origin.ok);
     t.true(fm.called());
+    t.is((fm.lastOptions() as any).foo, 'bar');
+    t.true(int1.calledOnce);
+    t.true(int2.calledOnce);
     t.is(order[0], 'int1');
     t.is(order[1], 'int2');
+  } else {
+    t.fail('Unexpected unwrapped response');
+  }
+});
+
+test('after response interceptor', async t => {
+  const url = `${BASE}/after`;
+  const expectedResponse = {
+    foo: 'bar',
+  };
+  const fm = fetchMock.once(url, expectedResponse);
+  const int = sinon
+    .stub()
+    .callsFake(async (arg: IAfterResponseInterceptorArg) => {
+      arg.wrappedResponse.value = await arg.wrappedResponse.origin.json();
+      return arg.wrappedResponse;
+    });
+
+  const frest = new Frest({
+    base: BASE,
+    fetch,
+    interceptors: {
+      after: [int],
+    },
+  });
+
+  const res = await frest.request<{ foo: string }>('after');
+  if (frest.isWrapped(res)) {
+    t.true(res.origin.ok);
+    t.true(res.origin.bodyUsed);
+    t.true(fm.called());
+    t.true(int.calledOnce);
+    t.deepEqual(res.value, expectedResponse);
+  } else {
+    t.fail('Unexpected unwrapped response');
+  }
+});
+
+test('error interceptor not recovered', async t => {
+  const url = `${BASE}/error`;
+  const fm = fetchMock.once(url, {
+    status: 500,
+  });
+  const int = sinon.stub().callsFake(() => Promise.resolve(null));
+
+  const frest = new Frest({
+    base: BASE,
+    fetch,
+    interceptors: {
+      error: [int],
+    },
+  });
+
+  await t.throws(frest.request('error'));
+  t.true(fm.called());
+  t.true(int.calledOnce);
+});
+
+test('error interceptor recovered', async t => {
+  const url = `${BASE}/error-recovered`;
+  const fm = fetchMock.once(url, {
+    body: {
+      error: 'test',
+    },
+    status: 401,
+  });
+  const int = sinon.stub().callsFake(async (err: IFrestError) => {
+    if (err.wrappedResponse) {
+      const value = await err.wrappedResponse.origin.json();
+      err.wrappedResponse.value = value;
+      return err.wrappedResponse;
+    }
+    return null;
+  });
+
+  const frest = new Frest({
+    base: BASE,
+    fetch,
+    interceptors: {
+      error: [int],
+    },
+  });
+
+  const res = await frest.request<{error: string}>('error-recovered');
+  if (frest.isWrapped(res)) {
+    t.false(res.origin.ok);
+    t.deepEqual(res.value, { error: 'test' });
+    t.true(fm.called());
+    t.true(int.calledOnce);
   } else {
     t.fail('Unexpected unwrapped response');
   }

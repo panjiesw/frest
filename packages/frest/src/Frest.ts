@@ -21,6 +21,7 @@ import {
   IWrappedFrestResponse,
   ICommonInterceptor,
 } from './interface';
+import xhr from './xhr';
 
 interface IInternalAfterFetch {
   response: Response;
@@ -149,7 +150,7 @@ export class Frest implements IFrest {
   ): Promise<TFrestResponse<T>> {
     const config = assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
       this.requestConfig(pathOrConfig, requestConfig),
-      { method: 'GET' },
+      { action: 'request' },
     );
     return this.internalRequest<T>(config);
   }
@@ -160,7 +161,7 @@ export class Frest implements IFrest {
   ): Promise<TFrestResponse<T>> {
     const config = assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
       this.requestConfig(pathOrConfig, requestConfig),
-      { method: 'POST' },
+      { method: 'POST', action: 'post' },
     );
     return this.internalRequest<T>(config);
   }
@@ -168,7 +169,11 @@ export class Frest implements IFrest {
     pathOrConfig: TFrestRequest,
     requestConfig: Partial<IFrestRequestConfig> = {},
   ): Promise<TFrestResponse<T>> {
-    return this.post<T>(pathOrConfig, requestConfig);
+    const config = assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
+      this.requestConfig(pathOrConfig, requestConfig),
+      { method: 'POST', action: 'create' },
+    );
+    return this.internalRequest<T>(config);
   }
 
   public get<T = any>(
@@ -177,7 +182,7 @@ export class Frest implements IFrest {
   ): Promise<TFrestResponse<T>> {
     const config = assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
       this.requestConfig(pathOrConfig, requestConfig),
-      { method: 'GET' },
+      { method: 'GET', action: 'get' },
     );
     return this.internalRequest<T>(config);
   }
@@ -185,7 +190,11 @@ export class Frest implements IFrest {
     pathOrConfig: TFrestRequest,
     requestConfig: Partial<IFrestRequestConfig> = {},
   ): Promise<TFrestResponse<T>> {
-    return this.get<T>(pathOrConfig, requestConfig);
+    const config = assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
+      this.requestConfig(pathOrConfig, requestConfig),
+      { method: 'GET', action: 'read' },
+    );
+    return this.internalRequest<T>(config);
   }
 
   public put<T = any>(
@@ -194,7 +203,7 @@ export class Frest implements IFrest {
   ): Promise<TFrestResponse<T>> {
     const config = assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
       this.requestConfig(pathOrConfig, requestConfig),
-      { method: 'PUT' },
+      { method: 'PUT', action: 'put' },
     );
     return this.internalRequest<T>(config);
   }
@@ -202,7 +211,11 @@ export class Frest implements IFrest {
     pathOrConfig: TFrestRequest,
     requestConfig: Partial<IFrestRequestConfig> = {},
   ): Promise<TFrestResponse<T>> {
-    return this.put<T>(pathOrConfig, requestConfig);
+    const config = assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
+      this.requestConfig(pathOrConfig, requestConfig),
+      { method: 'PUT', action: 'update' },
+    );
+    return this.internalRequest<T>(config);
   }
 
   public patch<T = any>(
@@ -211,7 +224,7 @@ export class Frest implements IFrest {
   ): Promise<TFrestResponse<T>> {
     const config = assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
       this.requestConfig(pathOrConfig, requestConfig),
-      { method: 'PATCH' },
+      { method: 'PATCH', action: 'patch' },
     );
     return this.internalRequest<T>(config);
   }
@@ -222,7 +235,7 @@ export class Frest implements IFrest {
   ): Promise<TFrestResponse<T>> {
     const config = assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
       this.requestConfig(pathOrConfig, requestConfig),
-      { method: 'DELETE' },
+      { method: 'DELETE', action: 'delete' },
     );
     return this.internalRequest<T>(config);
   }
@@ -230,7 +243,49 @@ export class Frest implements IFrest {
     pathOrConfig: TFrestRequest,
     requestConfig: Partial<IFrestRequestConfig> = {},
   ): Promise<TFrestResponse<T>> {
-    return this.delete<T>(pathOrConfig, requestConfig);
+    const config = assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
+      this.requestConfig(pathOrConfig, requestConfig),
+      { method: 'DELETE', action: 'destroy' },
+    );
+    return this.internalRequest<T>(config);
+  }
+
+  public option<T = any>(
+    pathOrConfig: TFrestRequest,
+    requestConfig: Partial<IFrestRequestConfig> = {},
+  ): Promise<TFrestResponse<T>> {
+    const config = assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
+      this.requestConfig(pathOrConfig, requestConfig),
+      { method: 'OPTION', action: 'option' },
+    );
+    return this.internalRequest<T>(config);
+  }
+
+  public upload<T = any>(
+    pathOrConfig: TFrestRequest,
+    requestConfig: Partial<IFrestRequestConfig> = {},
+  ): Promise<TFrestResponse<T>> {
+    const config = assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
+      this.requestConfig(pathOrConfig, requestConfig),
+      { method: 'POST', action: 'upload' },
+    );
+    if (!(config.body instanceof FormData)) {
+      return Promise.reject(
+        new TypeError('upload: body must be a FormData object'),
+      );
+    }
+    return this.internalRequest<T>(config);
+  }
+
+  public download<T = any>(
+    pathOrConfig: TFrestRequest,
+    requestConfig: Partial<IFrestRequestConfig> = {},
+  ): Promise<TFrestResponse<T>> {
+    const config = assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
+      this.requestConfig(pathOrConfig, requestConfig),
+      { method: 'GET', action: 'download' },
+    );
+    return this.internalRequest<T>(config);
   }
 
   public isWrapped<T = any>(
@@ -286,6 +341,26 @@ export class Frest implements IFrest {
     );
   }
 
+  private getFetchFunc(requestConfig: IFrestRequestConfig): typeof fetch {
+    if (
+      requestConfig.action === 'upload' ||
+      requestConfig.action === 'download'
+    ) {
+      return xhr;
+    }
+
+    if (typeof requestConfig.fetch === 'function') {
+      return requestConfig.fetch;
+    } else if (typeof this._config.fetch === 'function') {
+      return this._config.fetch;
+    }
+    throw new FrestError(
+      'Fetch API is not available',
+      this._config,
+      requestConfig,
+    );
+  }
+
   private doBefore(config: IFrestRequestConfig) {
     return new Promise<IFrestRequestConfig>((resolve, reject) => {
       let requestPromise = Promise.resolve<IFrestRequestConfig>(config);
@@ -326,14 +401,10 @@ export class Frest implements IFrest {
       ? request.path instanceof Array ? request.path : [request.path]
       : [''];
 
-    if (typeof request.fetch === 'function') {
-      fetchFn = request.fetch;
-    } else if (typeof this._config.fetch === 'function') {
-      fetchFn = this._config.fetch;
-    } else {
-      return Promise.reject(
-        new FrestError('Fetch API is not available', this._config, request),
-      );
+    try {
+      fetchFn = this.getFetchFunc(request);
+    } catch (error) {
+      return Promise.reject(error);
     }
 
     const query = this.parseQuery(request.query);
@@ -415,9 +486,9 @@ export class Frest implements IFrest {
         any
       > | null> = Promise.resolve(null);
       let recovery: IWrappedFrestResponse<any> | null = null;
-      [...this.interceptors.error].some(int => {
+      for (const errorInterceptor of this.interceptors.error) {
         if (recovery != null) {
-          return true;
+          break;
         }
         promise = promise
           .then(rec => {
@@ -425,13 +496,12 @@ export class Frest implements IFrest {
               recovery = rec;
               return rec;
             }
-            return int(err);
+            return errorInterceptor(err);
           })
           .catch(ee => {
             err = this.toFestError(ee, requestConfig);
           });
-        return false;
-      });
+      }
       promise.then(res => {
         if (res) {
           resolve(res);

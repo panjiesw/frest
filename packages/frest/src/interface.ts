@@ -11,7 +11,7 @@ export type THttpMethod =
   | 'PATCH'
   | 'OPTION';
 
-export type THttpHeaders = {[key: string]: string} | Headers
+// export type THttpHeaders = {[key: string]: string} | Headers
 
 export interface IFrestConfig extends RequestInit {
   base: string;
@@ -22,7 +22,7 @@ export interface IFrestConfig extends RequestInit {
     error?: IErrorInterceptor[];
   };
   method: THttpMethod;
-  headers: THttpHeaders;
+  headers: Headers;
 }
 
 export type TFrestConfig = string | Partial<IFrestConfig>;
@@ -31,13 +31,16 @@ export interface IFrestRequestConfig extends RequestInit {
   [key: string]: any;
   path: string | string[];
   method: THttpMethod;
-  headers: THttpHeaders;
+  headers: Headers;
+  action?: string
   base?: string;
   query?: any;
   fetch?: typeof fetch;
   skip?: string[];
   nowrap?: boolean;
   body?: any;
+  onUploadProgress?: (ev: ProgressEvent) => any;
+  onDownloadProgress?: (ev: ProgressEvent) => any;
 }
 
 export type TFrestRequest = string | string[] | Partial<IFrestRequestConfig>;
@@ -47,7 +50,9 @@ export interface IWrappedFrestResponse<T = any> {
   value?: T;
 }
 
-export type TFrestResponse<T = any> = (T | undefined) | IWrappedFrestResponse<T>;
+export type TFrestResponse<T = any> =
+  | (T | undefined)
+  | IWrappedFrestResponse<T>;
 
 export interface IFrest {
   readonly base: string;
@@ -105,6 +110,18 @@ export interface IFrest {
     pathOrConfig: TFrestRequest,
     requestConfig?: Partial<IFrestRequestConfig>,
   ): Promise<TFrestResponse<T>>;
+  option<T = any>(
+    pathOrConfig: TFrestRequest,
+    requestConfig?: Partial<IFrestRequestConfig>,
+  ): Promise<TFrestResponse<T>>;
+  upload<T = any>(
+    pathOrConfig: TFrestRequest,
+    requestConfig?: Partial<IFrestRequestConfig>,
+  ): Promise<TFrestResponse<T>>;
+  download<T = any>(
+    pathOrConfig: TFrestRequest,
+    requestConfig?: Partial<IFrestRequestConfig>,
+  ): Promise<TFrestResponse<T>>;
 }
 
 export interface IFrestError {
@@ -141,7 +158,7 @@ export interface IErrorInterceptor extends ICommonInterceptor {
 }
 
 export interface IInterceptorSets {
-  after: IAfterResponseInterceptor[]
-  before: IBeforeRequestInterceptor[]
-  error: IErrorInterceptor[]
+  after: IAfterResponseInterceptor[];
+  before: IBeforeRequestInterceptor[];
+  error: IErrorInterceptor[];
 }
