@@ -321,11 +321,12 @@ export class Frest implements IFrest {
     pathOrConfig: TFrestRequest,
     requestConfig: Partial<IFrestRequestConfig>,
   ): IFrestRequestConfig {
+    const {headers, method} = this._config;
     if (typeof pathOrConfig === 'string' || pathOrConfig instanceof Array) {
       return assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
         {
-          headers: new Headers(),
-          method: 'GET',
+          headers,
+          method,
           path: pathOrConfig,
         },
         requestConfig,
@@ -333,8 +334,8 @@ export class Frest implements IFrest {
     }
     return assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
       {
-        headers: new Headers(),
-        method: 'GET',
+        headers,
+        method,
         path: '',
       },
       pathOrConfig,
