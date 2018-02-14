@@ -16,6 +16,8 @@ jspm_packages
 .node_repl_history
 
 .awcache
-.build
-.tmp
+build
+es
+lib
+umd
 tests.js.map

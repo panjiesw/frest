@@ -1,6 +1,12 @@
 {
 	"compilerOptions": {
-		"target": "es6",
+		"target": "es5",
+		"lib": [
+			"es5",
+			"es2015.promise",
+			"dom"
+		],
+		"module": "es6",
 		"moduleResolution": "node",
 		"allowSyntheticDefaultImports": true,
 		"experimentalDecorators": true,
@@ -8,22 +14,13 @@
 		"noImplicitReturns": true,
 		"noImplicitThis": true,
 		"noUnusedParameters": true,
+		"noUnusedLocals": true,
 		"strictNullChecks": true,
-		"outDir": ".tmp",
-		"baseUrl": ".",
-		"paths": {
-			"frest": ["./src/frest/index.ts"],
-			"frest/*": ["./src/frest/*"],
-			"frest-interceptor-json": ["./src/frest-interceptor-json/index.ts"],
-			"frest-interceptor-json/*": ["./src/frest-interceptor-json/*"]
-		}
+		"importHelpers": true,
+		"esModuleInterop": true
 	},
 	"exclude": [
 		"node_modules"
 	],
-	"compileOnSave": false,
-	"awesomeTypescriptLoaderOptions": {
-		"useCache": true,
-		"useBabel": true
-	}
+	"compileOnSave": false
 }

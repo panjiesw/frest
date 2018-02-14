@@ -2,13 +2,14 @@
 {
 	"css.validate": false,
 	"editor.tabSize": 2,
-	"editor.insertSpaces": false,
+	"editor.insertSpaces": true,
 	"editor.detectIndentation": true,
 	"editor.renderWhitespace": "boundary",
 	"editor.rulers": [
-		120
+		80
 	],
-	"editor.wrappingColumn": 120,
+	"editor.wordWrapColumn": 80,
+	"editor.wordWrap": "bounded",
 	"editor.snippetSuggestions": "top",
 	"eslint.enable": false,
 	"files.trimTrailingWhitespace": true,
@@ -26,11 +27,18 @@
 	"tslint.enable": true,
 	"tslint.ignoreDefinitionFiles": true,
 	"tslint.exclude": [
-		"./.build",
-		"./.tmp"
-	],
+		"**/build/**",
+		"**/es/**",
+		"**/lib/**",
+		"**/umd/**",
+		"**/node_modules/**"
+  ],
 	"typescript.tsdk": "./node_modules/typescript/lib",
 	"typescript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
 	"javascript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
-	"xo.enable": false
+	"xo.enable": false,
+	"prettier.singleQuote": true,
+	"prettier.useTabs": false,
+	"prettier.trailingComma": "all",
+	"prettier.printWidth": 80
 }
