@@ -69,7 +69,7 @@ export interface IFrest {
   removeBeforeRequestInterceptor(
     idOrValue: string | IBeforeRequestInterceptor,
   ): void;
-  removeErrorInterceptor(id: string | IErrorInterceptor): void;
+  removeErrorInterceptor(idOrValue: string | IErrorInterceptor): void;
   request<T = any>(
     pathOrConfig: TFrestRequest,
     requestConfig?: Partial<IFrestRequestConfig>,

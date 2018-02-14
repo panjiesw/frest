@@ -5,7 +5,7 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 // @ts-ignore
 const pkg = require('./package.json');
 
-const banner = `frest ${pkg.version}
+const banner = `frest-interceptor-json ${pkg.version}
 https://github.com/panjiesw/frest
 License: https://opensource.org/licenses/MIT
 © 2017 Panjie Setiawan Wicaksono`
@@ -15,8 +15,8 @@ const config = {
   entry: './src/index.ts',
   output: {
     path: path.join(__dirname, 'umd'),
-    filename: 'frest.umd.js',
-    library: 'frest',
+    filename: 'frest-interceptor-json.umd.js',
+    library: 'frestInterceptorJson',
     libraryTarget: 'umd',
   },
   resolve: {
@@ -45,18 +45,25 @@ const config = {
       }
     ]
   },
+  externals: {
+    frest: {
+      commonjs: 'frest',
+      commonjs2: 'frest',
+      root: 'frest',
+    }
+  },
   plugins: [
     new webpack.BannerPlugin({
       banner
     }),
-    // new UglifyJsPlugin({
-    //   sourceMap: true,
-    //   uglifyOptions: {
-    //     output: {
-    //       comments: /^!/,
-    //     }
-    //   },
-    // }),
+    new UglifyJsPlugin({
+      sourceMap: true,
+      uglifyOptions: {
+        output: {
+          comments: /^!/,
+        }
+      },
+    }),
   ],
 }
 

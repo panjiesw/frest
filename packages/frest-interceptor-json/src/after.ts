@@ -4,9 +4,9 @@
 // https://opensource.org/licenses/MIT
 
 import {
-  AfterResponseInterceptorArg,
+  IAfterResponseInterceptorArg,
   IAfterResponseInterceptor,
-  WrappedFrestResponse,
+  IWrappedFrestResponse,
 } from 'frest';
 import { ID_AFTER } from './ids';
 
@@ -18,10 +18,10 @@ const after: (
   options?: IJSONAfterResponseOption,
 ) => IAfterResponseInterceptor = (options: IJSONAfterResponseOption = {}) => {
   const interceptor: IAfterResponseInterceptor = (
-    input: AfterResponseInterceptorArg,
+    input: IAfterResponseInterceptorArg,
   ) =>
-    new Promise<WrappedFrestResponse<any>>((resolve, reject) => {
-      const { origin, value: originValue } = input.response;
+    new Promise<IWrappedFrestResponse<any>>((resolve, reject) => {
+      const { origin, value: originValue } = input.wrappedResponse;
       const { headers, bodyUsed, status } = origin;
       const ct = headers.get('Content-Type');
       if (!bodyUsed) {
