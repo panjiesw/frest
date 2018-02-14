@@ -1,11 +1,11 @@
 {
 	"name": "frest-interceptor-json",
-	"version": "0.2.0-dev.0",
+	"version": "0.2.0",
 	"description": "A set of JSON interceptors for Frest",
 	"license": "MIT",
 	"main": "lib/index.js",
-  "module": "es/index.js",
-  "typings": "lib/index.d.ts",
+	"module": "es/index.js",
+	"typings": "lib/index.d.ts",
 	"homepage": "https://github.com/panjiesw/frest",
 	"repository": {
 		"type": "git",
@@ -30,19 +30,19 @@
 		"interceptor"
 	],
 	"files": [
-    "es/",
-    "lib/",
-    "umd/"
-  ],
+		"es/",
+		"lib/",
+		"umd/"
+	],
 	"scripts": {
-    "b:es": "tsc",
-    "b:lib": "tsc -p tsconfig.lib.json",
-    "b:umd": "webpack --profile --display-modules --display-reasons",
-    "build": "run-s del b:*",
-    "d:unit": "del-cli lib .nyc_output coverage",
-    "del": "del-cli es lib umd .nyc_output coverage node_modules/.cache",
-    "w:lib": "yarn b:lib -w"
-  },
+		"b:es": "tsc",
+		"b:lib": "tsc -p tsconfig.lib.json",
+		"b:umd": "webpack --profile --display-modules --display-reasons",
+		"build": "run-s del b:*",
+		"d:unit": "del-cli lib .nyc_output coverage",
+		"del": "del-cli es lib umd .nyc_output coverage node_modules/.cache",
+		"w:lib": "yarn b:lib -w"
+	},
 	"peerDependencies": {
 		"frest": "~0.5.0"
 	},
@@ -57,7 +57,7 @@
 		"del-cli": "^1.1.0",
 		"faucet": "^0.0.1",
 		"fetch-mock": "^6.0.0",
-		"frest": "~0.5.0",
+		"frest": "^0.5.0",
 		"node-fetch": "^2.0.0",
 		"npm-run-all": "^4.1.2",
 		"nyc": "^11.4.1",
