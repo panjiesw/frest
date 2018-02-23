@@ -5,7 +5,7 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 // @ts-ignore
 const pkg = require('./package.json');
 
-const banner = `frest-interceptor-json 0.5.1
+const banner = `frest-interceptor-json 0.2.1
 https://github.com/panjiesw/frest
 License: https://opensource.org/licenses/MIT
 © 2017 Panjie Setiawan Wicaksono`
