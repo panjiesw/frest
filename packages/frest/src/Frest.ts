@@ -347,7 +347,7 @@ export class Frest implements IFrest {
       requestConfig.action === 'upload' ||
       requestConfig.action === 'download'
     ) {
-      return xhr;
+      return xhr as any;
     }
 
     if (typeof requestConfig.fetch === 'function') {

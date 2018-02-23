@@ -5,7 +5,7 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 // @ts-ignore
 const pkg = require('./package.json');
 
-const banner = `frest-interceptor-json ${pkg.version}
+const banner = `frest-interceptor-json 0.5.1
 https://github.com/panjiesw/frest
 License: https://opensource.org/licenses/MIT
 © 2017 Panjie Setiawan Wicaksono`
@@ -37,9 +37,6 @@ const config = {
           // 'babel-loader',
           {
             loader: 'ts-loader',
-            options: {
-              configFile: 'tsconfig.umd.json'
-            }
           }
         ]
       }
