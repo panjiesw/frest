@@ -35,9 +35,9 @@
 		"umd/"
 	],
 	"scripts": {
-		"b:es": "tsc",
-		"b:lib": "tsc -p tsconfig.lib.json",
-		"b:umd": "webpack --profile --display-modules --display-reasons",
+		"b:es": "tsc --declaration --outDir es",
+    "b:lib": "tsc --declaration -m commonjs --outDir lib",
+    "b:umd": "webpack --profile",
 		"build": "run-s del b:*",
 		"d:unit": "del-cli lib .nyc_output coverage",
 		"del": "del-cli es lib umd .nyc_output coverage node_modules/.cache",

@@ -32,10 +32,11 @@
     "umd/"
   ],
   "scripts": {
-    "b:es": "tsc",
-    "b:lib": "tsc -p tsconfig.lib.json",
-    "b:umd": "webpack --profile --display-modules --display-reasons",
-    "build": "run-s del b:*",
+    "b:es": "tsc --declaration --outDir es",
+    "b:lib": "tsc --declaration -m commonjs --outDir lib",
+    "b:umd": "webpack --profile",
+    "build": "run-s del b:* d:b",
+    "d:b": "del-cli es/**/__tests__ lib/**/__tests__",
     "d:unit": "del-cli lib .nyc_output coverage",
     "del": "del-cli es lib umd .nyc_output coverage node_modules/.cache",
     "t:a": "cross-env NODE_ENV=test nyc ava --tap | faucet",

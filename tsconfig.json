@@ -1,26 +1,17 @@
 {
-	"compilerOptions": {
-		"target": "es5",
-		"lib": [
-			"es5",
-			"es2015.promise",
-			"dom"
-		],
-		"module": "es6",
-		"moduleResolution": "node",
-		"allowSyntheticDefaultImports": true,
-		"experimentalDecorators": true,
-		"noImplicitAny": true,
-		"noImplicitReturns": true,
-		"noImplicitThis": true,
-		"noUnusedParameters": true,
-		"noUnusedLocals": true,
-		"strictNullChecks": true,
-		"importHelpers": true,
-		"esModuleInterop": true
-	},
-	"exclude": [
-		"node_modules"
-	],
-	"compileOnSave": false
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "importHelpers": true,
+    "lib": ["es5", "es2015.promise", "dom"],
+    "module": "es6",
+    "moduleResolution": "node",
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "strict": true,
+    "target": "es5"
+  },
+  "exclude": ["node_modules"],
+  "compileOnSave": false
 }
