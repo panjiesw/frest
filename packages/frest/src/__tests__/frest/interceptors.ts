@@ -1,7 +1,7 @@
 import test from 'ava';
 import fetchMock from 'fetch-mock';
 import sinon from 'sinon';
-import { Frest, IAfterResponseInterceptorArg, IFrestError } from '../../';
+import { Frest, IAfterInterceptorArg, IFrestError } from '../../';
 import { BASE } from '../fixtures';
 
 test('constructor interceptors', t => {
@@ -27,22 +27,22 @@ test('add-remove', t => {
 
   const frest = new Frest();
 
-  frest.addAfterResponseInterceptor(int);
+  frest.addAfterInterceptor(int);
   t.is(frest.config.interceptors.after.length, 1);
-  frest.removeAfterResponseInterceptor(int.id);
+  frest.removeAfterInterceptor(int.id);
   t.is(frest.config.interceptors.after.length, 0);
-  frest.addAfterResponseInterceptor(int);
+  frest.addAfterInterceptor(int);
   t.is(frest.config.interceptors.after.length, 1);
-  frest.removeAfterResponseInterceptor(int);
+  frest.removeAfterInterceptor(int);
   t.is(frest.config.interceptors.after.length, 0);
 
-  frest.addBeforeRequestInterceptor(int);
+  frest.addBeforeInterceptor(int);
   t.is(frest.config.interceptors.before.length, 1);
-  frest.removeBeforeRequestInterceptor(int.id);
+  frest.removeBeforeInterceptor(int.id);
   t.is(frest.config.interceptors.before.length, 0);
-  frest.addBeforeRequestInterceptor(int);
+  frest.addBeforeInterceptor(int);
   t.is(frest.config.interceptors.before.length, 1);
-  frest.removeBeforeRequestInterceptor(int);
+  frest.removeBeforeInterceptor(int);
   t.is(frest.config.interceptors.before.length, 0);
 
   frest.addErrorInterceptor(int);
@@ -61,13 +61,13 @@ test('before request interceptor', async t => {
   const order: string[] = [];
   const int1: any = sinon.stub().callsFake(r => {
     order.push('int1');
-    return Promise.resolve(r.requestConfig);
+    return Promise.resolve(r.request);
   });
   int1.id = 'int1';
   const int2: any = sinon.stub().callsFake(r => {
     order.push('int2');
-    r.requestConfig.foo = 'bar';
-    return Promise.resolve(r.requestConfig);
+    r.request.foo = 'bar';
+    return Promise.resolve(r.request);
   });
   int2.id = 'int2';
   const frest = new Frest({
@@ -77,7 +77,7 @@ test('before request interceptor', async t => {
       before: [int1],
     },
   });
-  frest.addBeforeRequestInterceptor(int2);
+  frest.addBeforeInterceptor(int2);
 
   const res = await frest.request<{}>('before');
   t.true(res.origin.ok);
@@ -95,12 +95,10 @@ test('after response interceptor', async t => {
     foo: 'bar',
   };
   const fm = fetchMock.once(url, expectedResponse);
-  const int = sinon
-    .stub()
-    .callsFake(async (arg: IAfterResponseInterceptorArg) => {
-      arg.wrappedResponse.value = await arg.wrappedResponse.origin.json();
-      return arg.wrappedResponse;
-    });
+  const int = sinon.stub().callsFake(async (arg: IAfterInterceptorArg) => {
+    arg.response.body = await arg.response.origin.json();
+    return arg.response;
+  });
 
   const frest = new Frest({
     base: BASE,
@@ -115,7 +113,7 @@ test('after response interceptor', async t => {
   t.true(res.origin.bodyUsed);
   t.true(fm.called());
   t.true(int.calledOnce);
-  t.deepEqual(res.value, expectedResponse);
+  t.deepEqual(res.body, expectedResponse);
 });
 
 test('error interceptor not recovered', async t => {
@@ -147,10 +145,10 @@ test('error interceptor recovered', async t => {
     status: 401,
   });
   const int = sinon.stub().callsFake(async (err: IFrestError) => {
-    if (err.wrappedResponse) {
-      const value = await err.wrappedResponse.origin.json();
-      err.wrappedResponse.value = value;
-      return err.wrappedResponse;
+    if (err.response) {
+      const value = await err.response.origin.json();
+      err.response.body = value;
+      return err.response;
     }
     return null;
   });
@@ -165,7 +163,7 @@ test('error interceptor recovered', async t => {
 
   const res = await frest.request<{ error: string }>('error-recovered');
   t.false(res.origin.ok);
-  t.deepEqual(res.value, { error: 'test' });
+  t.deepEqual(res.body, { error: 'test' });
   t.true(fm.called());
   t.true(int.calledOnce);
 });

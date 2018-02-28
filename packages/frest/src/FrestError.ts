@@ -10,7 +10,7 @@ export class FrestError extends Error implements t.IFrestError {
     message: string,
     public config: t.IConfig,
     public request: t.IRequest,
-    public wrappedResponse?: t.IWrappedResponse<any>,
+    public response?: t.IResponse<any>,
   ) {
     super(message);
   }

@@ -15,13 +15,13 @@ export interface IConfigBase extends RequestInit {
 }
 
 export interface IConfigInterceptor {
-  interceptors: IInterceptorSets;
+  interceptors: IInterceptorSet;
 }
 
 export interface IConfig extends IConfigBase, IConfigInterceptor {}
 
 export type ConfigMergeType = Partial<IConfigBase> & {
-  interceptors?: Partial<IInterceptorSets>;
+  interceptors?: Partial<IInterceptorSet>;
 };
 
 export type ConfigType = string | ConfigMergeType;
@@ -36,7 +36,6 @@ export interface IRequest extends RequestInit {
   query?: any;
   fetch?: typeof fetch;
   skip?: string[];
-  nowrap?: boolean;
   body?: any;
   onUploadProgress?: (ev: ProgressEvent) => any;
   onDownloadProgress?: (ev: ProgressEvent) => any;
@@ -44,9 +43,9 @@ export interface IRequest extends RequestInit {
 
 export type RequestType = string | string[] | Partial<IRequest>;
 
-export interface IWrappedResponse<T = any> {
+export interface IResponse<T = any> {
   origin: Response;
-  value?: T;
+  body?: T;
 }
 
 export interface IFrest {
@@ -54,105 +53,101 @@ export interface IFrest {
   readonly config: IConfig;
   readonly fetchFn: typeof fetch;
   mergeConfig(config: Partial<IConfig>): void;
-  addAfterResponseInterceptor(interceptor: IAfterResponseInterceptor): void;
-  addBeforeRequestInterceptor(interceptor: IBeforeRequestInterceptor): void;
+  addAfterInterceptor(interceptor: IAfterInterceptor): void;
+  addBeforeInterceptor(interceptor: IBeforeInterceptor): void;
   addErrorInterceptor(interceptor: IErrorInterceptor): void;
-  removeAfterResponseInterceptor(
-    idOrValue: string | IAfterResponseInterceptor,
-  ): void;
-  removeBeforeRequestInterceptor(
-    idOrValue: string | IBeforeRequestInterceptor,
-  ): void;
+  removeAfterInterceptor(idOrValue: string | IAfterInterceptor): void;
+  removeBeforeInterceptor(idOrValue: string | IBeforeInterceptor): void;
   removeErrorInterceptor(idOrValue: string | IErrorInterceptor): void;
   request<T = any>(
     pathOrConfig: RequestType,
     requestConfig?: Partial<IRequest>,
-  ): Promise<IWrappedResponse<T>>;
-  post<T = any>(
-    pathOrConfig: RequestType,
-    requestConfig?: Partial<IRequest>,
-  ): Promise<IWrappedResponse<T>>;
+  ): Promise<IResponse<T>>;
+  // post<T = any>(
+  //   pathOrConfig: RequestType,
+  //   requestConfig?: Partial<IRequest>,
+  // ): Promise<IResponse<T>>;
   create<T = any>(
     pathOrConfig: RequestType,
     requestConfig?: Partial<IRequest>,
-  ): Promise<IWrappedResponse<T>>;
+  ): Promise<IResponse<T>>;
   get<T = any>(
     pathOrConfig: RequestType,
     requestConfig?: Partial<IRequest>,
-  ): Promise<IWrappedResponse<T>>;
+  ): Promise<IResponse<T>>;
   read<T = any>(
     pathOrConfig: RequestType,
     requestConfig?: Partial<IRequest>,
-  ): Promise<IWrappedResponse<T>>;
+  ): Promise<IResponse<T>>;
   put<T = any>(
     pathOrConfig: RequestType,
     requestConfig?: Partial<IRequest>,
-  ): Promise<IWrappedResponse<T>>;
+  ): Promise<IResponse<T>>;
   update<T = any>(
     pathOrConfig: RequestType,
     requestConfig?: Partial<IRequest>,
-  ): Promise<IWrappedResponse<T>>;
+  ): Promise<IResponse<T>>;
   patch<T = any>(
     pathOrConfig: RequestType,
     requestConfig?: Partial<IRequest>,
-  ): Promise<IWrappedResponse<T>>;
+  ): Promise<IResponse<T>>;
   delete<T = any>(
     pathOrConfig: RequestType,
     requestConfig?: Partial<IRequest>,
-  ): Promise<IWrappedResponse<T>>;
+  ): Promise<IResponse<T>>;
   destroy<T = any>(
     pathOrConfig: RequestType,
     requestConfig?: Partial<IRequest>,
-  ): Promise<IWrappedResponse<T>>;
+  ): Promise<IResponse<T>>;
   option<T = any>(
     pathOrConfig: RequestType,
     requestConfig?: Partial<IRequest>,
-  ): Promise<IWrappedResponse<T>>;
+  ): Promise<IResponse<T>>;
   upload<T = any>(
     pathOrConfig: RequestType,
     requestConfig?: Partial<IRequest>,
-  ): Promise<IWrappedResponse<T>>;
+  ): Promise<IResponse<T>>;
   download<T = any>(
     pathOrConfig: RequestType,
     requestConfig?: Partial<IRequest>,
-  ): Promise<IWrappedResponse<T>>;
+  ): Promise<IResponse<T>>;
 }
 
 export interface IFrestError {
   message: string;
   config: IConfig;
   request: IRequest;
-  wrappedResponse?: IWrappedResponse<any>;
+  response?: IResponse<any>;
 }
 
-export interface IBeforeRequestInterceptorArg {
+export interface IBeforeInterceptorArg {
   config: IConfig;
-  requestConfig: IRequest;
+  request: IRequest;
 }
 
-export interface IAfterResponseInterceptorArg {
+export interface IAfterInterceptorArg {
   config: IConfig;
-  wrappedResponse: IWrappedResponse<any>;
+  response: IResponse<any>;
 }
 
 export interface ICommonInterceptor {
   id?: string;
 }
 
-export interface IBeforeRequestInterceptor extends ICommonInterceptor {
-  (input: IBeforeRequestInterceptorArg): Promise<IRequest>;
+export interface IBeforeInterceptor extends ICommonInterceptor {
+  (input: IBeforeInterceptorArg): Promise<IRequest>;
 }
 
-export interface IAfterResponseInterceptor extends ICommonInterceptor {
-  (response: IAfterResponseInterceptorArg): Promise<IWrappedResponse<any>>;
+export interface IAfterInterceptor extends ICommonInterceptor {
+  (response: IAfterInterceptorArg): Promise<IResponse<any>>;
 }
 
 export interface IErrorInterceptor extends ICommonInterceptor {
-  (error: IFrestError): Promise<IWrappedResponse<any> | null>;
+  (error: IFrestError): Promise<IResponse<any> | null>;
 }
 
-export interface IInterceptorSets {
-  after: IAfterResponseInterceptor[];
-  before: IBeforeRequestInterceptor[];
+export interface IInterceptorSet {
+  after: IAfterInterceptor[];
+  before: IBeforeInterceptor[];
   error: IErrorInterceptor[];
 }
