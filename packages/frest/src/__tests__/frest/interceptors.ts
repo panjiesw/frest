@@ -80,17 +80,13 @@ test('before request interceptor', async t => {
   frest.addBeforeRequestInterceptor(int2);
 
   const res = await frest.request<{}>('before');
-  if (frest.isWrapped(res)) {
-    t.true(res.origin.ok);
-    t.true(fm.called());
-    t.is((fm.lastOptions() as any).foo, 'bar');
-    t.true(int1.calledOnce);
-    t.true(int2.calledOnce);
-    t.is(order[0], 'int1');
-    t.is(order[1], 'int2');
-  } else {
-    t.fail('Unexpected unwrapped response');
-  }
+  t.true(res.origin.ok);
+  t.true(fm.called());
+  t.is((fm.lastOptions() as any).foo, 'bar');
+  t.true(int1.calledOnce);
+  t.true(int2.calledOnce);
+  t.is(order[0], 'int1');
+  t.is(order[1], 'int2');
 });
 
 test('after response interceptor', async t => {
@@ -115,15 +111,11 @@ test('after response interceptor', async t => {
   });
 
   const res = await frest.request<{ foo: string }>('after');
-  if (frest.isWrapped(res)) {
-    t.true(res.origin.ok);
-    t.true(res.origin.bodyUsed);
-    t.true(fm.called());
-    t.true(int.calledOnce);
-    t.deepEqual(res.value, expectedResponse);
-  } else {
-    t.fail('Unexpected unwrapped response');
-  }
+  t.true(res.origin.ok);
+  t.true(res.origin.bodyUsed);
+  t.true(fm.called());
+  t.true(int.calledOnce);
+  t.deepEqual(res.value, expectedResponse);
 });
 
 test('error interceptor not recovered', async t => {
@@ -171,13 +163,9 @@ test('error interceptor recovered', async t => {
     },
   });
 
-  const res = await frest.request<{error: string}>('error-recovered');
-  if (frest.isWrapped(res)) {
-    t.false(res.origin.ok);
-    t.deepEqual(res.value, { error: 'test' });
-    t.true(fm.called());
-    t.true(int.calledOnce);
-  } else {
-    t.fail('Unexpected unwrapped response');
-  }
+  const res = await frest.request<{ error: string }>('error-recovered');
+  t.false(res.origin.ok);
+  t.deepEqual(res.value, { error: 'test' });
+  t.true(fm.called());
+  t.true(int.calledOnce);
 });

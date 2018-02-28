@@ -1,5 +1,5 @@
 {
-  "name": "frest-src",
+  "name": "frest",
   "private": true,
   "version": "0.0.0",
   "description": "REST client for browser with Fetch",
@@ -28,11 +28,15 @@
     "whatwg-fetch"
   ],
   "scripts": {
-    "format:ts": "prettier --trailing-comma all --single-quote --write \"packages/*/*.js\" \"packages/*/*.ts\" \"packages/*/src/**/*.{ts,tsx}\"",
+    "cm": "git-cz",
+    "format": "prettier --trailing-comma all --single-quote --write \"packages/*/*.js\" \"packages/*/*.ts\" \"packages/*/src/**/*.{ts,tsx}\"",
+    "precommit": "lint-staged",
     "t:frest": "lerna run --scope=frest test",
     "test": "run-p t:*"
   },
   "devDependencies": {
+    "commitizen": "^2.9.6",
+    "cz-conventional-changelog": "^2.1.0",
     "husky": "^0.14.3",
     "lerna": "^2.8.0",
     "lint-staged": "^6.1.0",
@@ -41,5 +45,17 @@
     "tslint": "^5.9.1",
     "tslint-config-prettier": "^1.7.0",
     "typescript": "^2.7.1"
+  },
+  "lint-staged": {
+		"*.{ts,tsx}": [
+			"tslint -e **/*.d.ts --fix",
+			"prettier --trailing-comma all --single-quote --write",
+			"git add"
+		]
+	},
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
   }
 }

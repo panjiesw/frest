@@ -8,15 +8,11 @@ test('string arg must become path', async t => {
   const frest = getInstance();
 
   const res = await frest.request('rconfstring');
-  if (frest.isWrapped(res)) {
-    const lastOptions = fm.lastOptions(url);
-    t.true(res.origin.ok);
-    t.true(fm.called(url));
-    t.is(lastOptions.method, 'GET');
-    t.truthy(lastOptions.headers);
-  } else {
-    t.fail('Unexpected unwrapped response');
-  }
+  const lastOptions = fm.lastOptions(url);
+  t.true(res.origin.ok);
+  t.true(fm.called(url));
+  t.is(lastOptions.method, 'GET');
+  t.truthy(lastOptions.headers);
 });
 
 test('string array arg must become path', async t => {
@@ -25,14 +21,10 @@ test('string array arg must become path', async t => {
   const frest = getInstance();
 
   const res = await frest.request(['foo', 'bar']);
-  if (frest.isWrapped(res)) {
-    const lastOptions = fm.lastOptions(url);
-    t.true(res.origin.ok);
-    t.true(fm.called(url));
-    t.is(lastOptions.method, 'GET');
-  } else {
-    t.fail('Unexpected unwrapped response');
-  }
+  const lastOptions = fm.lastOptions(url);
+  t.true(res.origin.ok);
+  t.true(fm.called(url));
+  t.is(lastOptions.method, 'GET');
 });
 
 test('object arg string path', async t => {
@@ -44,14 +36,10 @@ test('object arg string path', async t => {
     method: 'POST',
     path: 'rconfobj',
   });
-  if (frest.isWrapped(res)) {
-    const lastOptions = fm.lastOptions(url);
-    t.true(res.origin.ok);
-    t.true(fm.called(url));
-    t.is(lastOptions.method, 'POST');
-  } else {
-    t.fail('Unexpected unwrapped response');
-  }
+  const lastOptions = fm.lastOptions(url);
+  t.true(res.origin.ok);
+  t.true(fm.called(url));
+  t.is(lastOptions.method, 'POST');
 });
 
 test('object arg string array', async t => {
@@ -63,14 +51,10 @@ test('object arg string array', async t => {
     method: 'PUT',
     path: ['foo', 'bar', 'baz'],
   });
-  if (frest.isWrapped(res)) {
-    const lastOptions = fm.lastOptions(url);
-    t.true(res.origin.ok);
-    t.true(fm.called(url));
-    t.is(lastOptions.method, 'PUT');
-  } else {
-    t.fail('Unexpected unwrapped response');
-  }
+  const lastOptions = fm.lastOptions(url);
+  t.true(res.origin.ok);
+  t.true(fm.called(url));
+  t.is(lastOptions.method, 'PUT');
 });
 
 test('object arg headers', async t => {
@@ -85,21 +69,17 @@ test('object arg headers', async t => {
   const frest = getInstance();
 
   const res = await frest.request({
-    headers: new Headers({'X-FOO': 'bar'}),
+    headers: new Headers({ 'X-FOO': 'bar' }),
     path: 'headers',
   });
-  if (frest.isWrapped(res)) {
-    const lastOptions = fm.lastOptions(url);
-    t.true(res.origin.ok);
-    t.true(fm.called(url));
-    t.is(lastOptions.method, 'GET');
-    if (lastOptions.headers instanceof Headers) {
-      t.is(lastOptions.headers.get('X-FOO'), 'bar');
-    } else {
-      t.fail('Unexpected headers')
-    }
+  const lastOptions = fm.lastOptions(url);
+  t.true(res.origin.ok);
+  t.true(fm.called(url));
+  t.is(lastOptions.method, 'GET');
+  if (lastOptions.headers instanceof Headers) {
+    t.is(lastOptions.headers.get('X-FOO'), 'bar');
   } else {
-    t.fail('Unexpected unwrapped response');
+    t.fail('Unexpected headers');
   }
 });
 
@@ -108,11 +88,7 @@ test('both arg', async t => {
   const fm = fetchMock.deleteOnce(url, {});
   const frest = getInstance();
 
-  const res = await frest.request('both', {method: 'DELETE'});
-  if (frest.isWrapped(res)) {
-    t.true(res.origin.ok);
-    t.true(fm.called(url));
-  } else {
-    t.fail('Unexpected unwrapped response');
-  }
+  const res = await frest.request('both', { method: 'DELETE' });
+  t.true(res.origin.ok);
+  t.true(fm.called(url));
 });

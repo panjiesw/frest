@@ -15,13 +15,9 @@ test('post & create', async t => {
   const res1 = await frest.post('testpost');
   const res2 = await frest.create('testpost');
 
-  if (frest.isWrapped(res1) && frest.isWrapped(res2)) {
-    t.true(res1.origin.ok);
-    t.true(res2.origin.ok);
-    t.is(fm.calls(url).length, 2);
-  } else {
-    t.fail('Unexpected unwrapped response');
-  }
+  t.true(res1.origin.ok);
+  t.true(res2.origin.ok);
+  t.is(fm.calls(url).length, 2);
 });
 
 test('get & read', async t => {
@@ -37,13 +33,9 @@ test('get & read', async t => {
   const res1 = await frest.get('testget');
   const res2 = await frest.read('testget');
 
-  if (frest.isWrapped(res1) && frest.isWrapped(res2)) {
-    t.true(res1.origin.ok);
-    t.true(res2.origin.ok);
-    t.is(fm.calls(url).length, 2);
-  } else {
-    t.fail('Unexpected unwrapped response');
-  }
+  t.true(res1.origin.ok);
+  t.true(res2.origin.ok);
+  t.is(fm.calls(url).length, 2);
 });
 
 test('put & update', async t => {
@@ -59,13 +51,9 @@ test('put & update', async t => {
   const res1 = await frest.put('testput');
   const res2 = await frest.update('testput');
 
-  if (frest.isWrapped(res1) && frest.isWrapped(res2)) {
-    t.true(res1.origin.ok);
-    t.true(res2.origin.ok);
-    t.is(fm.calls(url).length, 2);
-  } else {
-    t.fail('Unexpected unwrapped response');
-  }
+  t.true(res1.origin.ok);
+  t.true(res2.origin.ok);
+  t.is(fm.calls(url).length, 2);
 });
 
 test('delete & destroy', async t => {
@@ -81,13 +69,9 @@ test('delete & destroy', async t => {
   const res1 = await frest.delete('testdelete');
   const res2 = await frest.destroy('testdelete');
 
-  if (frest.isWrapped(res1) && frest.isWrapped(res2)) {
-    t.true(res1.origin.ok);
-    t.true(res2.origin.ok);
-    t.is(fm.calls(url).length, 2);
-  } else {
-    t.fail('Unexpected unwrapped response');
-  }
+  t.true(res1.origin.ok);
+  t.true(res2.origin.ok);
+  t.is(fm.calls(url).length, 2);
 });
 
 test('patch', async t => {
@@ -97,12 +81,8 @@ test('patch', async t => {
 
   const res1 = await frest.patch('testpatch');
 
-  if (frest.isWrapped(res1)) {
-    t.true(res1.origin.ok);
-    t.true(fm.called(url))
-  } else {
-    t.fail('Unexpected unwrapped response');
-  }
+  t.true(res1.origin.ok);
+  t.true(fm.called(url));
 });
 
 test('option', async t => {
@@ -112,10 +92,6 @@ test('option', async t => {
 
   const res1 = await frest.option('testoption');
 
-  if (frest.isWrapped(res1)) {
-    t.true(res1.origin.ok);
-    t.true(fm.called(url));
-  } else {
-    t.fail('Unexpected unwrapped response');
-  }
+  t.true(res1.origin.ok);
+  t.true(fm.called(url));
 });

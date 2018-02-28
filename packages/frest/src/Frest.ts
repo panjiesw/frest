@@ -6,34 +6,15 @@
 import assign from 'object-assign';
 import qs from 'query-string';
 import { FrestError } from './FrestError';
-import {
-  TFrestConfig,
-  TFrestRequest,
-  TFrestResponse,
-  IAfterResponseInterceptor,
-  IBeforeRequestInterceptor,
-  IErrorInterceptor,
-  IFrest,
-  IFrestConfig,
-  IFrestError,
-  IFrestRequestConfig,
-  IInterceptorSets,
-  IWrappedFrestResponse,
-  ICommonInterceptor,
-} from './interface';
+import * as t from './types';
 import xhr from './xhr';
 
 interface IInternalAfterFetch {
   response: Response;
-  request: IFrestRequestConfig;
+  request: t.IRequest;
 }
 
-interface IInternalTransform {
-  response: IWrappedFrestResponse<any>;
-  request: IFrestRequestConfig;
-}
-
-export const FREST_DEFAULT_CONFIG: IFrestConfig = {
+export const FREST_DEFAULT_CONFIG: t.IConfig = {
   base: '',
   fetch,
   headers: new Headers(),
@@ -41,11 +22,11 @@ export const FREST_DEFAULT_CONFIG: IFrestConfig = {
   method: 'GET',
 };
 
-export class Frest implements IFrest {
-  private _config: IFrestConfig;
-  private interceptors: IInterceptorSets;
+export class Frest implements t.IFrest {
+  private _config: t.IConfig;
+  private interceptors: t.IInterceptorSets;
 
-  constructor(config?: TFrestConfig) {
+  constructor(config?: t.ConfigType) {
     if (config && typeof config === 'string') {
       this._config = assign({}, FREST_DEFAULT_CONFIG, { base: config });
     } else if (config && typeof config === 'object') {
@@ -70,7 +51,7 @@ export class Frest implements IFrest {
     }
   }
 
-  public get config(): IFrestConfig {
+  public get config(): t.IConfig {
     return this._config;
   }
 
@@ -78,7 +59,7 @@ export class Frest implements IFrest {
     return this._config.base;
   }
 
-  public mergeConfig(config: Partial<IFrestConfig>) {
+  public mergeConfig(config: Partial<t.IConfig>) {
     this._config = assign({}, this._config, config);
   }
 
@@ -86,20 +67,20 @@ export class Frest implements IFrest {
     return this._config.fetch;
   }
 
-  public addAfterResponseInterceptor(interceptor: IAfterResponseInterceptor) {
+  public addAfterResponseInterceptor(interceptor: t.IAfterResponseInterceptor) {
     this.interceptors.after.push(interceptor);
   }
 
-  public addBeforeRequestInterceptor(interceptor: IBeforeRequestInterceptor) {
+  public addBeforeRequestInterceptor(interceptor: t.IBeforeRequestInterceptor) {
     this.interceptors.before.push(interceptor);
   }
 
-  public addErrorInterceptor(interceptor: IErrorInterceptor) {
+  public addErrorInterceptor(interceptor: t.IErrorInterceptor) {
     this.interceptors.error.push(interceptor);
   }
 
   public removeAfterResponseInterceptor(
-    idOrValue: string | IAfterResponseInterceptor,
+    idOrValue: string | t.IAfterResponseInterceptor,
   ) {
     if (typeof idOrValue === 'string') {
       const idx = this.findInterceptor(this.interceptors.after, idOrValue);
@@ -115,7 +96,7 @@ export class Frest implements IFrest {
   }
 
   public removeBeforeRequestInterceptor(
-    idOrValue: string | IBeforeRequestInterceptor,
+    idOrValue: string | t.IBeforeRequestInterceptor,
   ) {
     if (typeof idOrValue === 'string') {
       const idx = this.findInterceptor(this.interceptors.before, idOrValue);
@@ -130,7 +111,7 @@ export class Frest implements IFrest {
     }
   }
 
-  public removeErrorInterceptor(idOrValue: string | IErrorInterceptor) {
+  public removeErrorInterceptor(idOrValue: string | t.IErrorInterceptor) {
     if (typeof idOrValue === 'string') {
       const idx = this.findInterceptor(this.interceptors.error, idOrValue);
       if (idx > -1) {
@@ -145,10 +126,10 @@ export class Frest implements IFrest {
   }
 
   public request<T = any>(
-    pathOrConfig: TFrestRequest,
-    requestConfig: Partial<IFrestRequestConfig> = {},
-  ): Promise<TFrestResponse<T>> {
-    const config = assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
+    pathOrConfig: t.RequestType,
+    requestConfig: Partial<t.IRequest> = {},
+  ): Promise<t.IWrappedResponse<T>> {
+    const config = assign<t.IRequest, Partial<t.IRequest>>(
       this.requestConfig(pathOrConfig, requestConfig),
       { action: 'request' },
     );
@@ -156,20 +137,20 @@ export class Frest implements IFrest {
   }
 
   public post<T = any>(
-    pathOrConfig: TFrestRequest,
-    requestConfig: Partial<IFrestRequestConfig> = {},
-  ): Promise<TFrestResponse<T>> {
-    const config = assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
+    pathOrConfig: t.RequestType,
+    requestConfig: Partial<t.IRequest> = {},
+  ): Promise<t.IWrappedResponse<T>> {
+    const config = assign<t.IRequest, Partial<t.IRequest>>(
       this.requestConfig(pathOrConfig, requestConfig),
       { method: 'POST', action: 'post' },
     );
     return this.internalRequest<T>(config);
   }
   public create<T = any>(
-    pathOrConfig: TFrestRequest,
-    requestConfig: Partial<IFrestRequestConfig> = {},
-  ): Promise<TFrestResponse<T>> {
-    const config = assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
+    pathOrConfig: t.RequestType,
+    requestConfig: Partial<t.IRequest> = {},
+  ): Promise<t.IWrappedResponse<T>> {
+    const config = assign<t.IRequest, Partial<t.IRequest>>(
       this.requestConfig(pathOrConfig, requestConfig),
       { method: 'POST', action: 'create' },
     );
@@ -177,20 +158,20 @@ export class Frest implements IFrest {
   }
 
   public get<T = any>(
-    pathOrConfig: TFrestRequest,
-    requestConfig: Partial<IFrestRequestConfig> = {},
-  ): Promise<TFrestResponse<T>> {
-    const config = assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
+    pathOrConfig: t.RequestType,
+    requestConfig: Partial<t.IRequest> = {},
+  ): Promise<t.IWrappedResponse<T>> {
+    const config = assign<t.IRequest, Partial<t.IRequest>>(
       this.requestConfig(pathOrConfig, requestConfig),
       { method: 'GET', action: 'get' },
     );
     return this.internalRequest<T>(config);
   }
   public read<T = any>(
-    pathOrConfig: TFrestRequest,
-    requestConfig: Partial<IFrestRequestConfig> = {},
-  ): Promise<TFrestResponse<T>> {
-    const config = assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
+    pathOrConfig: t.RequestType,
+    requestConfig: Partial<t.IRequest> = {},
+  ): Promise<t.IWrappedResponse<T>> {
+    const config = assign<t.IRequest, Partial<t.IRequest>>(
       this.requestConfig(pathOrConfig, requestConfig),
       { method: 'GET', action: 'read' },
     );
@@ -198,20 +179,20 @@ export class Frest implements IFrest {
   }
 
   public put<T = any>(
-    pathOrConfig: TFrestRequest,
-    requestConfig: Partial<IFrestRequestConfig> = {},
-  ): Promise<TFrestResponse<T>> {
-    const config = assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
+    pathOrConfig: t.RequestType,
+    requestConfig: Partial<t.IRequest> = {},
+  ): Promise<t.IWrappedResponse<T>> {
+    const config = assign<t.IRequest, Partial<t.IRequest>>(
       this.requestConfig(pathOrConfig, requestConfig),
       { method: 'PUT', action: 'put' },
     );
     return this.internalRequest<T>(config);
   }
   public update<T = any>(
-    pathOrConfig: TFrestRequest,
-    requestConfig: Partial<IFrestRequestConfig> = {},
-  ): Promise<TFrestResponse<T>> {
-    const config = assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
+    pathOrConfig: t.RequestType,
+    requestConfig: Partial<t.IRequest> = {},
+  ): Promise<t.IWrappedResponse<T>> {
+    const config = assign<t.IRequest, Partial<t.IRequest>>(
       this.requestConfig(pathOrConfig, requestConfig),
       { method: 'PUT', action: 'update' },
     );
@@ -219,10 +200,10 @@ export class Frest implements IFrest {
   }
 
   public patch<T = any>(
-    pathOrConfig: TFrestRequest,
-    requestConfig: Partial<IFrestRequestConfig> = {},
-  ): Promise<TFrestResponse<T>> {
-    const config = assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
+    pathOrConfig: t.RequestType,
+    requestConfig: Partial<t.IRequest> = {},
+  ): Promise<t.IWrappedResponse<T>> {
+    const config = assign<t.IRequest, Partial<t.IRequest>>(
       this.requestConfig(pathOrConfig, requestConfig),
       { method: 'PATCH', action: 'patch' },
     );
@@ -230,20 +211,20 @@ export class Frest implements IFrest {
   }
 
   public delete<T = any>(
-    pathOrConfig: TFrestRequest,
-    requestConfig: Partial<IFrestRequestConfig> = {},
-  ): Promise<TFrestResponse<T>> {
-    const config = assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
+    pathOrConfig: t.RequestType,
+    requestConfig: Partial<t.IRequest> = {},
+  ): Promise<t.IWrappedResponse<T>> {
+    const config = assign<t.IRequest, Partial<t.IRequest>>(
       this.requestConfig(pathOrConfig, requestConfig),
       { method: 'DELETE', action: 'delete' },
     );
     return this.internalRequest<T>(config);
   }
   public destroy<T = any>(
-    pathOrConfig: TFrestRequest,
-    requestConfig: Partial<IFrestRequestConfig> = {},
-  ): Promise<TFrestResponse<T>> {
-    const config = assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
+    pathOrConfig: t.RequestType,
+    requestConfig: Partial<t.IRequest> = {},
+  ): Promise<t.IWrappedResponse<T>> {
+    const config = assign<t.IRequest, Partial<t.IRequest>>(
       this.requestConfig(pathOrConfig, requestConfig),
       { method: 'DELETE', action: 'destroy' },
     );
@@ -251,10 +232,10 @@ export class Frest implements IFrest {
   }
 
   public option<T = any>(
-    pathOrConfig: TFrestRequest,
-    requestConfig: Partial<IFrestRequestConfig> = {},
-  ): Promise<TFrestResponse<T>> {
-    const config = assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
+    pathOrConfig: t.RequestType,
+    requestConfig: Partial<t.IRequest> = {},
+  ): Promise<t.IWrappedResponse<T>> {
+    const config = assign<t.IRequest, Partial<t.IRequest>>(
       this.requestConfig(pathOrConfig, requestConfig),
       { method: 'OPTION', action: 'option' },
     );
@@ -262,10 +243,10 @@ export class Frest implements IFrest {
   }
 
   public upload<T = any>(
-    pathOrConfig: TFrestRequest,
-    requestConfig: Partial<IFrestRequestConfig> = {},
-  ): Promise<TFrestResponse<T>> {
-    const config = assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
+    pathOrConfig: t.RequestType,
+    requestConfig: Partial<t.IRequest> = {},
+  ): Promise<t.IWrappedResponse<T>> {
+    const config = assign<t.IRequest, Partial<t.IRequest>>(
       this.requestConfig(pathOrConfig, requestConfig),
       { method: 'POST', action: 'upload' },
     );
@@ -278,23 +259,17 @@ export class Frest implements IFrest {
   }
 
   public download<T = any>(
-    pathOrConfig: TFrestRequest,
-    requestConfig: Partial<IFrestRequestConfig> = {},
-  ): Promise<TFrestResponse<T>> {
-    const config = assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
+    pathOrConfig: t.RequestType,
+    requestConfig: Partial<t.IRequest> = {},
+  ): Promise<t.IWrappedResponse<T>> {
+    const config = assign<t.IRequest, Partial<t.IRequest>>(
       this.requestConfig(pathOrConfig, requestConfig),
       { method: 'GET', action: 'download' },
     );
     return this.internalRequest<T>(config);
   }
 
-  public isWrapped<T = any>(
-    res: TFrestResponse<T>,
-  ): res is IWrappedFrestResponse<T> {
-    return (res as IWrappedFrestResponse).origin !== undefined;
-  }
-
-  private findInterceptor(arr: ICommonInterceptor[], id?: string): number {
+  private findInterceptor(arr: t.ICommonInterceptor[], id?: string): number {
     let found = false;
     let i = 0;
     while (i < arr.length) {
@@ -308,22 +283,21 @@ export class Frest implements IFrest {
   }
 
   private internalRequest<T = any>(
-    requestConfig: IFrestRequestConfig,
-  ): Promise<TFrestResponse<T>> {
+    requestConfig: t.IRequest,
+  ): Promise<t.IWrappedResponse<T>> {
     return this.doBefore(requestConfig)
       .then(this.doRequest)
       .then(this.doAfter)
-      .then(this.doTransform)
       .catch(this.onError(requestConfig));
   }
 
   private requestConfig(
-    pathOrConfig: TFrestRequest,
-    requestConfig: Partial<IFrestRequestConfig>,
-  ): IFrestRequestConfig {
-    const {headers, method} = this._config;
+    pathOrConfig: t.RequestType,
+    requestConfig: Partial<t.IRequest>,
+  ): t.IRequest {
+    const { headers, method } = this._config;
     if (typeof pathOrConfig === 'string' || pathOrConfig instanceof Array) {
-      return assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
+      return assign<t.IRequest, Partial<t.IRequest>>(
         {
           headers,
           method,
@@ -332,7 +306,7 @@ export class Frest implements IFrest {
         requestConfig,
       );
     }
-    return assign<IFrestRequestConfig, Partial<IFrestRequestConfig>>(
+    return assign<t.IRequest, Partial<t.IRequest>>(
       {
         headers,
         method,
@@ -342,7 +316,7 @@ export class Frest implements IFrest {
     );
   }
 
-  private getFetchFunc(requestConfig: IFrestRequestConfig): typeof fetch {
+  private getFetchFunc(requestConfig: t.IRequest): typeof fetch {
     if (
       requestConfig.action === 'upload' ||
       requestConfig.action === 'download'
@@ -362,9 +336,9 @@ export class Frest implements IFrest {
     );
   }
 
-  private doBefore(config: IFrestRequestConfig) {
-    return new Promise<IFrestRequestConfig>((resolve, reject) => {
-      let requestPromise = Promise.resolve<IFrestRequestConfig>(config);
+  private doBefore(config: t.IRequest) {
+    return new Promise<t.IRequest>((resolve, reject) => {
+      let requestPromise = Promise.resolve<t.IRequest>(config);
       for (const requestInterceptor of this.interceptors.before) {
         requestPromise = requestPromise.then(requestConfig => {
           if (!requestConfig) {
@@ -394,9 +368,7 @@ export class Frest implements IFrest {
     });
   }
 
-  private doRequest = (
-    request: IFrestRequestConfig,
-  ): Promise<IInternalAfterFetch> => {
+  private doRequest = (request: t.IRequest): Promise<IInternalAfterFetch> => {
     let fetchFn: typeof fetch;
     const paths: string[] = request.path
       ? request.path instanceof Array ? request.path : [request.path]
@@ -420,7 +392,7 @@ export class Frest implements IFrest {
 
   private doAfter = <T = any>(
     afterFetch: IInternalAfterFetch,
-  ): Promise<IInternalTransform> => {
+  ): Promise<t.IWrappedResponse> => {
     const { response, request } = afterFetch;
     if (!response.ok) {
       return Promise.reject(
@@ -434,7 +406,7 @@ export class Frest implements IFrest {
         ),
       );
     }
-    let responsePromise: Promise<IWrappedFrestResponse<T>> = Promise.resolve({
+    let responsePromise: Promise<t.IWrappedResponse<T>> = Promise.resolve({
       origin: response,
     });
     for (const responseInterceptor of this.interceptors.after) {
@@ -452,7 +424,7 @@ export class Frest implements IFrest {
         });
       });
     }
-    return responsePromise.then(r => ({ request, response: r })).catch(e => {
+    return responsePromise.catch(e => {
       const cause = typeof e === 'string' ? e : e.message ? e.message : e;
       return Promise.reject(
         new FrestError(
@@ -465,28 +437,18 @@ export class Frest implements IFrest {
     });
   };
 
-  private doTransform = <T = any>(
-    transform: IInternalTransform,
-  ): Promise<TFrestResponse<T>> => {
-    const { response, request } = transform;
-    if (request.nowrap) {
-      return Promise.resolve<T>(response.value);
-    }
-    return Promise.resolve<TFrestResponse<T>>(response);
-  };
-
-  private onError = (requestConfig: IFrestRequestConfig) => (e: any): any => {
-    let err: IFrestError = this.toFestError(e, requestConfig);
+  private onError = (requestConfig: t.IRequest) => (e: any): any => {
+    let err: t.IFrestError = this.toFestError(e, requestConfig);
 
     if (this.interceptors.error.length === 0) {
       return Promise.reject(err);
     }
 
     return new Promise<any>((resolve, reject) => {
-      let promise: Promise<void | IWrappedFrestResponse<
+      let promise: Promise<void | t.IWrappedResponse<
         any
       > | null> = Promise.resolve(null);
-      let recovery: IWrappedFrestResponse<any> | null = null;
+      let recovery: t.IWrappedResponse<any> | null = null;
       for (const errorInterceptor of this.interceptors.error) {
         if (recovery != null) {
           break;
@@ -529,7 +491,7 @@ export class Frest implements IFrest {
     return input.toString().replace(/(^\/+|\/+$)/g, '');
   }
 
-  private toFestError(e: any, requestConfig: IFrestRequestConfig): IFrestError {
+  private toFestError(e: any, requestConfig: t.IRequest): t.IFrestError {
     return !e.config && !e.request
       ? new FrestError(e.message, this._config, requestConfig)
       : e;

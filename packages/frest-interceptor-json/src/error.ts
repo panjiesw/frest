@@ -3,12 +3,12 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { IErrorInterceptor, IFrestError, IWrappedFrestResponse } from 'frest';
+import { IErrorInterceptor, IFrestError, IWrappedResponse } from 'frest';
 import { ID_ERROR } from './ids';
 
 const error: () => IErrorInterceptor = () => {
   const interceptor: IErrorInterceptor = (err: IFrestError) =>
-    new Promise<IWrappedFrestResponse<any> | null>((resolve, reject) => {
+    new Promise<IWrappedResponse<any> | null>((resolve, reject) => {
       const { wrappedResponse } = err;
       if (wrappedResponse) {
         const { headers, bodyUsed } = wrappedResponse.origin;

@@ -1,11 +1,15 @@
 import test from 'ava';
-import { Frest, IFrestConfig } from '../../';
+import { Frest, IConfig } from '../../';
 import { FREST_DEFAULT_CONFIG } from '../../Frest';
 import { BASE } from '../fixtures';
 
 test('constructor no arg default config', t => {
   const frest = new Frest();
-  t.deepEqual(frest.config, FREST_DEFAULT_CONFIG, 'must be equal the default config');
+  t.deepEqual(
+    frest.config,
+    FREST_DEFAULT_CONFIG,
+    'must be equal the default config',
+  );
 });
 
 test('constructor string arg become base', t => {
@@ -19,7 +23,7 @@ test('constructor string arg become base', t => {
 });
 
 test('constructor merge config', t => {
-  const config: Partial<IFrestConfig> = {
+  const config: Partial<IConfig> = {
     base: BASE,
     method: 'POST',
   };

@@ -1,4 +1,4 @@
-import { IFrestRequestConfig } from './interface';
+import { IRequest } from './types';
 
 const supportBlob = () =>
   FileReader !== undefined &&
@@ -30,7 +30,7 @@ function parseHeaders(rawHeaders: any) {
   return headers;
 }
 
-function xhrFetch(url: string, conf: IFrestRequestConfig): Promise<Response> {
+function xhrFetch(url: string, conf: IRequest): Promise<Response> {
   return new Promise<Response>((resolve, reject) => {
     // const request = new Request(url, conf);
     const xhr = new XMLHttpRequest();

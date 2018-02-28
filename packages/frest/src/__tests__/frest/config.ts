@@ -1,14 +1,14 @@
 import test from 'ava';
-import { Frest, IFrestConfig } from '../../';
+import { Frest, IConfig } from '../../';
 import { FREST_DEFAULT_CONFIG } from '../../Frest';
 import { BASE } from '../fixtures';
 
 test('merge', t => {
-  const config: Partial<IFrestConfig> = {
+  const config: Partial<IConfig> = {
     base: BASE,
     method: 'POST',
   };
-  const changed: Partial<IFrestConfig> = {
+  const changed: Partial<IConfig> = {
     credentials: 'include',
     method: 'GET',
   };

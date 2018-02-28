@@ -6,7 +6,7 @@
 import {
   IAfterResponseInterceptorArg,
   IAfterResponseInterceptor,
-  IWrappedFrestResponse,
+  IWrappedResponse,
 } from 'frest';
 import { ID_AFTER } from './ids';
 
@@ -20,7 +20,7 @@ const after: (
   const interceptor: IAfterResponseInterceptor = (
     input: IAfterResponseInterceptorArg,
   ) =>
-    new Promise<IWrappedFrestResponse<any>>((resolve, reject) => {
+    new Promise<IWrappedResponse<any>>((resolve, reject) => {
       const { origin, value: originValue } = input.wrappedResponse;
       const { headers, bodyUsed, status } = origin;
       const ct = headers.get('Content-Type');

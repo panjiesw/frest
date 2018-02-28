@@ -6,7 +6,7 @@
 import {
   IBeforeRequestInterceptorArg,
   IBeforeRequestInterceptor,
-  IFrestRequestConfig,
+  IRequest,
 } from 'frest';
 import assign from 'object-assign';
 import { ID_BEFORE } from './ids';
@@ -15,7 +15,7 @@ const before: () => IBeforeRequestInterceptor = () => {
   const interceptor: IBeforeRequestInterceptor = (
     input: IBeforeRequestInterceptorArg,
   ) =>
-    new Promise<IFrestRequestConfig>((resolve, reject) => {
+    new Promise<IRequest>((resolve, reject) => {
       try {
         const { body: origin, headers, skip } = input.requestConfig;
         let body = input.requestConfig.body;
