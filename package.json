@@ -49,7 +49,7 @@
   "lint-staged": {
 		"*.{ts,tsx}": [
 			"tslint -e **/*.d.ts --fix",
-			"prettier --trailing-comma all --single-quote --use-tabs --write",
+			"prettier --trailing-comma all --single-quote --write",
 			"git add"
 		]
 	},
