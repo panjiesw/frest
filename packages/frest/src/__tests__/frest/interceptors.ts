@@ -16,9 +16,9 @@ test('constructor interceptors', t => {
     },
   });
 
-  t.is((frest as any).interceptors.after.length, 1);
-  t.is((frest as any).interceptors.before.length, 1);
-  t.is((frest as any).interceptors.error.length, 1);
+  t.is(frest.config.interceptors.after.length, 1);
+  t.is(frest.config.interceptors.before.length, 1);
+  t.is(frest.config.interceptors.error.length, 1);
 });
 
 test('add-remove', t => {
@@ -28,31 +28,31 @@ test('add-remove', t => {
   const frest = new Frest();
 
   frest.addAfterResponseInterceptor(int);
-  t.is((frest as any).interceptors.after.length, 1);
+  t.is(frest.config.interceptors.after.length, 1);
   frest.removeAfterResponseInterceptor(int.id);
-  t.is((frest as any).interceptors.after.length, 0);
+  t.is(frest.config.interceptors.after.length, 0);
   frest.addAfterResponseInterceptor(int);
-  t.is((frest as any).interceptors.after.length, 1);
+  t.is(frest.config.interceptors.after.length, 1);
   frest.removeAfterResponseInterceptor(int);
-  t.is((frest as any).interceptors.after.length, 0);
+  t.is(frest.config.interceptors.after.length, 0);
 
   frest.addBeforeRequestInterceptor(int);
-  t.is((frest as any).interceptors.before.length, 1);
+  t.is(frest.config.interceptors.before.length, 1);
   frest.removeBeforeRequestInterceptor(int.id);
-  t.is((frest as any).interceptors.before.length, 0);
+  t.is(frest.config.interceptors.before.length, 0);
   frest.addBeforeRequestInterceptor(int);
-  t.is((frest as any).interceptors.before.length, 1);
+  t.is(frest.config.interceptors.before.length, 1);
   frest.removeBeforeRequestInterceptor(int);
-  t.is((frest as any).interceptors.before.length, 0);
+  t.is(frest.config.interceptors.before.length, 0);
 
   frest.addErrorInterceptor(int);
-  t.is((frest as any).interceptors.error.length, 1);
+  t.is(frest.config.interceptors.error.length, 1);
   frest.removeErrorInterceptor(int.id);
-  t.is((frest as any).interceptors.error.length, 0);
+  t.is(frest.config.interceptors.error.length, 0);
   frest.addErrorInterceptor(int);
-  t.is((frest as any).interceptors.error.length, 1);
+  t.is(frest.config.interceptors.error.length, 1);
   frest.removeErrorInterceptor(int);
-  t.is((frest as any).interceptors.error.length, 0);
+  t.is(frest.config.interceptors.error.length, 0);
 });
 
 test('before request interceptor', async t => {
@@ -81,7 +81,7 @@ test('before request interceptor', async t => {
 
   const res = await frest.request<{}>('before');
   t.true(res.origin.ok);
-  t.true(fm.called());
+  t.true(fm.called(url));
   t.is((fm.lastOptions() as any).foo, 'bar');
   t.true(int1.calledOnce);
   t.true(int2.calledOnce);

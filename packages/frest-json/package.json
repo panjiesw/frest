@@ -1,5 +1,5 @@
 {
-	"name": "frest-interceptor-json",
+	"name": "frest-json",
 	"version": "0.2.2",
 	"description": "A set of JSON interceptors for Frest",
 	"license": "MIT",
@@ -9,7 +9,7 @@
 	"homepage": "https://github.com/panjiesw/frest",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/panjiesw/frest.git"
+		"url": "https://github.com/panjiesw/frest/tree/master/packages/frest-json"
 	},
 	"author": {
 		"name": "Panjie Setiawan Wicaksono",
@@ -38,13 +38,36 @@
 		"b:es": "tsc --declaration --outDir es",
 		"b:lib": "tsc --declaration -m commonjs --outDir lib",
 		"b:umd": "webpack --profile",
-		"build": "run-s del b:*",
+		"build": "run-s del b:* d:b",
+		"d:b": "del-cli es/**/__tests__ lib/**/__tests__",
 		"d:unit": "del-cli lib .nyc_output coverage",
 		"del": "del-cli es lib umd .nyc_output coverage node_modules/.cache",
-		"w:lib": "yarn b:lib -w"
+		"t:a": "cross-env NODE_ENV=test nyc ava --tap | faucet",
+		"w:lib": "yarn b:lib -w",
+    "report": "nyc report",
+    "start": "run-p w:lib w:a",
+    "test": "run-s unit report",
+    "unit": "run-s d:unit b:lib t:a",
+    "w:a": "ava --watch"
 	},
+	"ava": {
+    "concurrency": 1,
+    "files": [
+      "lib/__tests__/**/*.js"
+    ],
+    "require": [
+      "./src/__tests__/_helpers.js"
+    ]
+  },
+  "nyc": {
+    "reporter": [
+      "text",
+      "lcov",
+      "cobertura"
+    ]
+  },
 	"peerDependencies": {
-		"frest": "~0.5.0"
+		"frest": "~0.6.0"
 	},
 	"devDependencies": {
 		"@types/fetch-mock": "^5.12.2",

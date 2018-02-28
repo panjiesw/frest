@@ -3,31 +3,40 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import {
-  IBeforeRequestInterceptorArg,
-  IBeforeRequestInterceptor,
-  IRequest,
-} from 'frest';
+import * as t from 'frest';
 import assign from 'object-assign';
 import { ID_BEFORE } from './ids';
 
-const before: () => IBeforeRequestInterceptor = () => {
-  const interceptor: IBeforeRequestInterceptor = (
-    input: IBeforeRequestInterceptorArg,
+export interface IJSONBeforeOption {
+  headerContent?: string;
+  headerAccept?: string;
+  method?: t.HttpMethod;
+}
+
+const before = (opts: IJSONBeforeOption = {}): t.IBeforeRequestInterceptor => {
+  const { headerAccept, headerContent, method } = opts;
+  const interceptor: t.IBeforeRequestInterceptor = (
+    input: t.IBeforeRequestInterceptorArg,
   ) =>
-    new Promise<IRequest>((resolve, reject) => {
+    new Promise<t.IRequest>((resolve, reject) => {
       try {
-        const { body: origin, headers, skip } = input.requestConfig;
+        const {
+          body: origin,
+          method: meth,
+          headers,
+          skip,
+        } = input.requestConfig;
         let body = input.requestConfig.body;
         if (
           typeof origin === 'object' &&
           !(origin instanceof FormData) &&
           !(origin instanceof ArrayBuffer) &&
+          (!method || method === meth) &&
           (!skip || skip.indexOf(ID_BEFORE) < 0)
         ) {
           body = JSON.stringify(origin);
-          headers.set('Content-Type', 'application/json');
-          headers.set('Accept', 'application/json');
+          headers.set('Content-Type', headerContent || 'application/json');
+          headers.set('Accept', headerAccept || 'application/json');
         }
         resolve(assign({}, input.requestConfig, { headers, body }));
       } catch (e) {

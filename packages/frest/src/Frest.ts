@@ -3,7 +3,6 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import assign from 'object-assign';
 import qs from 'query-string';
 import { FrestError } from './FrestError';
 import * as t from './types';
@@ -14,41 +13,32 @@ interface IInternalAfterFetch {
   request: t.IRequest;
 }
 
-export const FREST_DEFAULT_CONFIG: t.IConfig = {
+export const DEFAULT_CONFIG: t.IConfig & {
+  interceptors: t.IInterceptorSets;
+} = {
   base: '',
   fetch,
   headers: new Headers(),
-  interceptors: {},
+  interceptors: { after: [], before: [], error: [] },
   method: 'GET',
 };
 
 export class Frest implements t.IFrest {
   private _config: t.IConfig;
-  private interceptors: t.IInterceptorSets;
 
   constructor(config?: t.ConfigType) {
     if (config && typeof config === 'string') {
-      this._config = assign({}, FREST_DEFAULT_CONFIG, { base: config });
+      this._config = { ...DEFAULT_CONFIG, base: config };
     } else if (config && typeof config === 'object') {
-      this._config = assign({}, FREST_DEFAULT_CONFIG, config);
+      const interceptors = {
+        ...DEFAULT_CONFIG.interceptors,
+        ...config.interceptors,
+      };
+      this._config = { ...DEFAULT_CONFIG, ...config, interceptors };
     } else {
-      this._config = assign({}, FREST_DEFAULT_CONFIG);
+      this._config = { ...DEFAULT_CONFIG };
     }
     this._config.base = this.trimSlashes(this._config.base);
-    this.interceptors = {
-      after: [],
-      before: [],
-      error: [],
-    };
-    if (this._config.interceptors.after) {
-      this.interceptors.after = this._config.interceptors.after;
-    }
-    if (this._config.interceptors.before) {
-      this.interceptors.before = this._config.interceptors.before;
-    }
-    if (this._config.interceptors.error) {
-      this.interceptors.error = this._config.interceptors.error;
-    }
   }
 
   public get config(): t.IConfig {
@@ -59,8 +49,12 @@ export class Frest implements t.IFrest {
     return this._config.base;
   }
 
-  public mergeConfig(config: Partial<t.IConfig>) {
-    this._config = assign({}, this._config, config);
+  public mergeConfig(config: t.ConfigMergeType) {
+    const interceptors = {
+      ...this._config.interceptors,
+      ...config.interceptors,
+    };
+    this._config = { ...this._config, ...config, interceptors };
   }
 
   public get fetchFn(): typeof window.fetch {
@@ -68,29 +62,35 @@ export class Frest implements t.IFrest {
   }
 
   public addAfterResponseInterceptor(interceptor: t.IAfterResponseInterceptor) {
-    this.interceptors.after.push(interceptor);
+    this._config.interceptors.after.push(interceptor);
   }
 
   public addBeforeRequestInterceptor(interceptor: t.IBeforeRequestInterceptor) {
-    this.interceptors.before.push(interceptor);
+    this._config.interceptors.before.push(interceptor);
   }
 
   public addErrorInterceptor(interceptor: t.IErrorInterceptor) {
-    this.interceptors.error.push(interceptor);
+    this._config.interceptors.error.push(interceptor);
   }
 
   public removeAfterResponseInterceptor(
     idOrValue: string | t.IAfterResponseInterceptor,
   ) {
     if (typeof idOrValue === 'string') {
-      const idx = this.findInterceptor(this.interceptors.after, idOrValue);
+      const idx = this.findInterceptor(
+        this._config.interceptors.after,
+        idOrValue,
+      );
       if (idx > -1) {
-        this.interceptors.after.splice(idx, 1);
+        this._config.interceptors.after.splice(idx, 1);
       }
     } else {
-      const idx = this.findInterceptor(this.interceptors.after, idOrValue.id);
+      const idx = this.findInterceptor(
+        this._config.interceptors.after,
+        idOrValue.id,
+      );
       if (idx > -1) {
-        this.interceptors.after.splice(idx, 1);
+        this._config.interceptors.after.splice(idx, 1);
       }
     }
   }
@@ -99,28 +99,40 @@ export class Frest implements t.IFrest {
     idOrValue: string | t.IBeforeRequestInterceptor,
   ) {
     if (typeof idOrValue === 'string') {
-      const idx = this.findInterceptor(this.interceptors.before, idOrValue);
+      const idx = this.findInterceptor(
+        this._config.interceptors.before,
+        idOrValue,
+      );
       if (idx > -1) {
-        this.interceptors.before.splice(idx, 1);
+        this._config.interceptors.before.splice(idx, 1);
       }
     } else {
-      const idx = this.findInterceptor(this.interceptors.before, idOrValue.id);
+      const idx = this.findInterceptor(
+        this._config.interceptors.before,
+        idOrValue.id,
+      );
       if (idx > -1) {
-        this.interceptors.before.splice(idx, 1);
+        this._config.interceptors.before.splice(idx, 1);
       }
     }
   }
 
   public removeErrorInterceptor(idOrValue: string | t.IErrorInterceptor) {
     if (typeof idOrValue === 'string') {
-      const idx = this.findInterceptor(this.interceptors.error, idOrValue);
+      const idx = this.findInterceptor(
+        this._config.interceptors.error,
+        idOrValue,
+      );
       if (idx > -1) {
-        this.interceptors.error.splice(idx, 1);
+        this._config.interceptors.error.splice(idx, 1);
       }
     } else {
-      const idx = this.findInterceptor(this.interceptors.error, idOrValue.id);
+      const idx = this.findInterceptor(
+        this._config.interceptors.error,
+        idOrValue.id,
+      );
       if (idx > -1) {
-        this.interceptors.error.splice(idx, 1);
+        this._config.interceptors.error.splice(idx, 1);
       }
     }
   }
@@ -129,144 +141,145 @@ export class Frest implements t.IFrest {
     pathOrConfig: t.RequestType,
     requestConfig: Partial<t.IRequest> = {},
   ): Promise<t.IWrappedResponse<T>> {
-    const config = assign<t.IRequest, Partial<t.IRequest>>(
-      this.requestConfig(pathOrConfig, requestConfig),
-      { action: 'request' },
-    );
-    return this.internalRequest<T>(config);
+    return this.internalRequest<T>({
+      ...this.requestConfig(pathOrConfig, requestConfig),
+      action: 'request',
+    });
   }
 
   public post<T = any>(
     pathOrConfig: t.RequestType,
     requestConfig: Partial<t.IRequest> = {},
   ): Promise<t.IWrappedResponse<T>> {
-    const config = assign<t.IRequest, Partial<t.IRequest>>(
-      this.requestConfig(pathOrConfig, requestConfig),
-      { method: 'POST', action: 'post' },
-    );
-    return this.internalRequest<T>(config);
+    return this.internalRequest<T>({
+      ...this.requestConfig(pathOrConfig, requestConfig),
+      method: 'POST',
+      action: 'post',
+    });
   }
   public create<T = any>(
     pathOrConfig: t.RequestType,
     requestConfig: Partial<t.IRequest> = {},
   ): Promise<t.IWrappedResponse<T>> {
-    const config = assign<t.IRequest, Partial<t.IRequest>>(
-      this.requestConfig(pathOrConfig, requestConfig),
-      { method: 'POST', action: 'create' },
-    );
-    return this.internalRequest<T>(config);
+    return this.internalRequest<T>({
+      ...this.requestConfig(pathOrConfig, requestConfig),
+      method: 'POST',
+      action: 'create',
+    });
   }
 
   public get<T = any>(
     pathOrConfig: t.RequestType,
     requestConfig: Partial<t.IRequest> = {},
   ): Promise<t.IWrappedResponse<T>> {
-    const config = assign<t.IRequest, Partial<t.IRequest>>(
-      this.requestConfig(pathOrConfig, requestConfig),
-      { method: 'GET', action: 'get' },
-    );
-    return this.internalRequest<T>(config);
+    return this.internalRequest<T>({
+      ...this.requestConfig(pathOrConfig, requestConfig),
+      method: 'GET',
+      action: 'get',
+    });
   }
   public read<T = any>(
     pathOrConfig: t.RequestType,
     requestConfig: Partial<t.IRequest> = {},
   ): Promise<t.IWrappedResponse<T>> {
-    const config = assign<t.IRequest, Partial<t.IRequest>>(
-      this.requestConfig(pathOrConfig, requestConfig),
-      { method: 'GET', action: 'read' },
-    );
-    return this.internalRequest<T>(config);
+    return this.internalRequest<T>({
+      ...this.requestConfig(pathOrConfig, requestConfig),
+      method: 'GET',
+      action: 'read',
+    });
   }
 
   public put<T = any>(
     pathOrConfig: t.RequestType,
     requestConfig: Partial<t.IRequest> = {},
   ): Promise<t.IWrappedResponse<T>> {
-    const config = assign<t.IRequest, Partial<t.IRequest>>(
-      this.requestConfig(pathOrConfig, requestConfig),
-      { method: 'PUT', action: 'put' },
-    );
-    return this.internalRequest<T>(config);
+    return this.internalRequest<T>({
+      ...this.requestConfig(pathOrConfig, requestConfig),
+      method: 'PUT',
+      action: 'put',
+    });
   }
   public update<T = any>(
     pathOrConfig: t.RequestType,
     requestConfig: Partial<t.IRequest> = {},
   ): Promise<t.IWrappedResponse<T>> {
-    const config = assign<t.IRequest, Partial<t.IRequest>>(
-      this.requestConfig(pathOrConfig, requestConfig),
-      { method: 'PUT', action: 'update' },
-    );
-    return this.internalRequest<T>(config);
+    return this.internalRequest<T>({
+      ...this.requestConfig(pathOrConfig, requestConfig),
+      method: 'PUT',
+      action: 'update',
+    });
   }
 
   public patch<T = any>(
     pathOrConfig: t.RequestType,
     requestConfig: Partial<t.IRequest> = {},
   ): Promise<t.IWrappedResponse<T>> {
-    const config = assign<t.IRequest, Partial<t.IRequest>>(
-      this.requestConfig(pathOrConfig, requestConfig),
-      { method: 'PATCH', action: 'patch' },
-    );
-    return this.internalRequest<T>(config);
+    return this.internalRequest<T>({
+      ...this.requestConfig(pathOrConfig, requestConfig),
+      method: 'PATCH',
+      action: 'patch',
+    });
   }
 
   public delete<T = any>(
     pathOrConfig: t.RequestType,
     requestConfig: Partial<t.IRequest> = {},
   ): Promise<t.IWrappedResponse<T>> {
-    const config = assign<t.IRequest, Partial<t.IRequest>>(
-      this.requestConfig(pathOrConfig, requestConfig),
-      { method: 'DELETE', action: 'delete' },
-    );
-    return this.internalRequest<T>(config);
+    return this.internalRequest<T>({
+      ...this.requestConfig(pathOrConfig, requestConfig),
+      method: 'DELETE',
+      action: 'delete',
+    });
   }
   public destroy<T = any>(
     pathOrConfig: t.RequestType,
     requestConfig: Partial<t.IRequest> = {},
   ): Promise<t.IWrappedResponse<T>> {
-    const config = assign<t.IRequest, Partial<t.IRequest>>(
-      this.requestConfig(pathOrConfig, requestConfig),
-      { method: 'DELETE', action: 'destroy' },
-    );
-    return this.internalRequest<T>(config);
+    return this.internalRequest<T>({
+      ...this.requestConfig(pathOrConfig, requestConfig),
+      method: 'DELETE',
+      action: 'destroy',
+    });
   }
 
   public option<T = any>(
     pathOrConfig: t.RequestType,
     requestConfig: Partial<t.IRequest> = {},
   ): Promise<t.IWrappedResponse<T>> {
-    const config = assign<t.IRequest, Partial<t.IRequest>>(
-      this.requestConfig(pathOrConfig, requestConfig),
-      { method: 'OPTION', action: 'option' },
-    );
-    return this.internalRequest<T>(config);
+    return this.internalRequest<T>({
+      ...this.requestConfig(pathOrConfig, requestConfig),
+      method: 'OPTION',
+      action: 'option',
+    });
   }
 
   public upload<T = any>(
     pathOrConfig: t.RequestType,
     requestConfig: Partial<t.IRequest> = {},
   ): Promise<t.IWrappedResponse<T>> {
-    const config = assign<t.IRequest, Partial<t.IRequest>>(
-      this.requestConfig(pathOrConfig, requestConfig),
-      { method: 'POST', action: 'upload' },
-    );
+    const config = this.requestConfig(pathOrConfig, requestConfig);
     if (!(config.body instanceof FormData)) {
       return Promise.reject(
         new TypeError('upload: body must be a FormData object'),
       );
     }
-    return this.internalRequest<T>(config);
+    return this.internalRequest<T>({
+      ...config,
+      method: 'POST',
+      action: 'upload',
+    });
   }
 
   public download<T = any>(
     pathOrConfig: t.RequestType,
     requestConfig: Partial<t.IRequest> = {},
   ): Promise<t.IWrappedResponse<T>> {
-    const config = assign<t.IRequest, Partial<t.IRequest>>(
-      this.requestConfig(pathOrConfig, requestConfig),
-      { method: 'GET', action: 'download' },
-    );
-    return this.internalRequest<T>(config);
+    const conf = this.requestConfig(pathOrConfig, requestConfig);
+    return this.internalRequest<T>({
+      ...conf,
+      method: conf.method || 'GET',
+      action: 'download',
+    });
   }
 
   private findInterceptor(arr: t.ICommonInterceptor[], id?: string): number {
@@ -297,23 +310,19 @@ export class Frest implements t.IFrest {
   ): t.IRequest {
     const { headers, method } = this._config;
     if (typeof pathOrConfig === 'string' || pathOrConfig instanceof Array) {
-      return assign<t.IRequest, Partial<t.IRequest>>(
-        {
-          headers,
-          method,
-          path: pathOrConfig,
-        },
-        requestConfig,
-      );
-    }
-    return assign<t.IRequest, Partial<t.IRequest>>(
-      {
+      return {
         headers,
         method,
-        path: '',
-      },
-      pathOrConfig,
-    );
+        path: pathOrConfig,
+        ...requestConfig,
+      };
+    }
+    return {
+      headers,
+      method,
+      path: '',
+      ...pathOrConfig,
+    };
   }
 
   private getFetchFunc(requestConfig: t.IRequest): typeof fetch {
@@ -339,7 +348,7 @@ export class Frest implements t.IFrest {
   private doBefore(config: t.IRequest) {
     return new Promise<t.IRequest>((resolve, reject) => {
       let requestPromise = Promise.resolve<t.IRequest>(config);
-      for (const requestInterceptor of this.interceptors.before) {
+      for (const requestInterceptor of this._config.interceptors.before) {
         requestPromise = requestPromise.then(requestConfig => {
           if (!requestConfig) {
             throw new Error(
@@ -409,7 +418,7 @@ export class Frest implements t.IFrest {
     let responsePromise: Promise<t.IWrappedResponse<T>> = Promise.resolve({
       origin: response,
     });
-    for (const responseInterceptor of this.interceptors.after) {
+    for (const responseInterceptor of this._config.interceptors.after) {
       responsePromise = responsePromise.then(wrappedResponse => {
         if (!wrappedResponse) {
           throw new Error(
@@ -440,7 +449,7 @@ export class Frest implements t.IFrest {
   private onError = (requestConfig: t.IRequest) => (e: any): any => {
     let err: t.IFrestError = this.toFestError(e, requestConfig);
 
-    if (this.interceptors.error.length === 0) {
+    if (this._config.interceptors.error.length === 0) {
       return Promise.reject(err);
     }
 
@@ -449,7 +458,7 @@ export class Frest implements t.IFrest {
         any
       > | null> = Promise.resolve(null);
       let recovery: t.IWrappedResponse<any> | null = null;
-      for (const errorInterceptor of this.interceptors.error) {
+      for (const errorInterceptor of this._config.interceptors.error) {
         if (recovery != null) {
           break;
         }

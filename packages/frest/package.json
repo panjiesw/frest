@@ -9,7 +9,7 @@
   "homepage": "https://github.com/panjiesw/frest",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/panjiesw/frest.git"
+    "url": "https://github.com/panjiesw/frest/tree/master/packages/frest"
   },
   "author": {
     "name": "Panjie Setiawan Wicaksono",
@@ -40,13 +40,13 @@
     "d:unit": "del-cli lib .nyc_output coverage",
     "del": "del-cli es lib umd .nyc_output coverage node_modules/.cache",
     "lint": "tslint -p tsconfig.json",
+    "report": "nyc report",
+    "start": "run-p w:lib w:a",
     "t:a": "cross-env NODE_ENV=test nyc ava --tap | faucet",
     "test": "run-s unit report",
     "unit": "run-s d:unit b:lib t:a",
-    "report": "nyc report",
-    "w:lib": "yarn b:lib -w",
     "w:a": "ava --watch",
-    "start": "run-p w:lib w:a"
+    "w:lib": "yarn b:lib -w"
   },
   "ava": {
     "concurrency": 5,
@@ -68,6 +68,7 @@
     "@types/fetch-mock": "^5.12.2",
     "@types/node": "8.9.1",
     "@types/object-assign": "^4.0.30",
+    "@types/qs": "^6.5.1",
     "@types/query-string": "^5.0.1",
     "@types/sinon": "^4.1.3",
     "@types/webpack": "^3.8.7",
@@ -89,7 +90,6 @@
     "webpack": "^3.11.0"
   },
   "dependencies": {
-    "object-assign": "^4.1.1",
     "query-string": "^5.1.0",
     "tslib": "^1.9.0"
   },

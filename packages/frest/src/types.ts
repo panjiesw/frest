@@ -7,19 +7,24 @@
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'OPTION';
 
-export interface IConfig extends RequestInit {
+export interface IConfigBase extends RequestInit {
   base: string;
   fetch: typeof fetch;
-  interceptors: {
-    after?: IAfterResponseInterceptor[];
-    before?: IBeforeRequestInterceptor[];
-    error?: IErrorInterceptor[];
-  };
   method: HttpMethod;
   headers: Headers;
 }
 
-export type ConfigType = string | Partial<IConfig>;
+export interface IConfigInterceptor {
+  interceptors: IInterceptorSets;
+}
+
+export interface IConfig extends IConfigBase, IConfigInterceptor {}
+
+export type ConfigMergeType = Partial<IConfigBase> & {
+  interceptors?: Partial<IInterceptorSets>;
+};
+
+export type ConfigType = string | ConfigMergeType;
 
 export interface IRequest extends RequestInit {
   [key: string]: any;

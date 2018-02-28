@@ -1,6 +1,6 @@
 import test from 'ava';
 import { Frest, IConfig } from '../../';
-import { FREST_DEFAULT_CONFIG } from '../../Frest';
+import { DEFAULT_CONFIG } from '../../Frest';
 import { BASE } from '../fixtures';
 
 test('merge', t => {
@@ -13,7 +13,7 @@ test('merge', t => {
     method: 'GET',
   };
   const expected = {
-    ...FREST_DEFAULT_CONFIG,
+    ...DEFAULT_CONFIG,
     ...changed,
     base: BASE,
   };
