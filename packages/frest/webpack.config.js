@@ -1,14 +1,14 @@
 const path = require('path');
 const webpack = require('webpack');
 // @ts-ignore
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 // @ts-ignore
 const pkg = require('./package.json');
 
 const banner = `frest 0.5.1
 https://github.com/panjiesw/frest
 License: https://opensource.org/licenses/MIT
-© 2018 Panjie Setiawan Wicaksono`
+© 2018 Panjie Setiawan Wicaksono`;
 
 const config = {
   // devtool: 'source-map',
@@ -36,25 +36,25 @@ const config = {
         use: [
           // 'babel-loader',
           {
-            loader: 'ts-loader'
-          }
-        ]
-      }
-    ]
+            loader: 'ts-loader',
+          },
+        ],
+      },
+    ],
   },
   plugins: [
     new webpack.BannerPlugin({
-      banner
+      banner,
     }),
     new UglifyJsPlugin({
       sourceMap: true,
       uglifyOptions: {
         output: {
           comments: /^!/,
-        }
+        },
       },
     }),
   ],
-}
+};
 
 module.exports = config;

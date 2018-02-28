@@ -23,6 +23,7 @@
 	"licenser.author": "Panjie Setiawan Wicaksono",
 	"licenser.projectName": "frest",
 	"licenser.license": "MIT",
+	"licenser.useSingleLineStyle": false,
 	"stylelint.enable": false,
 	"tslint.enable": true,
 	"tslint.ignoreDefinitionFiles": true,
