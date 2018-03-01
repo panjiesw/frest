@@ -88,6 +88,7 @@ export interface IBeforeInterceptorArg {
 
 export interface IAfterInterceptorArg {
   config: IConfig;
+  request: IRequest;
   response: IResponse<any>;
 }
 
@@ -100,7 +101,7 @@ export interface IBeforeInterceptor extends ICommonInterceptor {
 }
 
 export interface IAfterInterceptor extends ICommonInterceptor {
-  (response: IAfterInterceptorArg): Promise<IResponse<any>>;
+  (input: IAfterInterceptorArg): Promise<IResponse<any>>;
 }
 
 export interface IErrorInterceptor extends ICommonInterceptor {

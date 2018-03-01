@@ -6,8 +6,8 @@
  */
 
 import test from 'ava';
-import { BASE, instances, randomStr } from './fixtures';
-import { before, ID_BEFORE } from '../';
+import { BASE, instances, randomStr } from '../fixtures';
+import { before, ID_BEFORE } from '../../';
 
 test('must JSON.stringify object', async t => {
   const body = { foo: 'bar', doo: 1 };

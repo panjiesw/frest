@@ -3,7 +3,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { IAfterInterceptor, IResponse } from 'frest';
+import * as f from 'frest';
 import { ID_AFTER } from './ids';
 
 export interface IJSONAfterOption {
@@ -11,15 +11,17 @@ export interface IJSONAfterOption {
   headerContent?: string;
 }
 
-const after = (opts: IJSONAfterOption = {}): IAfterInterceptor => {
+const after = (opts: IJSONAfterOption = {}): f.IAfterInterceptor => {
   const { force, headerContent } = opts;
-  const jsonAfterInterceptor: IAfterInterceptor = input =>
-    new Promise<IResponse<any>>((resolve, reject) => {
+  const jsonAfterInterceptor: f.IAfterInterceptor = input =>
+    new Promise<f.IResponse<any>>((resolve, reject) => {
+      const { skip } = input.request;
       const { origin, body: originBody } = input.response;
       const { headers, bodyUsed, status } = origin;
       const ct = headers.get('Content-Type');
       if (
         !bodyUsed &&
+        (!skip || skip.indexOf(ID_AFTER) < 0) &&
         ((ct && ct.indexOf(headerContent || 'application/json') >= 0) || force)
       ) {
         origin

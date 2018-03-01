@@ -311,6 +311,7 @@ class Frest implements t.IFrest {
         }
         return responseInterceptor({
           config: this._config,
+          request,
           response,
         });
       });
