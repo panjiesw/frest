@@ -1,7 +1,8 @@
 {
   "extends": ["tslint:latest", "tslint-config-prettier"],
   "rules": {
-		"object-literal-sort-keys": false,
+    "object-literal-sort-keys": false,
+    "interface-name": false,
     "max-line-length": [true, 80],
     "indent": [true, "spaces"],
     "quotemark": [true, "single", "avoid-escape"],

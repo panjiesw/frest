@@ -1,15 +1,17 @@
 {
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
+    "downlevelIteration": true,
     "esModuleInterop": true,
     "importHelpers": true,
-    "lib": ["es5", "es2015.promise", "dom"],
+    "lib": ["es5", "es2015.promise", "dom", "dom.iterable"],
     "module": "es6",
     "moduleResolution": "node",
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "strict": true,
+    "suppressImplicitAnyIndexErrors": true,
     "target": "es5"
   },
   "exclude": ["node_modules"],

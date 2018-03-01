@@ -3,7 +3,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { IErrorInterceptor, IFrestError, IResponse } from 'frest';
+import * as f from 'frest';
 import { ID_ERROR } from './ids';
 
 export interface IJSONErrorOption {
@@ -11,8 +11,8 @@ export interface IJSONErrorOption {
 }
 
 const error = (opts: IJSONErrorOption) => {
-  const interceptor: IErrorInterceptor = (err: IFrestError) =>
-    new Promise<IResponse<any> | null>((resolve, reject) => {
+  const jsonErrorInterceptor: f.IErrorInterceptor = err =>
+    new Promise<f.IResponse<any> | null>((resolve, reject) => {
       const { headerContent } = opts;
       const { response } = err;
       if (response) {
@@ -34,8 +34,8 @@ const error = (opts: IJSONErrorOption) => {
       resolve(null);
     });
 
-  Object.defineProperty(interceptor, 'id', { value: ID_ERROR });
-  return interceptor;
+  Object.defineProperty(jsonErrorInterceptor, 'id', { value: ID_ERROR });
+  return jsonErrorInterceptor;
 };
 
 export { error };

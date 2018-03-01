@@ -13,7 +13,7 @@ export interface IJSONAfterOption {
 
 const after = (opts: IJSONAfterOption = {}): IAfterInterceptor => {
   const { force, headerContent } = opts;
-  const interceptor: IAfterInterceptor = input =>
+  const jsonAfterInterceptor: IAfterInterceptor = input =>
     new Promise<IResponse<any>>((resolve, reject) => {
       const { origin, body: originBody } = input.response;
       const { headers, bodyUsed, status } = origin;
@@ -39,8 +39,8 @@ const after = (opts: IJSONAfterOption = {}): IAfterInterceptor => {
       resolve({ origin, body: originBody });
     });
 
-  Object.defineProperty(interceptor, 'id', { value: ID_AFTER });
-  return interceptor;
+  Object.defineProperty(jsonAfterInterceptor, 'id', { value: ID_AFTER });
+  return jsonAfterInterceptor;
 };
 
 export { after };

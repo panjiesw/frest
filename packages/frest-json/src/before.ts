@@ -9,21 +9,21 @@ import { ID_BEFORE } from './ids';
 export interface IJSONBeforeOption {
   headerContent?: string;
   headerAccept?: string;
-  method?: t.HttpMethod;
+  method?: t.HttpMethod[];
 }
 
 const before = (opts: IJSONBeforeOption = {}): t.IBeforeInterceptor => {
-  const { headerAccept, headerContent, method } = opts;
-  const interceptor: t.IBeforeInterceptor = (input: t.IBeforeInterceptorArg) =>
+  const jsonBeforeInterceptor: t.IBeforeInterceptor = input =>
     new Promise<t.IRequest>((resolve, reject) => {
       try {
+        const { headerAccept, headerContent, method } = opts;
         const { body: origin, method: meth, headers, skip } = input.request;
         let body = input.request.body;
         if (
           typeof origin === 'object' &&
           !(origin instanceof FormData) &&
           !(origin instanceof ArrayBuffer) &&
-          (!method || method === meth) &&
+          (!method || method.indexOf(meth) > -1) &&
           (!skip || skip.indexOf(ID_BEFORE) < 0)
         ) {
           body = JSON.stringify(origin);
@@ -36,8 +36,8 @@ const before = (opts: IJSONBeforeOption = {}): t.IBeforeInterceptor => {
       }
     });
 
-  Object.defineProperty(interceptor, 'id', { value: ID_BEFORE });
-  return interceptor;
+  Object.defineProperty(jsonBeforeInterceptor, 'id', { value: ID_BEFORE });
+  return jsonBeforeInterceptor;
 };
 
 export { before };

@@ -56,9 +56,10 @@ export interface IFrest {
   addAfterInterceptor(interceptor: IAfterInterceptor): void;
   addBeforeInterceptor(interceptor: IBeforeInterceptor): void;
   addErrorInterceptor(interceptor: IErrorInterceptor): void;
-  removeAfterInterceptor(idOrValue: string | IAfterInterceptor): void;
-  removeBeforeInterceptor(idOrValue: string | IBeforeInterceptor): void;
-  removeErrorInterceptor(idOrValue: string | IErrorInterceptor): void;
+  removeAfterInterceptor(idv: string | IAfterInterceptor): void;
+  removeBeforeInterceptor(idv: string | IBeforeInterceptor): void;
+  removeErrorInterceptor(idv: string | IErrorInterceptor): void;
+  hasInterceptor(id: string): boolean;
   request<T = any>(
     pathOrConfig: RequestType,
     requestConfig?: Partial<IRequest>,

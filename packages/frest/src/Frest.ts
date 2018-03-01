@@ -85,6 +85,19 @@ class Frest implements t.IFrest {
     this.removeInterceptor('error', idv);
   }
 
+  public hasInterceptor(id: string): boolean {
+    const interceptors = this._config.interceptors;
+    for (const interceptor in interceptors) {
+      if (interceptors.hasOwnProperty(interceptor)) {
+        const idf = this.findInterceptor(interceptors[interceptor], id);
+        if (idf > -1) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   public request<T = any>(
     init: t.RequestType,
     request: Partial<t.IRequest> = {},
@@ -99,15 +112,15 @@ class Frest implements t.IFrest {
     init: t.RequestType,
     request: Partial<t.IRequest> = {},
   ): Promise<t.IResponse<T>> {
-    const config = this.requestConfig(init, request);
-    if (!(config.body instanceof FormData)) {
+    const conf = this.requestConfig(init, request);
+    if (!(conf.body instanceof FormData)) {
       return Promise.reject(
         new TypeError('upload: body must be a FormData object'),
       );
     }
     return this.internalRequest<T>({
-      ...config,
-      method: 'POST',
+      ...conf,
+      method: conf.method || 'POST',
       action: 'upload',
     });
   }
@@ -171,24 +184,35 @@ class Frest implements t.IFrest {
     init: t.RequestType,
     request: Partial<t.IRequest>,
   ): t.IRequest {
-    const { headers, method } = this._config;
+    const { method } = this._config;
     if (typeof init === 'string' || init instanceof Array) {
+      this.headers(request);
       return {
-        headers,
         method,
         path: init,
         ...request,
-      };
+      } as any;
     }
+    this.headers(init);
     return {
-      headers,
       method,
       path: '',
       ...init,
-    };
+    } as any;
   }
 
-  private getFetchFunc(request: t.IRequest): typeof fetch {
+  private headers(request: Partial<t.IRequest>) {
+    if (request.headers) {
+      const headers = new Headers(this._config.headers);
+      for (const header of request.headers.entries()) {
+        headers.set(header[0], header[1]);
+      }
+    } else {
+      request.headers = new Headers(this._config.headers);
+    }
+  }
+
+  private getFetch(request: t.IRequest): typeof fetch {
     if (request.action === 'upload' || request.action === 'download') {
       return xhr as any;
     }
@@ -244,7 +268,7 @@ class Frest implements t.IFrest {
       : [''];
 
     try {
-      fetchFn = this.getFetchFunc(request);
+      fetchFn = this.getFetch(request);
     } catch (error) {
       return Promise.reject(error);
     }
@@ -397,7 +421,6 @@ for (const action in methods) {
   }
 }
 
-// tslint:disable-next-line:interface-name
 interface Frest extends t.IFrest {
   post<T = any>(
     init: t.RequestType,

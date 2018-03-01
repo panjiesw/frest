@@ -8,7 +8,6 @@
 	"editor.rulers": [
 		80
 	],
-	"editor.snippetSuggestions": "top",
 	"eslint.enable": false,
 	"files.trimTrailingWhitespace": true,
 	"files.insertFinalNewline": true,
