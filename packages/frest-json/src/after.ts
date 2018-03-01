@@ -3,7 +3,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { IAfterResponseInterceptor, IWrappedResponse } from 'frest';
+import { IAfterInterceptor, IResponse } from 'frest';
 import { ID_AFTER } from './ids';
 
 export interface IJSONAfterOption {
@@ -11,11 +11,11 @@ export interface IJSONAfterOption {
   headerContent?: string;
 }
 
-const after = (opts: IJSONAfterOption = {}): IAfterResponseInterceptor => {
+const after = (opts: IJSONAfterOption = {}): IAfterInterceptor => {
   const { force, headerContent } = opts;
-  const interceptor: IAfterResponseInterceptor = input =>
-    new Promise<IWrappedResponse<any>>((resolve, reject) => {
-      const { origin, value: originValue } = input.wrappedResponse;
+  const interceptor: IAfterInterceptor = input =>
+    new Promise<IResponse<any>>((resolve, reject) => {
+      const { origin, body: originBody } = input.response;
       const { headers, bodyUsed, status } = origin;
       const ct = headers.get('Content-Type');
       if (
@@ -24,8 +24,8 @@ const after = (opts: IJSONAfterOption = {}): IAfterResponseInterceptor => {
       ) {
         origin
           .json()
-          .then(value => {
-            resolve({ origin, value });
+          .then(body => {
+            resolve({ origin, body });
           })
           .catch(err => {
             if (status >= 201 && status <= 204) {
@@ -36,7 +36,7 @@ const after = (opts: IJSONAfterOption = {}): IAfterResponseInterceptor => {
           });
         return;
       }
-      resolve({ origin, value: originValue });
+      resolve({ origin, body: originBody });
     });
 
   Object.defineProperty(interceptor, 'id', { value: ID_AFTER });

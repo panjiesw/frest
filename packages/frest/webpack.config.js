@@ -11,7 +11,6 @@ License: https://opensource.org/licenses/MIT
 © 2018 Panjie Setiawan Wicaksono`;
 
 const config = {
-  // devtool: 'source-map',
   entry: './src/index.ts',
   output: {
     path: path.join(__dirname, 'umd'),
@@ -55,6 +54,9 @@ const config = {
       },
     }),
   ],
+  node: {
+    process: false,
+  },
 };
 
 module.exports = config;

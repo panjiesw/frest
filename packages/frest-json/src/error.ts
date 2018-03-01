@@ -3,7 +3,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { IErrorInterceptor, IFrestError, IWrappedResponse } from 'frest';
+import { IErrorInterceptor, IFrestError, IResponse } from 'frest';
 import { ID_ERROR } from './ids';
 
 export interface IJSONErrorOption {
@@ -12,20 +12,20 @@ export interface IJSONErrorOption {
 
 const error = (opts: IJSONErrorOption) => {
   const interceptor: IErrorInterceptor = (err: IFrestError) =>
-    new Promise<IWrappedResponse<any> | null>((resolve, reject) => {
+    new Promise<IResponse<any> | null>((resolve, reject) => {
       const { headerContent } = opts;
-      const { wrappedResponse } = err;
-      if (wrappedResponse) {
-        const { headers, bodyUsed } = wrappedResponse.origin;
+      const { response } = err;
+      if (response) {
+        const { headers, bodyUsed } = response.origin;
         const ct = headers.get('Content-Type');
         if (
           ct &&
           ct.indexOf(headerContent || 'application/json') >= 0 &&
           !bodyUsed
         ) {
-          wrappedResponse.origin.json().then(value => {
-            wrappedResponse.value = value;
-            err.wrappedResponse = wrappedResponse;
+          response.origin.json().then(body => {
+            response.body = body;
+            err.response = response;
             reject(err);
           });
           return;

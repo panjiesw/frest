@@ -63,46 +63,6 @@ export interface IFrest {
     pathOrConfig: RequestType,
     requestConfig?: Partial<IRequest>,
   ): Promise<IResponse<T>>;
-  // post<T = any>(
-  //   pathOrConfig: RequestType,
-  //   requestConfig?: Partial<IRequest>,
-  // ): Promise<IResponse<T>>;
-  create<T = any>(
-    pathOrConfig: RequestType,
-    requestConfig?: Partial<IRequest>,
-  ): Promise<IResponse<T>>;
-  get<T = any>(
-    pathOrConfig: RequestType,
-    requestConfig?: Partial<IRequest>,
-  ): Promise<IResponse<T>>;
-  read<T = any>(
-    pathOrConfig: RequestType,
-    requestConfig?: Partial<IRequest>,
-  ): Promise<IResponse<T>>;
-  put<T = any>(
-    pathOrConfig: RequestType,
-    requestConfig?: Partial<IRequest>,
-  ): Promise<IResponse<T>>;
-  update<T = any>(
-    pathOrConfig: RequestType,
-    requestConfig?: Partial<IRequest>,
-  ): Promise<IResponse<T>>;
-  patch<T = any>(
-    pathOrConfig: RequestType,
-    requestConfig?: Partial<IRequest>,
-  ): Promise<IResponse<T>>;
-  delete<T = any>(
-    pathOrConfig: RequestType,
-    requestConfig?: Partial<IRequest>,
-  ): Promise<IResponse<T>>;
-  destroy<T = any>(
-    pathOrConfig: RequestType,
-    requestConfig?: Partial<IRequest>,
-  ): Promise<IResponse<T>>;
-  option<T = any>(
-    pathOrConfig: RequestType,
-    requestConfig?: Partial<IRequest>,
-  ): Promise<IResponse<T>>;
   upload<T = any>(
     pathOrConfig: RequestType,
     requestConfig?: Partial<IRequest>,

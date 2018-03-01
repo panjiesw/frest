@@ -4,7 +4,6 @@
 // https://opensource.org/licenses/MIT
 
 import * as t from 'frest';
-import assign from 'object-assign';
 import { ID_BEFORE } from './ids';
 
 export interface IJSONBeforeOption {
@@ -13,20 +12,13 @@ export interface IJSONBeforeOption {
   method?: t.HttpMethod;
 }
 
-const before = (opts: IJSONBeforeOption = {}): t.IBeforeRequestInterceptor => {
+const before = (opts: IJSONBeforeOption = {}): t.IBeforeInterceptor => {
   const { headerAccept, headerContent, method } = opts;
-  const interceptor: t.IBeforeRequestInterceptor = (
-    input: t.IBeforeRequestInterceptorArg,
-  ) =>
+  const interceptor: t.IBeforeInterceptor = (input: t.IBeforeInterceptorArg) =>
     new Promise<t.IRequest>((resolve, reject) => {
       try {
-        const {
-          body: origin,
-          method: meth,
-          headers,
-          skip,
-        } = input.requestConfig;
-        let body = input.requestConfig.body;
+        const { body: origin, method: meth, headers, skip } = input.request;
+        let body = input.request.body;
         if (
           typeof origin === 'object' &&
           !(origin instanceof FormData) &&
@@ -38,7 +30,7 @@ const before = (opts: IJSONBeforeOption = {}): t.IBeforeRequestInterceptor => {
           headers.set('Content-Type', headerContent || 'application/json');
           headers.set('Accept', headerAccept || 'application/json');
         }
-        resolve(assign({}, input.requestConfig, { headers, body }));
+        resolve({ ...input.request, headers, body });
       } catch (e) {
         reject(e);
       }
