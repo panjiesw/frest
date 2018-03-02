@@ -8,9 +8,6 @@
 	"editor.rulers": [
 		80
 	],
-	"editor.wordWrapColumn": 80,
-	"editor.wordWrap": "bounded",
-	"editor.snippetSuggestions": "top",
 	"eslint.enable": false,
 	"files.trimTrailingWhitespace": true,
 	"files.insertFinalNewline": true,
