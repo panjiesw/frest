@@ -12,7 +12,7 @@ export interface IJSONErrorOption {
 
 const error = (opts: IJSONErrorOption = {}) => {
   const jsonErrorInterceptor: f.IErrorInterceptor = err =>
-    new Promise<f.IResponse<any> | null>((resolve, reject) => {
+    new Promise<f.IResponse | undefined | null>((resolve, reject) => {
       const { headerContent } = opts;
       const { response, request } = err;
       const { skip } = request;

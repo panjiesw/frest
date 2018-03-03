@@ -102,9 +102,10 @@ class Frest implements t.IFrest {
     init: t.RequestType,
     request: Partial<t.IRequest> = {},
   ): Promise<t.IResponse<T>> {
+    const conf = this.requestConfig(init, request);
     return this.internalRequest<T>({
-      ...this.requestConfig(init, request),
-      action: 'request',
+      ...conf,
+      action: conf.action || 'request',
     });
   }
 
@@ -121,7 +122,7 @@ class Frest implements t.IFrest {
     return this.internalRequest<T>({
       ...conf,
       method: conf.method || 'POST',
-      action: 'upload',
+      action: conf.action || 'upload',
     });
   }
 
@@ -133,7 +134,7 @@ class Frest implements t.IFrest {
     return this.internalRequest<T>({
       ...conf,
       method: conf.method || 'GET',
-      action: 'download',
+      action: conf.action || 'download',
     });
   }
 
@@ -242,7 +243,7 @@ class Frest implements t.IFrest {
             );
           }
           return requestInterceptor({
-            config: this._config,
+            frest: this,
             request: requestConfig,
           });
         });
@@ -253,7 +254,7 @@ class Frest implements t.IFrest {
         reject(
           new FrestError(
             `Error in before request interceptor: ${cause}`,
-            this._config,
+            this,
             request,
           ),
         );
@@ -293,7 +294,7 @@ class Frest implements t.IFrest {
           `Non OK HTTP response status: ${origin.status} - ${
             origin.statusText
           }`,
-          this._config,
+          this,
           request,
           { origin },
         ),
@@ -310,7 +311,7 @@ class Frest implements t.IFrest {
           );
         }
         return responseInterceptor({
-          config: this._config,
+          frest: this,
           request,
           response,
         });
@@ -320,8 +321,8 @@ class Frest implements t.IFrest {
       const cause = typeof e === 'string' ? e : e.message ? e.message : e;
       return Promise.reject(
         new FrestError(
-          `Error in after response intercepor: ${cause}`,
-          this._config,
+          `Error in after response interceptor: ${cause}`,
+          this,
           request,
           { origin },
         ),
@@ -329,18 +330,18 @@ class Frest implements t.IFrest {
     });
   };
 
-  private onError = (requestConfig: t.IRequest) => (e: any): any => {
-    let err: t.IFrestError = this.toFrestError(e, requestConfig);
+  private onError = (request: t.IRequest) => (e: any): any => {
+    let err: t.IFrestError = this.toFrestError(e, request);
 
     if (this._config.interceptors.error.length === 0) {
       return Promise.reject(err);
     }
 
     return new Promise<any>((resolve, reject) => {
-      let promise: Promise<void | t.IResponse<any> | null> = Promise.resolve(
+      let promise: Promise<t.IResponse | undefined | null> = Promise.resolve(
         null,
       );
-      let recovery: t.IResponse<any> | null = null;
+      let recovery: t.IResponse | undefined | null = null;
       for (const errorInterceptor of this._config.interceptors.error) {
         if (recovery != null) {
           break;
@@ -354,7 +355,8 @@ class Frest implements t.IFrest {
             return errorInterceptor(err);
           })
           .catch(ee => {
-            err = this.toFrestError(ee, requestConfig);
+            err = this.toFrestError(ee, request);
+            return null;
           });
       }
       promise.then(res => {
@@ -384,8 +386,8 @@ class Frest implements t.IFrest {
   }
 
   private toFrestError(e: any, requestConfig: t.IRequest): t.IFrestError {
-    return !e.config && !e.request
-      ? new FrestError(e.message, this._config, requestConfig)
+    return !e.frest && !e.request
+      ? new FrestError(e.message, this, requestConfig)
       : e;
   }
 }
@@ -412,10 +414,11 @@ for (const action in methods) {
         init: t.RequestType,
         requestConfig: Partial<t.IRequest> = {},
       ) {
+        const conf = this.requestConfig(init, requestConfig);
         return this.internalRequest({
-          ...this.requestConfig(init, requestConfig),
-          method,
-          action,
+          ...conf,
+          method: conf.method || method,
+          action: conf.action || action,
         });
       },
     });

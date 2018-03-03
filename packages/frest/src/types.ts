@@ -76,20 +76,20 @@ export interface IFrest {
 
 export interface IFrestError {
   message: string;
-  config: IConfig;
+  frest: IFrest;
   request: IRequest;
-  response?: IResponse<any>;
+  response?: IResponse;
 }
 
 export interface IBeforeInterceptorArg {
-  config: IConfig;
+  frest: IFrest;
   request: IRequest;
 }
 
 export interface IAfterInterceptorArg {
-  config: IConfig;
+  frest: IFrest;
   request: IRequest;
-  response: IResponse<any>;
+  response: IResponse;
 }
 
 export interface ICommonInterceptor {
@@ -101,11 +101,11 @@ export interface IBeforeInterceptor extends ICommonInterceptor {
 }
 
 export interface IAfterInterceptor extends ICommonInterceptor {
-  (input: IAfterInterceptorArg): Promise<IResponse<any>>;
+  (input: IAfterInterceptorArg): Promise<IResponse>;
 }
 
 export interface IErrorInterceptor extends ICommonInterceptor {
-  (error: IFrestError): Promise<IResponse<any> | null>;
+  (error: IFrestError): Promise<IResponse | undefined | null>;
 }
 
 export interface IInterceptorSet {

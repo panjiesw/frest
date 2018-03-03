@@ -5,6 +5,7 @@
   "license": "MIT",
   "main": "lib/index.js",
   "module": "es/index.js",
+  "unpkg": "umd/frest.umd.js",
   "typings": "lib/index.d.ts",
   "homepage": "https://github.com/panjiesw/frest",
   "repository": {

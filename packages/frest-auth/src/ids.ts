@@ -6,3 +6,4 @@
  */
 
 export const ID_BEFORE = 'auth:before';
+export const ID_ERROR = 'auth:error';

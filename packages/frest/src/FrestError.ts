@@ -8,7 +8,7 @@ import * as t from './types';
 export class FrestError extends Error implements t.IFrestError {
   constructor(
     message: string,
-    public config: t.IConfig,
+    public frest: t.IFrest,
     public request: t.IRequest,
     public response?: t.IResponse<any>,
   ) {
