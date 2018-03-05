@@ -126,6 +126,7 @@ class Frest implements t.IFrest {
     const conf = this.requestConfig(init, request);
     return this.internalRequest<T>({
       ...conf,
+      method: conf.method || this._config.method,
       action: conf.action || 'request',
     });
   }
@@ -206,18 +207,15 @@ class Frest implements t.IFrest {
     init: t.RequestType,
     request: Partial<t.IRequest>,
   ): t.IRequest {
-    const { method } = this._config;
     if (typeof init === 'string' || init instanceof Array) {
       this.headers(request);
       return {
-        method,
         path: init,
         ...request,
       } as any;
     }
     this.headers(init);
     return {
-      method,
       path: '',
       ...init,
     } as any;

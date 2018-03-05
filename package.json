@@ -34,7 +34,7 @@
     "start": "lerna run --stream start",
     "t:frest": "lerna run --scope=frest test",
     "t:json": "lerna run --scope=frest-json test",
-    "test": "lerna run --stream test"
+    "test": "lerna run --stream --scope=\"!frest-auth\" test"
   },
   "devDependencies": {
     "commitizen": "^2.9.6",
