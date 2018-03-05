@@ -60,6 +60,8 @@ export interface IFrest {
   removeBeforeInterceptor(idv: string | IBeforeInterceptor): void;
   removeErrorInterceptor(idv: string | IErrorInterceptor): void;
   hasInterceptor(id: string): boolean;
+  parsePath(path: string | string[], query?: any): string;
+  parseQuery(query: any): string;
   request<T = any>(
     pathOrConfig: RequestType,
     requestConfig?: Partial<IRequest>,

@@ -98,6 +98,27 @@ class Frest implements t.IFrest {
     return false;
   }
 
+  public parsePath(path: string | string[], query?: any): string {
+    const paths: string[] = path
+      ? path instanceof Array ? path : [path]
+      : [''];
+    query = this.parseQuery(query);
+    return this.trimSlashes(
+      `${this._config.base}/${paths.map(encodeURI).join('/')}${query}`,
+    );
+  }
+
+  public parseQuery(query: any): string {
+    let q = query || '';
+    if (typeof q === 'object') {
+      const qq = qs.stringify(q);
+      q = qq.length > 0 ? `?${qq}` : '';
+    } else if (q !== '') {
+      q = q.charAt(0) === '?' ? q : `?${q}`;
+    }
+    return q;
+  }
+
   public request<T = any>(
     init: t.RequestType,
     request: Partial<t.IRequest> = {},
@@ -264,9 +285,6 @@ class Frest implements t.IFrest {
 
   private doRequest = (request: t.IRequest): Promise<IInternalAfterFetch> => {
     let fetchFn: typeof fetch;
-    const paths: string[] = request.path
-      ? request.path instanceof Array ? request.path : [request.path]
-      : [''];
 
     try {
       fetchFn = this.getFetch(request);
@@ -274,10 +292,7 @@ class Frest implements t.IFrest {
       return Promise.reject(error);
     }
 
-    const query = this.parseQuery(request.query);
-    const fullPath = this.trimSlashes(
-      `${this._config.base}/${paths.map(encodeURI).join('/')}${query}`,
-    );
+    const fullPath = this.parsePath(request.path, request.query);
     return fetchFn(fullPath, request).then<IInternalAfterFetch>(origin => ({
       request,
       origin,
@@ -368,18 +383,6 @@ class Frest implements t.IFrest {
       });
     });
   };
-
-  private parseQuery(query: any): string {
-    let q = query || '';
-    if (typeof q === 'object') {
-      const qq = qs.stringify(q);
-      q = qq.length > 0 ? `?${qq}` : '';
-    } else if (q !== '') {
-      q = q.charAt(0) === '?' ? q : `?${q}`;
-    }
-
-    return q;
-  }
 
   private trimSlashes(input: string): string {
     return input.toString().replace(/(^\/+|\/+$)/g, '');
