@@ -6,15 +6,18 @@
 import * as f from 'frest';
 import { ID_AFTER } from './ids';
 
+export type IJSONTransformFn = (response: Response) => Promise<string>;
+
 export interface IJSONAfterOption {
   force?: boolean;
   headerContent?: string;
+  transform?: IJSONTransformFn;
 }
 
 const after = (opts: IJSONAfterOption = {}): f.IAfterInterceptor => {
-  const { force, headerContent } = opts;
   const jsonAfterInterceptor: f.IAfterInterceptor = input =>
     new Promise<f.IResponse<any>>((resolve, reject) => {
+      const { force, headerContent, transform } = opts;
       const { skip } = input.request;
       const { origin, body: originBody } = input.response;
       const { headers, bodyUsed, status } = origin;
@@ -24,18 +27,26 @@ const after = (opts: IJSONAfterOption = {}): f.IAfterInterceptor => {
         (!skip || skip.indexOf(ID_AFTER) < 0) &&
         ((ct && ct.indexOf(headerContent || 'application/json') >= 0) || force)
       ) {
-        origin
-          .json()
-          .then(body => {
+        let promise: Promise<any>;
+        if (transform) {
+          promise = transform(origin)
+            .then(text => JSON.parse(text))
+            .then(body => {
+              resolve({ origin, body });
+            });
+        } else {
+          promise = origin.json().then(body => {
             resolve({ origin, body });
-          })
-          .catch(err => {
-            if (status >= 201 && status <= 204) {
-              resolve({ origin });
-            } else {
-              reject(err);
-            }
           });
+        }
+
+        promise.catch(err => {
+          if (status >= 201 && status <= 204) {
+            resolve({ origin });
+          } else {
+            reject(err);
+          }
+        });
         return;
       }
       resolve({ origin, body: originBody });
