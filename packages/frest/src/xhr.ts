@@ -75,9 +75,9 @@ function xhrFetch(url: string, conf: IRequest): Promise<Response> {
       xhr.responseType = 'blob';
     }
 
-    (conf.headers as Headers).forEach((value, name) => {
+    for (const [name, value] of conf.headers) {
       xhr.setRequestHeader(name, value);
-    });
+    }
 
     xhr.send(conf.body);
   });

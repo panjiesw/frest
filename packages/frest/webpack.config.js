@@ -1,9 +1,5 @@
 const path = require('path');
 const webpack = require('webpack');
-// @ts-ignore
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
-// @ts-ignore
-const pkg = require('./package.json');
 
 const banner = `frest 0.5.1
 https://github.com/panjiesw/frest
@@ -11,7 +7,7 @@ License: https://opensource.org/licenses/MIT
 © 2018 Panjie Setiawan Wicaksono`;
 
 const config = {
-  entry: './src/index.ts',
+  mode: 'production',
   output: {
     path: path.join(__dirname, 'umd'),
     filename: 'frest.umd.js',
@@ -44,14 +40,6 @@ const config = {
   plugins: [
     new webpack.BannerPlugin({
       banner,
-    }),
-    new UglifyJsPlugin({
-      sourceMap: true,
-      uglifyOptions: {
-        output: {
-          comments: /^!/,
-        },
-      },
     }),
   ],
   node: {

@@ -29,7 +29,7 @@
   ],
   "scripts": {
     "cm": "git-cz",
-    "format": "prettier --trailing-comma all --single-quote --write \"packages/*/*.js\" \"packages/*/*.ts\" \"packages/*/src/**/*.{ts,tsx}\"",
+    "format": "prettier --write \"packages/*/*.js\" \"packages/*/*.ts\" \"packages/*/src/**/*.{ts,tsx}\"",
     "precommit": "lint-staged",
     "start": "lerna run --stream start",
     "t:frest": "lerna run --scope=frest test",
@@ -40,24 +40,28 @@
     "commitizen": "^2.9.6",
     "cz-conventional-changelog": "^2.1.0",
     "husky": "^0.14.3",
-    "lerna": "^2.8.0",
-    "lint-staged": "^6.1.0",
+    "lerna": "^2.10.1",
+    "lint-staged": "^7.0.4",
     "npm-run-all": "^4.1.2",
-    "prettier": "^1.10.2",
+    "prettier": "^1.11.1",
     "tslint": "^5.9.1",
-    "tslint-config-prettier": "^1.7.0",
-    "typescript": "^2.7.1"
+    "tslint-config-prettier": "^1.10.0",
+    "typescript": "^2.8.1"
   },
   "lint-staged": {
-		"*.{ts,tsx}": [
-			"tslint -e **/*.d.ts --fix",
-			"prettier --trailing-comma all --single-quote --write",
-			"git add"
-		]
-	},
+    "*.{ts,tsx}": [
+      "tslint -e **/*.d.ts --fix",
+      "prettier --trailing-comma all --single-quote --write",
+      "git add"
+    ]
+  },
   "config": {
     "commitizen": {
       "path": "cz-conventional-changelog"
     }
+  },
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "all"
   }
 }
