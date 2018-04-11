@@ -1,4 +1,25 @@
+/**
+ *    Copyright 2018 Panjie Setiawan Wicaksono
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 import { IRequest } from './types';
+
+// These were taken from somewhere, made by someone.
+// I adopted it to frest but forgot to put any reference to original source.
+// If someone recognized these code and know where the original code came from,
+// please raise an issue so that I can put attribution here.
 
 const supportBlob = () =>
   FileReader !== undefined &&
