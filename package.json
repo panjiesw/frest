@@ -30,6 +30,7 @@
   "scripts": {
     "cm": "git-cz",
     "format": "prettier --write \"packages/*/*.js\" \"packages/*/*.ts\" \"packages/*/src/**/*.{ts,tsx}\"",
+    "prepare": "lerna run build",
     "precommit": "lint-staged",
     "start": "lerna run --stream start",
     "t:frest": "lerna run --scope=frest test",

@@ -30,11 +30,13 @@ const attachAuth = (req: f.IRequest, scheme: t.IAuthScheme, token: string) => {
 const getToken = (scheme: t.IAuthScheme) => {
   const { prefix: _prefix, token: tokenFn } = scheme;
   const prefix = _prefix || '';
-  const token = tokenFn();
-  if (token == null) {
-    return null;
+  if (tokenFn) {
+    const token = tokenFn();
+    if (token != null) {
+      return `${prefix}${token}`;
+    }
   }
-  return `${prefix}${token}`;
+  return null;
 };
 
 const before = (scheme: t.IAuthScheme): f.IBeforeInterceptor => {
@@ -42,8 +44,11 @@ const before = (scheme: t.IAuthScheme): f.IBeforeInterceptor => {
     new Promise<f.IRequest>(resolve => {
       const token = getToken(scheme);
       if (token == null) {
-        // tslint:disable-next-line:no-console
-        console.warn('frest-auth: no token provided, not attaching auth');
+        // Either the tokenFn return null or it's using 'cookie' scheme
+        if (scheme.name !== 'cookie') {
+          // tslint:disable-next-line:no-console
+          console.warn('frest-auth: no token provided, not attaching auth');
+        }
         resolve(input.request);
         return;
       }

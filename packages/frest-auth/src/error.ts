@@ -37,8 +37,9 @@ export interface IAuthErrorOption {
 }
 
 const error = (opts: IAuthErrorOption): f.IErrorInterceptor => {
-  const defaultCondition: RetryConditionFn = (_, req, res) =>
-    req.action !== 'login' && res.origin.status === 401;
+  const defaultCondition: RetryConditionFn = (_, __, res) =>
+    res.origin.status === 401;
+  const defaultRetry: RetryFn = (fr, req) => fr.request(req);
 
   const authErrorInterceptor: f.IErrorInterceptor = err =>
     new Promise<f.IResponse | null>((resolve, reject) => {
@@ -47,7 +48,7 @@ const error = (opts: IAuthErrorOption): f.IErrorInterceptor => {
         delay = 1000,
         exp = 1,
         condition = defaultCondition,
-        doRetry,
+        doRetry = defaultRetry,
       } = opts;
       const { frest, request, response } = err;
       const { skip } = request;

@@ -7,16 +7,20 @@
 
 import * as t from './types';
 
-export const basicAuth = (token: () => string): t.IAuthScheme => ({
+export const basicAuth = (token?: () => string): t.IAuthScheme => ({
   name: 'Authorization',
   attach: 'header',
   prefix: 'Basic ',
   token,
 });
 
-export const bearerAuth = (token: () => string): t.IAuthScheme => ({
+export const bearerAuth = (token?: () => string): t.IAuthScheme => ({
   name: 'Authorization',
   attach: 'header',
   prefix: 'Bearer ',
   token,
+});
+
+export const cookieAuth = (): t.IAuthScheme => ({
+  attach: 'cookie',
 });
