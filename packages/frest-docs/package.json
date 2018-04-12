@@ -1,0 +1,13 @@
+{
+  "private": true,
+  "name": "frest-docs",
+  "description": "Frest documentation site using hugo",
+  "version": "0.6.1",
+  "license": "Apache-2.0",
+  "scripts": {
+    "serve": "hugo server -w"
+  },
+  "devDependencies": {
+    "hugo-bin": "^0.23.0"
+  }
+}
