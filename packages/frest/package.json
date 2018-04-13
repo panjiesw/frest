@@ -37,15 +37,16 @@
     "b:lib": "tsc --declaration -m commonjs --outDir lib",
     "b:umd": "webpack --profile",
     "build": "run-s lint del b:* d:b",
-    "d:b": "del-cli es/**/__tests__ lib/**/__tests__",
+    "d:b": "del-cli es/**/__tests__ lib/**/__tests__ es/**/*.map lib/**/*.map",
     "d:unit": "del-cli lib .nyc_output coverage",
     "del": "del-cli es lib umd .nyc_output coverage node_modules/.cache",
-    "lint": "tslint -p tsconfig.json",
+    "lint": "tslint -c ../../tslint.json -p tsconfig.json",
+    "prep": "yarn b:lib --sourceMap",
     "report": "nyc report",
     "start": "run-p w:lib w:a",
     "t:a": "cross-env NODE_ENV=test nyc ava --tap | faucet",
     "test": "run-s unit report",
-    "unit": "run-s d:unit b:lib t:a",
+    "unit": "run-s d:unit 'b:lib --sourceMap' t:a",
     "w:a": "ava --watch",
     "w:lib": "yarn b:lib -w"
   },
@@ -61,8 +62,7 @@
   "nyc": {
     "reporter": [
       "text",
-      "lcov",
-      "cobertura"
+      "lcov"
     ]
   },
   "devDependencies": {
