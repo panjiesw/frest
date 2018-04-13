@@ -37,6 +37,24 @@ test('constructor interceptors', t => {
   t.is(frest.config.interceptors.error.length, 1);
 });
 
+test('has interceptor', t => {
+  const int: any = sinon.spy();
+  int.id = 'test';
+  const int2: any = sinon.spy();
+  int2.id = 'test2';
+
+  const frest = new Frest({
+    interceptors: {
+      after: [int],
+      error: [int2],
+    },
+  });
+
+  t.true(frest.hasInterceptor(int.id));
+  t.true(frest.hasInterceptor(int2.id));
+  t.false(frest.hasInterceptor('foo'));
+});
+
 test('add-remove', t => {
   const int: any = sinon.spy();
   int.id = 'test';

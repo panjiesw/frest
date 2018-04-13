@@ -17,7 +17,7 @@
 import test from 'ava';
 import { Frest, IConfig } from '../../';
 import { DEFAULT_CONFIG } from '../../Frest';
-import { BASE } from '../fixtures';
+import { BASE, instances } from '../fixtures';
 
 test('merge', t => {
   const config: Partial<IConfig> = {
@@ -37,4 +37,10 @@ test('merge', t => {
   const frest = new Frest(config);
   frest.mergeConfig(changed);
   t.deepEqual(frest.config, expected);
+});
+
+test('fetch fn', t => {
+  const { frest, fm } = instances();
+
+  t.deepEqual(frest.fetchFn, fm as any);
 });
