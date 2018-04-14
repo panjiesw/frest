@@ -15,7 +15,7 @@
  */
 
 import test from 'ava';
-import { BASE, instances, randomStr } from '../fixtures';
+import { BASE, instances, randomStr } from 'frest/lib/__tests__/fixtures';
 import { before, ID_BEFORE } from '../../';
 
 test('must JSON.stringify object', async t => {

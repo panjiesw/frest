@@ -16,7 +16,7 @@
 
 import test from 'ava';
 import { FrestError } from 'frest';
-import { instances } from '../fixtures';
+import { instances } from 'frest/lib/__tests__/fixtures';
 import { after, ID_AFTER } from '../../';
 
 test('must parse json response', async t => {

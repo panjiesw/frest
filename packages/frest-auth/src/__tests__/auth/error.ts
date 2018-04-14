@@ -16,7 +16,7 @@
 
 import test from 'ava';
 import sinon from 'sinon';
-import { instances } from '../fixtures';
+import { instances } from 'frest/lib/__tests__/fixtures';
 import { error /* scheme, ID_ERROR */ } from '../..';
 
 test('default to throw', async t => {

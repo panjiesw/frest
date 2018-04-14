@@ -16,7 +16,7 @@
 
 import test from 'ava';
 import sinon from 'sinon';
-import { instances } from '../fixtures';
+import { instances } from 'frest/lib/__tests__/fixtures';
 import { before, scheme, ID_BEFORE, IAuthScheme } from '../..';
 
 test('scheme Basic', async t => {

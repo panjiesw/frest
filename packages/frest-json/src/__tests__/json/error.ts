@@ -16,7 +16,7 @@
 
 import test from 'ava';
 import { FrestError, IResponse } from 'frest';
-import { instances } from '../fixtures';
+import { instances } from 'frest/lib/__tests__/fixtures';
 import { error, ID_ERROR } from '../../';
 
 test('must handle http error', async t => {

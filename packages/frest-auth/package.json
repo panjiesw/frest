@@ -3,7 +3,7 @@
   "name": "frest-auth",
   "version": "0.0.0",
   "description": "A set of Authentication interceptors for Frest",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "main": "lib/index.js",
   "module": "es/index.js",
   "unpkg": "umd/frest-auth.umd.js",
@@ -60,7 +60,7 @@
       "lib/__tests__/**/*.js"
     ],
     "require": [
-      "./src/__tests__/_helpers.js"
+      "frest/src/__tests__/_helpers.js"
     ]
   },
   "nyc": {
