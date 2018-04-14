@@ -17,7 +17,7 @@
 import test from 'ava';
 import fetchMock from 'fetch-mock';
 import sinon from 'sinon';
-import { Frest, IAfterInterceptorArg, IFrestError } from '../../';
+import Frest, { IAfterInterceptorArg, IFrestError } from '../../';
 import { BASE } from '../fixtures';
 
 test('constructor interceptors', t => {

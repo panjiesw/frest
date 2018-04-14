@@ -34,6 +34,10 @@ export const DEFAULT_CONFIG: t.IConfig & {
   method: 'GET',
 };
 
+export interface FrestConstructor {
+  new (config?: t.ConfigType): Frest;
+}
+
 class Frest implements t.IFrest {
   private _config: t.IConfig;
 

@@ -15,7 +15,7 @@
  */
 
 import test from 'ava';
-import { Frest, IConfig } from '../../';
+import Frest, { IConfig } from '../../';
 import { DEFAULT_CONFIG } from '../../Frest';
 import { BASE } from '../fixtures';
 

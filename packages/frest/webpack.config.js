@@ -18,6 +18,7 @@ limitations under the License.`;
 
 const config = {
   mode: 'production',
+  entry: './src/umd.ts',
   output: {
     path: path.join(__dirname, 'umd'),
     filename: 'frest.umd.js',
