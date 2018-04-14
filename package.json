@@ -28,6 +28,7 @@
     "whatwg-fetch"
   ],
   "scripts": {
+    "build": "lerna run build && lerna run d:b",
     "cm": "git-cz",
     "codecov": "codecov",
     "cover": "cross-env NODE_ENV=test nyc ava --tap | faucet",

@@ -1,5 +1,4 @@
 {
-  "private": true,
   "name": "frest-auth",
   "version": "0.0.0",
   "description": "A set of Authentication interceptors for Frest",
@@ -40,7 +39,7 @@
     "b:es": "tsc --declaration --outDir es",
     "b:lib": "tsc --declaration -m commonjs --outDir lib",
     "b:umd": "webpack --profile",
-    "build": "run-s del b:* d:b",
+    "build": "npm-run-all lint del --parallel b:*",
     "d:b": "del-cli es/**/__tests__ lib/**/__tests__ es/**/*.map lib/**/*.map",
     "d:unit": "del-cli lib .nyc_output coverage",
     "del": "del-cli es lib umd .nyc_output coverage node_modules/.cache",

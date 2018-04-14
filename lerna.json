@@ -1,14 +1,15 @@
 {
   "lerna": "2.8.0",
-  "packages": [
-    "packages/*"
-  ],
+  "packages": ["packages/*"],
   "version": "independent",
   "npmClient": "yarn",
   "useWorkspaces": true,
   "command": {
     "run": {
       "stream": true
+    },
+    "publish": {
+      "allowBranch": ["master", "release/*"]
     }
   }
 }
