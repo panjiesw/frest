@@ -1,6 +1,6 @@
 {
   "name": "frest-auth",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A set of Authentication interceptors for Frest",
   "license": "Apache-2.0",
   "main": "lib/index.js",
@@ -69,7 +69,7 @@
     ]
   },
   "peerDependencies": {
-    "frest": "~0.6.0"
+    "frest": "^0.7.0"
   },
   "devDependencies": {
     "@types/fetch-mock": "^6.0.1",
