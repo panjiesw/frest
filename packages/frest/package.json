@@ -1,6 +1,6 @@
 {
   "name": "frest",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "description": "REST client for browser with Fetch",
   "license": "Apache-2.0",
   "main": "lib/index.js",
