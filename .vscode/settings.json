@@ -17,9 +17,8 @@
 		"**/.idea": true,
 		"**/.iml": true
 	},
-	"licenser.author": "Panjie Setiawan Wicaksono",
 	"licenser.projectName": "frest",
-	"licenser.license": "MIT",
+	"licenser.license": "AL2",
 	"licenser.useSingleLineStyle": false,
 	"stylelint.enable": false,
 	"tslint.enable": true,

@@ -1,7 +1,18 @@
-// Copyright (c) 2017 Panjie Setiawan Wicaksono
-//
-// This software is released under the MIT License.
-// https://opensource.org/licenses/MIT
+/**
+ *    Copyright 2018 Panjie Setiawan Wicaksono
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 
 import qs from 'query-string';
 import { FrestError } from './FrestError';
@@ -98,13 +109,36 @@ class Frest implements t.IFrest {
     return false;
   }
 
+  public parsePath(path: string | string[], query?: any): string {
+    const paths: string[] = path
+      ? path instanceof Array ? path : [path]
+      : [''];
+    query = this.parseQuery(query);
+    return this.trimSlashes(
+      `${this._config.base}/${paths.map(encodeURI).join('/')}${query}`,
+    );
+  }
+
+  public parseQuery(query: any): string {
+    let q = query || '';
+    if (typeof q === 'object') {
+      const qq = qs.stringify(q);
+      q = qq.length > 0 ? `?${qq}` : '';
+    } else if (q !== '') {
+      q = q.charAt(0) === '?' ? q : `?${q}`;
+    }
+    return q;
+  }
+
   public request<T = any>(
     init: t.RequestType,
     request: Partial<t.IRequest> = {},
   ): Promise<t.IResponse<T>> {
+    const conf = this.requestConfig(init, request);
     return this.internalRequest<T>({
-      ...this.requestConfig(init, request),
-      action: 'request',
+      ...conf,
+      method: conf.method || this._config.method,
+      action: conf.action || 'request',
     });
   }
 
@@ -121,7 +155,7 @@ class Frest implements t.IFrest {
     return this.internalRequest<T>({
       ...conf,
       method: conf.method || 'POST',
-      action: 'upload',
+      action: conf.action || 'upload',
     });
   }
 
@@ -133,7 +167,7 @@ class Frest implements t.IFrest {
     return this.internalRequest<T>({
       ...conf,
       method: conf.method || 'GET',
-      action: 'download',
+      action: conf.action || 'download',
     });
   }
 
@@ -184,18 +218,15 @@ class Frest implements t.IFrest {
     init: t.RequestType,
     request: Partial<t.IRequest>,
   ): t.IRequest {
-    const { method } = this._config;
     if (typeof init === 'string' || init instanceof Array) {
       this.headers(request);
       return {
-        method,
         path: init,
         ...request,
       } as any;
     }
     this.headers(init);
     return {
-      method,
       path: '',
       ...init,
     } as any;
@@ -242,7 +273,7 @@ class Frest implements t.IFrest {
             );
           }
           return requestInterceptor({
-            config: this._config,
+            frest: this,
             request: requestConfig,
           });
         });
@@ -253,7 +284,7 @@ class Frest implements t.IFrest {
         reject(
           new FrestError(
             `Error in before request interceptor: ${cause}`,
-            this._config,
+            this,
             request,
           ),
         );
@@ -263,9 +294,6 @@ class Frest implements t.IFrest {
 
   private doRequest = (request: t.IRequest): Promise<IInternalAfterFetch> => {
     let fetchFn: typeof fetch;
-    const paths: string[] = request.path
-      ? request.path instanceof Array ? request.path : [request.path]
-      : [''];
 
     try {
       fetchFn = this.getFetch(request);
@@ -273,10 +301,7 @@ class Frest implements t.IFrest {
       return Promise.reject(error);
     }
 
-    const query = this.parseQuery(request.query);
-    const fullPath = this.trimSlashes(
-      `${this._config.base}/${paths.map(encodeURI).join('/')}${query}`,
-    );
+    const fullPath = this.parsePath(request.path, request.query);
     return fetchFn(fullPath, request).then<IInternalAfterFetch>(origin => ({
       request,
       origin,
@@ -293,7 +318,7 @@ class Frest implements t.IFrest {
           `Non OK HTTP response status: ${origin.status} - ${
             origin.statusText
           }`,
-          this._config,
+          this,
           request,
           { origin },
         ),
@@ -310,7 +335,7 @@ class Frest implements t.IFrest {
           );
         }
         return responseInterceptor({
-          config: this._config,
+          frest: this,
           request,
           response,
         });
@@ -320,8 +345,8 @@ class Frest implements t.IFrest {
       const cause = typeof e === 'string' ? e : e.message ? e.message : e;
       return Promise.reject(
         new FrestError(
-          `Error in after response intercepor: ${cause}`,
-          this._config,
+          `Error in after response interceptor: ${cause}`,
+          this,
           request,
           { origin },
         ),
@@ -329,18 +354,18 @@ class Frest implements t.IFrest {
     });
   };
 
-  private onError = (requestConfig: t.IRequest) => (e: any): any => {
-    let err: t.IFrestError = this.toFrestError(e, requestConfig);
+  private onError = (request: t.IRequest) => (e: any): any => {
+    let err: t.IFrestError = this.toFrestError(e, request);
 
     if (this._config.interceptors.error.length === 0) {
       return Promise.reject(err);
     }
 
     return new Promise<any>((resolve, reject) => {
-      let promise: Promise<void | t.IResponse<any> | null> = Promise.resolve(
+      let promise: Promise<t.IResponse | undefined | null> = Promise.resolve(
         null,
       );
-      let recovery: t.IResponse<any> | null = null;
+      let recovery: t.IResponse | undefined | null = null;
       for (const errorInterceptor of this._config.interceptors.error) {
         if (recovery != null) {
           break;
@@ -354,7 +379,8 @@ class Frest implements t.IFrest {
             return errorInterceptor(err);
           })
           .catch(ee => {
-            err = this.toFrestError(ee, requestConfig);
+            err = this.toFrestError(ee, request);
+            return null;
           });
       }
       promise.then(res => {
@@ -367,25 +393,13 @@ class Frest implements t.IFrest {
     });
   };
 
-  private parseQuery(query: any): string {
-    let q = query || '';
-    if (typeof q === 'object') {
-      const qq = qs.stringify(q);
-      q = qq.length > 0 ? `?${qq}` : '';
-    } else if (q !== '') {
-      q = q.charAt(0) === '?' ? q : `?${q}`;
-    }
-
-    return q;
-  }
-
   private trimSlashes(input: string): string {
     return input.toString().replace(/(^\/+|\/+$)/g, '');
   }
 
   private toFrestError(e: any, requestConfig: t.IRequest): t.IFrestError {
-    return !e.config && !e.request
-      ? new FrestError(e.message, this._config, requestConfig)
+    return !e.frest && !e.request
+      ? new FrestError(e.message, this, requestConfig)
       : e;
   }
 }
@@ -412,10 +426,11 @@ for (const action in methods) {
         init: t.RequestType,
         requestConfig: Partial<t.IRequest> = {},
       ) {
+        const conf = this.requestConfig(init, requestConfig);
         return this.internalRequest({
-          ...this.requestConfig(init, requestConfig),
-          method,
-          action,
+          ...conf,
+          method: conf.method || method,
+          action: conf.action || action,
         });
       },
     });

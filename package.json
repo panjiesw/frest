@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "description": "REST client for browser with Fetch",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "workspaces": [
     "packages/*"
   ],
@@ -28,36 +28,62 @@
     "whatwg-fetch"
   ],
   "scripts": {
+    "build": "lerna run build && lerna run d:b",
     "cm": "git-cz",
-    "format": "prettier --trailing-comma all --single-quote --write \"packages/*/*.js\" \"packages/*/*.ts\" \"packages/*/src/**/*.{ts,tsx}\"",
+    "codecov": "codecov",
+    "cover": "cross-env NODE_ENV=test nyc ava --tap | faucet",
+    "del": "del-cli .nyc_output coverage && lerna run del",
+    "format": "prettier --write \"packages/*/*.js\" \"packages/*/*.ts\" \"packages/*/src/**/*.{ts,tsx}\"",
+    "prepare": "lerna run prep",
     "precommit": "lint-staged",
-    "start": "lerna run --stream start",
-    "t:frest": "lerna run --scope=frest test",
-    "t:json": "lerna run --scope=frest-json test",
-    "test": "lerna run --stream test"
+    "start": "lerna run start",
+    "test": "lerna run test"
   },
   "devDependencies": {
+    "ava": "^1.0.0-beta.3",
+    "codecov": "^3.0.0",
     "commitizen": "^2.9.6",
+    "cross-env": "^5.1.4",
     "cz-conventional-changelog": "^2.1.0",
+    "del-cli": "^1.1.0",
     "husky": "^0.14.3",
-    "lerna": "^2.8.0",
-    "lint-staged": "^6.1.0",
+    "lerna": "^2.10.1",
+    "lint-staged": "^7.0.4",
     "npm-run-all": "^4.1.2",
-    "prettier": "^1.10.2",
+    "nyc": "^11.6.0",
+    "prettier": "^1.11.1",
     "tslint": "^5.9.1",
-    "tslint-config-prettier": "^1.7.0",
-    "typescript": "^2.7.1"
+    "tslint-config-prettier": "^1.10.0",
+    "typescript": "^2.8.1"
   },
   "lint-staged": {
-		"*.{ts,tsx}": [
-			"tslint -e **/*.d.ts --fix",
-			"prettier --trailing-comma all --single-quote --write",
-			"git add"
-		]
-	},
+    "*.{ts,tsx}": [
+      "tslint -e **/*.d.ts --fix",
+      "prettier --trailing-comma all --single-quote --write",
+      "git add"
+    ]
+  },
   "config": {
     "commitizen": {
       "path": "cz-conventional-changelog"
     }
+  },
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "all"
+  },
+  "ava": {
+    "concurrency": 5,
+    "files": [
+      "packages/*/lib/__tests__/**/*.js"
+    ],
+    "require": [
+      "./packages/frest/src/__tests__/_helpers.js"
+    ]
+  },
+  "nyc": {
+    "reporter": [
+      "lcov"
+    ]
   }
 }

@@ -9,7 +9,8 @@
     "no-unused-variable": [true],
     "ordered-imports": false,
     "variable-name": false,
-    "no-implicit-dependencies": false
+    "no-implicit-dependencies": false,
+    "no-submodule-imports": [true, "frest"]
   },
   "defaultSeverity": "warning"
 }

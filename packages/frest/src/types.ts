@@ -1,8 +1,17 @@
 /**
- * Copyright (c) 2018 Panjie Setiawan Wicaksono
+ *    Copyright 2018 Panjie Setiawan Wicaksono
  *
- * This software is released under the MIT License.
- * https://opensource.org/licenses/MIT
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'OPTION';
@@ -60,6 +69,8 @@ export interface IFrest {
   removeBeforeInterceptor(idv: string | IBeforeInterceptor): void;
   removeErrorInterceptor(idv: string | IErrorInterceptor): void;
   hasInterceptor(id: string): boolean;
+  parsePath(path: string | string[], query?: any): string;
+  parseQuery(query: any): string;
   request<T = any>(
     pathOrConfig: RequestType,
     requestConfig?: Partial<IRequest>,
@@ -76,20 +87,20 @@ export interface IFrest {
 
 export interface IFrestError {
   message: string;
-  config: IConfig;
+  frest: IFrest;
   request: IRequest;
-  response?: IResponse<any>;
+  response?: IResponse;
 }
 
 export interface IBeforeInterceptorArg {
-  config: IConfig;
+  frest: IFrest;
   request: IRequest;
 }
 
 export interface IAfterInterceptorArg {
-  config: IConfig;
+  frest: IFrest;
   request: IRequest;
-  response: IResponse<any>;
+  response: IResponse;
 }
 
 export interface ICommonInterceptor {
@@ -101,11 +112,11 @@ export interface IBeforeInterceptor extends ICommonInterceptor {
 }
 
 export interface IAfterInterceptor extends ICommonInterceptor {
-  (input: IAfterInterceptorArg): Promise<IResponse<any>>;
+  (input: IAfterInterceptorArg): Promise<IResponse>;
 }
 
 export interface IErrorInterceptor extends ICommonInterceptor {
-  (error: IFrestError): Promise<IResponse<any> | null>;
+  (error: IFrestError): Promise<IResponse | undefined | null>;
 }
 
 export interface IInterceptorSet {

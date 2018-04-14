@@ -1,95 +1,97 @@
 {
-	"private": true,
-	"name": "frest-auth",
-	"version": "0.0.0",
-	"description": "A set of Authentication interceptors for Frest",
-	"license": "MIT",
-	"main": "lib/index.js",
-	"module": "es/index.js",
-	"typings": "lib/index.d.ts",
-	"homepage": "https://github.com/panjiesw/frest",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/panjiesw/frest/tree/master/packages/frest-auth"
-	},
-	"author": {
-		"name": "Panjie Setiawan Wicaksono",
-		"email": "panjie@panjiesw.com",
-		"url": "http://panjiesw.life"
-	},
-	"bugs": {
-		"url": "https://github.com/panjiesw/frest/issues"
-	},
-	"keywords": [
-		"rest",
-		"client",
-		"browser",
-		"fetch",
-		"whatwg-fetch",
-		"frest",
-		"auth",
-		"interceptor"
-	],
-	"files": [
-		"es/",
-		"lib/",
-		"umd/"
-	],
-	"scripts": {
-		"b:es": "tsc --declaration --outDir es",
-		"b:lib": "tsc --declaration -m commonjs --outDir lib",
-		"b:umd": "webpack --profile",
-		"build": "run-s del b:* d:b",
-		"d:b": "del-cli es/**/__tests__ lib/**/__tests__",
-		"d:unit": "del-cli lib .nyc_output coverage",
-		"del": "del-cli es lib umd .nyc_output coverage node_modules/.cache",
-		"t:a": "cross-env NODE_ENV=test nyc ava --tap | faucet",
-		"w:lib": "yarn b:lib -w",
-		"report": "nyc report",
-		"start": "run-p w:lib w:a",
-		"test": "run-s unit report",
-		"unit": "run-s d:unit b:lib t:a",
-		"w:a": "ava --watch"
-	},
-	"ava": {
-		"concurrency": 1,
-		"files": [
-			"lib/__tests__/**/*.js"
-		],
-		"require": [
-			"./src/__tests__/_helpers.js"
-		]
-	},
-	"nyc": {
-		"reporter": [
-			"text",
-			"lcov",
-			"cobertura"
-		]
-	},
-	"peerDependencies": {
-		"frest": "~0.6.0"
-	},
-	"devDependencies": {
-		"@types/fetch-mock": "^6.0.0",
-		"@types/node": "8.9.1",
-		"@types/sinon": "^4.1.3",
-		"@types/webpack": "^3.8.7",
-		"ava": "^1.0.0-beta.3",
-		"browser-env": "^3.2.5",
-		"cross-env": "^5.1.3",
-		"del-cli": "^1.1.0",
-		"faucet": "^0.0.1",
-		"fetch-mock": "^6.0.0",
-		"frest": "^0.6.1",
-		"node-fetch": "^2.0.0",
-		"npm-run-all": "^4.1.2",
-		"nyc": "^11.4.1",
-		"sinon": "^4.3.0",
-		"ts-loader": "^3.5.0",
-		"tslint": "^5.9.1",
-		"typescript": "^2.7.1",
-		"uglifyjs-webpack-plugin": "^1.1.8",
-		"webpack": "^3.11.0"
-	}
+  "name": "frest-auth",
+  "version": "0.1.0",
+  "description": "A set of Authentication interceptors for Frest",
+  "license": "Apache-2.0",
+  "main": "lib/index.js",
+  "module": "es/index.js",
+  "unpkg": "umd/frest-auth.umd.js",
+  "typings": "lib/index.d.ts",
+  "homepage": "https://github.com/panjiesw/frest",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/panjiesw/frest/tree/master/packages/frest-auth"
+  },
+  "author": {
+    "name": "Panjie Setiawan Wicaksono",
+    "email": "panjie@panjiesw.com",
+    "url": "http://panjiesw.life"
+  },
+  "bugs": {
+    "url": "https://github.com/panjiesw/frest/issues"
+  },
+  "keywords": [
+    "rest",
+    "client",
+    "browser",
+    "fetch",
+    "whatwg-fetch",
+    "frest",
+    "auth",
+    "interceptor"
+  ],
+  "files": [
+    "es/",
+    "lib/",
+    "umd/"
+  ],
+  "scripts": {
+    "b:es": "tsc --declaration --outDir es",
+    "b:lib": "tsc --declaration -m commonjs --outDir lib",
+    "b:umd": "webpack --profile",
+    "build": "npm-run-all lint del --parallel b:*",
+    "d:b": "del-cli es/**/__tests__ lib/**/__tests__ es/**/*.map lib/**/*.map",
+    "d:unit": "del-cli lib .nyc_output coverage",
+    "del": "del-cli es lib umd .nyc_output coverage node_modules/.cache",
+    "lint": "tslint -c ../../tslint.json -p tsconfig.json",
+    "prep": "yarn b:lib --sourceMap",
+    "report": "nyc report",
+    "start": "run-p w:lib w:a",
+    "t:a": "cross-env NODE_ENV=test nyc ava --tap | faucet",
+    "test": "run-s unit report",
+    "unit": "run-s d:unit 'b:lib --sourceMap' t:a",
+    "w:a": "ava --watch",
+    "w:lib": "yarn b:lib -w --preserveWatchOutput"
+  },
+  "ava": {
+    "concurrency": 1,
+    "files": [
+      "lib/__tests__/**/*.js"
+    ],
+    "require": [
+      "frest/src/__tests__/_helpers.js"
+    ]
+  },
+  "nyc": {
+    "reporter": [
+      "text",
+      "lcov"
+    ]
+  },
+  "peerDependencies": {
+    "frest": "~0.6.0"
+  },
+  "devDependencies": {
+    "@types/fetch-mock": "^6.0.1",
+    "@types/node": "8.9.1",
+    "@types/sinon": "^4.3.1",
+    "@types/webpack": "^4.1.3",
+    "ava": "^1.0.0-beta.3",
+    "browser-env": "^3.2.5",
+    "cross-env": "^5.1.4",
+    "del-cli": "^1.1.0",
+    "faucet": "^0.0.1",
+    "fetch-mock": "^6.3.0",
+    "frest": "^0.7.0",
+    "node-fetch": "^2.1.2",
+    "npm-run-all": "^4.1.2",
+    "nyc": "^11.6.0",
+    "sinon": "^4.5.0",
+    "ts-loader": "^4.2.0",
+    "tslint": "^5.9.1",
+    "typescript": "^2.8.1",
+    "uglifyjs-webpack-plugin": "^1.2.4",
+    "webpack": "^4.5.0",
+    "webpack-cli": "^2.0.14"
+  }
 }

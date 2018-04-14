@@ -1,0 +1,23 @@
+baseURL = "https://frest.surge.sh/"
+languageCode = "en-us"
+defaultContentLanguage = "en"
+
+title = "Frest Documentation"
+theme = "hugo-theme-learn"
+metaDataFormat = "yaml"
+defaultContentLanguageInSubdir= true
+
+[params]
+editURL = "https://github.com/panjiesw/frest/edit/master/packages/frest-docs/content/"
+description = "Documentation for Frest"
+author = "Panjie Setiawan Wicaksono"
+showVisitedLinks = true
+
+[outputs]
+home = [ "HTML", "RSS", "JSON"]
+
+[Languages]
+[Languages.en]
+title = "Documentation for Frest"
+weight = 1
+languageName = "English"
