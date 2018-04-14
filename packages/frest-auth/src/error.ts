@@ -45,7 +45,7 @@ export interface IAuthErrorOption {
   doRetry?: RetryFn;
 }
 
-const error = (opts: IAuthErrorOption): f.IErrorInterceptor => {
+const error = (opts: IAuthErrorOption = {}): f.IErrorInterceptor => {
   const defaultCondition: RetryConditionFn = (_, __, res) =>
     res.origin.status === 401;
   const defaultRetry: RetryFn = (fr, req) => fr.request(req);
@@ -71,7 +71,8 @@ const error = (opts: IAuthErrorOption): f.IErrorInterceptor => {
       ) {
         if (request.retry == null) {
           request.retry = 0;
-        } else if (request.retry >= count) {
+        }
+        if (request.retry >= count) {
           resolve(null);
           return;
         }
@@ -80,6 +81,7 @@ const error = (opts: IAuthErrorOption): f.IErrorInterceptor => {
             .then(resolve)
             .catch(reject);
         }, ++request.retry * delay * exp);
+        return;
       }
       resolve(null);
     });

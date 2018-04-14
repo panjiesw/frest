@@ -51,7 +51,7 @@
     "test": "run-s unit report",
     "unit": "run-s d:unit 'b:lib --sourceMap' t:a",
     "w:a": "ava --watch",
-    "w:lib": "yarn b:lib -w"
+    "w:lib": "yarn b:lib -w --preserveWatchOutput"
   },
   "ava": {
     "concurrency": 5,

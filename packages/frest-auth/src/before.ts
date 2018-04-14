@@ -52,20 +52,29 @@ const before = (scheme: t.IAuthScheme): f.IBeforeInterceptor => {
   const authBeforeInterceptor: f.IBeforeInterceptor = input =>
     new Promise<f.IRequest>(resolve => {
       const token = getToken(scheme);
+      let { request } = input;
+      const { credentials } = request;
       if (token == null) {
         // Either the tokenFn return null or it's using 'cookie' scheme
-        if (scheme.name !== 'cookie') {
-          // tslint:disable-next-line:no-console
-          console.warn('frest-auth: no token provided, not attaching auth');
+        if (process.env.NODE_ENV !== 'production') {
+          if (scheme.name !== 'cookie') {
+            // tslint:disable-next-line:no-console
+            console.warn('frest-auth: no token provided, not attaching auth');
+          } else if (!credentials || credentials === 'omit') {
+            // tslint:disable-next-line:no-console
+            console.warn(
+              'frest-auth: no credentials is included, not sending cookies',
+            );
+          }
         }
-        resolve(input.request);
+        resolve(request);
         return;
       }
-      const { skip } = input.request;
+      const { skip } = request;
       if (!skip || skip.indexOf(ID_BEFORE) < 0) {
-        input.request = attachAuth(input.request, scheme, token);
+        request = attachAuth(request, scheme, token);
       }
-      resolve(input.request);
+      resolve(request);
     });
 
   Object.defineProperty(authBeforeInterceptor, 'id', { value: ID_BEFORE });

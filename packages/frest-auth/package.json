@@ -49,10 +49,10 @@
     "report": "nyc report",
     "start": "run-p w:lib w:a",
     "t:a": "cross-env NODE_ENV=test nyc ava --tap | faucet",
-    "!test": "run-s unit report",
+    "test": "run-s unit report",
     "unit": "run-s d:unit 'b:lib --sourceMap' t:a",
     "w:a": "ava --watch",
-    "w:lib": "yarn b:lib -w"
+    "w:lib": "yarn b:lib -w --preserveWatchOutput"
   },
   "ava": {
     "concurrency": 1,
