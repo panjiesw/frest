@@ -6,7 +6,7 @@
 
 > Browser REST client wrapper of [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) with XHR fallback and interceptor support
 
-[Go to full documentation](https://frest.surge.sh).
+[Go to full documentation](https://frest.netlify.com/).
 
 ## Features
 
@@ -35,7 +35,7 @@ Or include the UMD build directly in a script tag
 <script type="text/javascript" src="https://unpkg.com/frest"></script>
 ```
 
-Basic examples. Go to [documentation site](https://frest.surge.sh) for more detailed things.
+Basic examples.
 
 ```typescript
 import Frest from 'frest';

@@ -21,3 +21,4 @@ es
 lib
 umd
 tests.js.map
+netlify.toml
