@@ -5,6 +5,7 @@
   "version": "0.6.2",
   "license": "Apache-2.0",
   "scripts": {
+    "build": "hugo",
     "serve": "hugo server -w"
   },
   "devDependencies": {
