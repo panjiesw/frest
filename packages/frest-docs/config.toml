@@ -1,4 +1,4 @@
-baseURL = "https://frest.surge.sh/"
+baseURL = "https://frest.netlify.com/"
 languageCode = "en-us"
 defaultContentLanguage = "en"
 
