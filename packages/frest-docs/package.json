@@ -5,10 +5,12 @@
   "version": "0.6.2",
   "license": "Apache-2.0",
   "scripts": {
-    "build": "hugo",
+    "build": "hugo && echo frest.surge.sh > public/CNAME",
+    "clean": "del-cli public",
     "serve": "hugo server -w"
   },
   "devDependencies": {
+    "del-cli": "^1.1.0",
     "hugo-bin": "^0.23.0"
   }
 }
