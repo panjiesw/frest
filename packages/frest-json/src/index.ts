@@ -14,7 +14,17 @@
  *    limitations under the License.
  */
 
+import { IJSONAfterOption } from './after';
+import { IJSONBeforeOption } from './before';
+import { IJSONErrorOption } from './error';
+
 export * from './after';
 export * from './before';
 export * from './error';
 export * from './ids';
+
+export interface IJSONInterceptorOptions {
+  after?: IJSONAfterOption;
+  before?: IJSONBeforeOption;
+  error?: IJSONErrorOption;
+}
