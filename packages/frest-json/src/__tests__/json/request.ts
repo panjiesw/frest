@@ -16,14 +16,14 @@
 
 import test from 'ava';
 import { BASE, instances, randomStr } from 'frest/lib/__tests__/fixtures';
-import { before, ID_BEFORE } from '../../';
+import { requestInterceptor, ID_REQUEST } from '../../';
 
 test('must JSON.stringify object', async t => {
   const body = { foo: 'bar', doo: 1 };
   const exp = JSON.stringify(body);
-  const int = before();
+  const int = requestInterceptor();
   const { frest, fm, url, path } = instances({
-    interceptors: { before: [int] },
+    interceptors: { request: [int] },
   });
   fm.postOnce(url, {}, { method: 'POST', name: path });
 
@@ -46,9 +46,9 @@ test('with custom headers value', async t => {
   const exp = JSON.stringify(body);
   const headerContent = 'application/json;charset=utf-8';
   const headerAccept = 'application/json;charset=utf-8';
-  const int = before({ headerAccept, headerContent });
+  const int = requestInterceptor({ headerAccept, headerContent });
   const { frest, fm, url, path } = instances({
-    interceptors: { before: [int] },
+    interceptors: { request: [int] },
   });
   fm.postOnce(url, {}, { method: 'POST', name: path });
 
@@ -65,13 +65,13 @@ test('with custom headers value', async t => {
 
 test('must skip', async t => {
   const body = { foo: 'bar', doo: 1 };
-  const int = before();
+  const int = requestInterceptor();
   const { frest, fm, url, path } = instances({
-    interceptors: { before: [int] },
+    interceptors: { request: [int] },
   });
   fm.once(url, {}, { method: 'GET', name: path });
 
-  const res = await frest.request(path, { body, skip: [ID_BEFORE] });
+  const res = await frest.request(path, { body, skip: [ID_REQUEST] });
   t.true(res.origin.ok);
   t.true(fm.called(path));
   t.not(
@@ -87,13 +87,13 @@ test('must skip', async t => {
 test('must skip if body is form data', async t => {
   const body = new FormData();
   body.append('foo', 'bar');
-  const int = before();
+  const int = requestInterceptor();
   const { frest, fm, url, path } = instances({
-    interceptors: { before: [int] },
+    interceptors: { request: [int] },
   });
   fm.once(url, {}, { method: 'GET', name: path });
 
-  const res = await frest.request(path, { body, skip: [ID_BEFORE] });
+  const res = await frest.request(path, { body, skip: [ID_REQUEST] });
   t.true(res.origin.ok);
   t.true(fm.called(path));
   t.not(
@@ -108,9 +108,9 @@ test('must skip if body is form data', async t => {
 
 test('must skip if method is not as defined', async t => {
   const body = { foo: 'bar', doo: 1 };
-  const int = before({ method: ['GET', 'PUT'] });
+  const int = requestInterceptor({ method: ['GET', 'PUT'] });
   const { frest, fm, url, path } = instances({
-    interceptors: { before: [int] },
+    interceptors: { request: [int] },
   });
   const path2 = randomStr();
   const url2 = `${BASE}/${path2}`;

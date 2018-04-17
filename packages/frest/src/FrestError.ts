@@ -16,6 +16,15 @@
 
 import * as t from './types';
 
+export interface FrestErrorConstructor {
+  new (
+    message: string,
+    frest: t.IFrest,
+    request: t.IRequest,
+    response?: t.IResponse<any>,
+  ): FrestError;
+}
+
 export class FrestError extends Error implements t.IFrestError {
   constructor(
     message: string,

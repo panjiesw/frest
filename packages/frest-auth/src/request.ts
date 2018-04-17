@@ -16,7 +16,7 @@
 
 import * as f from 'frest';
 import * as t from './types';
-import { ID_BEFORE } from './ids';
+import { ID_REQUEST } from './ids';
 
 const attachAuth = (req: f.IRequest, scheme: t.IAuthScheme, token: string) => {
   const { attach, name: _name } = scheme;
@@ -48,8 +48,10 @@ const getToken = (scheme: t.IAuthScheme) => {
   return null;
 };
 
-const before = (scheme: t.IAuthScheme): f.IBeforeInterceptor => {
-  const authBeforeInterceptor: f.IBeforeInterceptor = input =>
+export default function requestInterceptor(
+  scheme: t.IAuthScheme,
+): f.IRequestInterceptor {
+  const authRequestInterceptor: f.IRequestInterceptor = input =>
     new Promise<f.IRequest>(resolve => {
       const token = getToken(scheme);
       let { request } = input;
@@ -71,14 +73,12 @@ const before = (scheme: t.IAuthScheme): f.IBeforeInterceptor => {
         return;
       }
       const { skip } = request;
-      if (!skip || skip.indexOf(ID_BEFORE) < 0) {
+      if (!skip || skip.indexOf(ID_REQUEST) < 0) {
         request = attachAuth(request, scheme, token);
       }
       resolve(request);
     });
 
-  Object.defineProperty(authBeforeInterceptor, 'id', { value: ID_BEFORE });
-  return authBeforeInterceptor;
-};
-
-export { before, attachAuth, getToken };
+  Object.defineProperty(authRequestInterceptor, 'id', { value: ID_REQUEST });
+  return authRequestInterceptor;
+}

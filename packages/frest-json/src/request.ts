@@ -14,18 +14,15 @@
  *    limitations under the License.
  */
 
-import * as t from 'frest';
-import { ID_BEFORE } from './ids';
+import * as f from 'frest';
+import * as t from './types';
+import { ID_REQUEST } from './ids';
 
-export interface IJSONBeforeOption {
-  headerContent?: string;
-  headerAccept?: string;
-  method?: t.HttpMethod[];
-}
-
-const before = (opts: IJSONBeforeOption = {}): t.IBeforeInterceptor => {
-  const jsonBeforeInterceptor: t.IBeforeInterceptor = input =>
-    new Promise<t.IRequest>((resolve, reject) => {
+export default function requestInterceptor(
+  opts: t.IJSONRequestInterceptorOption = {},
+): f.IRequestInterceptor {
+  const jsonBeforeInterceptor: f.IRequestInterceptor = input =>
+    new Promise<f.IRequest>((resolve, reject) => {
       try {
         const { headerAccept, headerContent, method } = opts;
         const { body: origin, method: meth, headers, skip } = input.request;
@@ -35,7 +32,7 @@ const before = (opts: IJSONBeforeOption = {}): t.IBeforeInterceptor => {
           !(origin instanceof FormData) &&
           !(origin instanceof ArrayBuffer) &&
           (!method || method.indexOf(meth) > -1) &&
-          (!skip || skip.indexOf(ID_BEFORE) < 0)
+          (!skip || skip.indexOf(ID_REQUEST) < 0)
         ) {
           body = JSON.stringify(origin);
           headers.set('Content-Type', headerContent || 'application/json');
@@ -47,8 +44,6 @@ const before = (opts: IJSONBeforeOption = {}): t.IBeforeInterceptor => {
       }
     });
 
-  Object.defineProperty(jsonBeforeInterceptor, 'id', { value: ID_BEFORE });
+  Object.defineProperty(jsonBeforeInterceptor, 'id', { value: ID_REQUEST });
   return jsonBeforeInterceptor;
-};
-
-export { before };
+}

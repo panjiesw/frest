@@ -17,14 +17,14 @@
 import test from 'ava';
 import { FrestError } from 'frest';
 import { instances } from 'frest/lib/__tests__/fixtures';
-import { after, ID_AFTER } from '../../';
+import { responseInterceptor, ID_RESPONSE } from '../../';
 
 test('must parse json response', async t => {
   const exp = { foo: 'bar', doo: 1 };
   const body = JSON.stringify(exp);
-  const int = after();
+  const int = responseInterceptor();
   const { frest, fm, url, path } = instances({
-    interceptors: { after: [int] },
+    interceptors: { response: [int] },
   });
   fm.once(
     url,
@@ -43,9 +43,9 @@ test('must parse json response', async t => {
 test('must parse json response if force is true', async t => {
   const exp = { foo: 'bar', doo: 1 };
   const body = JSON.stringify(exp);
-  const int = after({ force: true });
+  const int = responseInterceptor({ force: true });
   const { frest, fm, url, path } = instances({
-    interceptors: { after: [int] },
+    interceptors: { response: [int] },
   });
   fm.once(
     url,
@@ -63,9 +63,9 @@ test('must parse json response if force is true', async t => {
 test('must parse json with custom response header', async t => {
   const exp = { foo: 'bar', doo: 1 };
   const body = JSON.stringify(exp);
-  const int = after({ headerContent: 'text/json' });
+  const int = responseInterceptor({ headerContent: 'text/json' });
   const { frest, fm, url, path } = instances({
-    interceptors: { after: [int] },
+    interceptors: { response: [int] },
   });
   fm.once(
     url,
@@ -84,9 +84,9 @@ test('must parse json with custom response header', async t => {
 test('must skip', async t => {
   const exp = { foo: 'bar', doo: 1 };
   const body = JSON.stringify(exp);
-  const int = after();
+  const int = responseInterceptor();
   const { frest, fm, url, path } = instances({
-    interceptors: { after: [int] },
+    interceptors: { response: [int] },
   });
   fm.once(
     url,
@@ -97,15 +97,15 @@ test('must skip', async t => {
     { method: 'GET', name: path },
   );
 
-  const res = await frest.get(path, { skip: [ID_AFTER] });
+  const res = await frest.get(path, { skip: [ID_RESPONSE] });
   t.true(res.origin.ok);
   t.notDeepEqual(res.body, exp);
 });
 
 test('must handle empty content', async t => {
-  const int = after({ headerContent: 'text/json' });
+  const int = responseInterceptor({ headerContent: 'text/json' });
   const { frest, fm, url, path } = instances({
-    interceptors: { after: [int] },
+    interceptors: { response: [int] },
   });
   fm.once(
     url,
@@ -123,9 +123,9 @@ test('must handle empty content', async t => {
 });
 
 test('must handle parsing error', async t => {
-  const int = after({ headerContent: 'text/json' });
+  const int = responseInterceptor({ headerContent: 'text/json' });
   const { frest, fm, url, path } = instances({
-    interceptors: { after: [int] },
+    interceptors: { response: [int] },
   });
   fm.once(
     url,

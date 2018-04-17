@@ -14,7 +14,9 @@
  *    limitations under the License.
  */
 
-export * from './after';
-export * from './before';
-export * from './error';
+export * from './types';
 export * from './ids';
+export { default as responseInterceptor } from './response';
+export { default as requestInterceptor } from './request';
+export { default as errorInterceptor } from './error';
+export { default as interceptors } from './interceptors';

@@ -15,7 +15,7 @@
  */
 
 import fetchMock from 'fetch-mock';
-import { ConfigMergeType, Frest } from '../../';
+import Frest, { ConfigMergeType } from '../../';
 
 export const BASE = 'http://localhost';
 
