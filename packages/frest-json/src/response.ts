@@ -15,18 +15,13 @@
  */
 
 import * as f from 'frest';
-import { ID_AFTER } from './ids';
+import * as t from './types';
+import { ID_RESPONSE } from './ids';
 
-export type IJSONTransformFn = (response: Response) => Promise<string>;
-
-export interface IJSONAfterOption {
-  force?: boolean;
-  headerContent?: string;
-  transform?: IJSONTransformFn;
-}
-
-const after = (opts: IJSONAfterOption = {}): f.IAfterInterceptor => {
-  const jsonAfterInterceptor: f.IAfterInterceptor = input =>
+export default function responseInterceptor(
+  opts: t.IJSONResponseInterceptorOption = {},
+): f.IResponseInterceptor {
+  const jsonResponseInterceptor: f.IResponseInterceptor = input =>
     new Promise<f.IResponse<any>>((resolve, reject) => {
       const { force, headerContent, transform } = opts;
       const { skip } = input.request;
@@ -35,7 +30,7 @@ const after = (opts: IJSONAfterOption = {}): f.IAfterInterceptor => {
       const ct = headers.get('Content-Type');
       if (
         !bodyUsed &&
-        (!skip || skip.indexOf(ID_AFTER) < 0) &&
+        (!skip || skip.indexOf(ID_RESPONSE) < 0) &&
         ((ct && ct.indexOf(headerContent || 'application/json') >= 0) || force)
       ) {
         let promise: Promise<any>;
@@ -63,8 +58,6 @@ const after = (opts: IJSONAfterOption = {}): f.IAfterInterceptor => {
       resolve({ origin, body: originBody });
     });
 
-  Object.defineProperty(jsonAfterInterceptor, 'id', { value: ID_AFTER });
-  return jsonAfterInterceptor;
-};
-
-export { after };
+  Object.defineProperty(jsonResponseInterceptor, 'id', { value: ID_RESPONSE });
+  return jsonResponseInterceptor;
+}

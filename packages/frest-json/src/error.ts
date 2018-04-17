@@ -15,13 +15,12 @@
  */
 
 import * as f from 'frest';
+import * as t from './types';
 import { ID_ERROR } from './ids';
 
-export interface IJSONErrorOption {
-  headerContent?: string;
-}
-
-const error = (opts: IJSONErrorOption = {}) => {
+export default function errorInterceptor(
+  opts: t.IJSONErrorInterceptorOption = {},
+): f.IErrorInterceptor {
   const jsonErrorInterceptor: f.IErrorInterceptor = err =>
     new Promise<f.IResponse | undefined | null>((resolve, reject) => {
       const { headerContent } = opts;
@@ -49,6 +48,4 @@ const error = (opts: IJSONErrorOption = {}) => {
 
   Object.defineProperty(jsonErrorInterceptor, 'id', { value: ID_ERROR });
   return jsonErrorInterceptor;
-};
-
-export { error };
+}

@@ -14,6 +14,28 @@
  *    limitations under the License.
  */
 
-export const ID_REQUEST = 'json:request';
-export const ID_RESPONSE = 'json:response';
-export const ID_ERROR = 'json:error';
+import * as t from 'frest';
+
+export interface IJSONRequestInterceptorOption {
+  headerContent?: string;
+  headerAccept?: string;
+  method?: t.HttpMethod[];
+}
+
+export type IJSONTransformFn = (response: Response) => Promise<string>;
+
+export interface IJSONResponseInterceptorOption {
+  force?: boolean;
+  headerContent?: string;
+  transform?: IJSONTransformFn;
+}
+
+export interface IJSONErrorInterceptorOption {
+  headerContent?: string;
+}
+
+export interface IJSONInterceptorsOptions {
+  error?: IJSONErrorInterceptorOption;
+  request?: IJSONRequestInterceptorOption;
+  response?: IJSONResponseInterceptorOption;
+}

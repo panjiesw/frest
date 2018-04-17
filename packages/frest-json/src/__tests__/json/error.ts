@@ -17,12 +17,12 @@
 import test from 'ava';
 import { FrestError, IResponse } from 'frest';
 import { instances } from 'frest/lib/__tests__/fixtures';
-import { error, ID_ERROR } from '../../';
+import { errorInterceptor, ID_ERROR } from '../../';
 
 test('must handle http error', async t => {
   const exp = { foo: 'bar', doo: 1 };
   const body = JSON.stringify(exp);
-  const int = error();
+  const int = errorInterceptor();
   const { frest, fm, url, path } = instances({
     interceptors: { error: [int] },
   });
@@ -46,7 +46,7 @@ test('must handle http error', async t => {
 test('must handle http error with custom header', async t => {
   const exp = { foo: 'bar', doo: 1 };
   const body = JSON.stringify(exp);
-  const int = error({ headerContent: 'text/json' });
+  const int = errorInterceptor({ headerContent: 'text/json' });
   const { frest, fm, url, path } = instances({
     interceptors: { error: [int] },
   });
@@ -68,7 +68,7 @@ test('must handle http error with custom header', async t => {
 });
 
 test('must skip', async t => {
-  const int = error({ headerContent: 'application/json' });
+  const int = errorInterceptor({ headerContent: 'application/json' });
   const { frest, fm, url, path } = instances({
     interceptors: { error: [int] },
   });

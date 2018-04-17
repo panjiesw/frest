@@ -14,6 +14,18 @@
  *    limitations under the License.
  */
 
-export const ID_REQUEST = 'json:request';
-export const ID_RESPONSE = 'json:response';
-export const ID_ERROR = 'json:error';
+import * as f from 'frest';
+import * as t from './types';
+import errorInterceptor from './error';
+import requestInterceptor from './request';
+import responseInterceptor from './response';
+
+export default function jsonInterceptors(
+  opts: t.IJSONInterceptorsOptions = {},
+): f.IInterceptors {
+  return {
+    error: opts.error ? errorInterceptor(opts.error) : undefined,
+    request: opts.request ? requestInterceptor(opts.request) : undefined,
+    response: opts.response ? responseInterceptor(opts.response) : undefined,
+  };
+}
