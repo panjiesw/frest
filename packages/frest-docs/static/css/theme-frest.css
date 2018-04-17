@@ -139,3 +139,8 @@ a:hover {
 pre {
   background: var(--PRE-BG-color);
 }
+
+.hljs {
+  font-feature-settings: "calt" 1;  /* Enable ligatures for IE 10+, Edge */
+  text-rendering: optimizeLegibility; /* Force ligatures for Webkit, Blink, Gecko */
+}

@@ -1,9 +1,18 @@
 ---
-title: Basic
+title: Using Frest
+pre: "<b>1. </b>"
 weight: 5
 ---
 
-# How to Use Frest
+<!-- TOC -->
+
+- [The Frest Instance](#the-frest-instance)
+- [Calling API Endpoint](#calling-api-endpoint)
+- [Response Processing](#response-processing)
+- [Async Await Style](#async-await-style)
+- [Using TypeScript](#using-typescript)
+
+<!-- /TOC -->
 
 After installation, import it your code. The `Frest` class is exported in default namespace
 
@@ -145,3 +154,9 @@ async function makeRequest() {
   }
 }
 ```
+
+## Using TypeScript
+
+Frest is developed with [TypeScript](https://www.typescriptlang.org/) and include
+its own definition files. We can comfortably import Frest and use the awesomeness
+of TypeScript altogether :)
