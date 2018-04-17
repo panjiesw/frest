@@ -14,5 +14,5 @@
  *    limitations under the License.
  */
 
-export const ID_BEFORE = 'auth:before';
+export const ID_REQUEST = 'auth:request';
 export const ID_ERROR = 'auth:error';

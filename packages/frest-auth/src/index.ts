@@ -14,10 +14,10 @@
  *    limitations under the License.
  */
 
-import { before } from './before';
 import * as scheme from './scheme';
 
 export * from './types';
 export * from './ids';
-export * from './error';
-export { before, scheme };
+export { scheme };
+export { default as errorInterceptor } from './error';
+export { default as requestInterceptor } from './request';
