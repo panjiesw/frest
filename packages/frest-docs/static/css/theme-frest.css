@@ -144,3 +144,20 @@ pre {
   font-feature-settings: "calt" 1;  /* Enable ligatures for IE 10+, Edge */
   text-rendering: optimizeLegibility; /* Force ligatures for Webkit, Blink, Gecko */
 }
+
+.highlight table tr td:first-child .copy-to-clipboard {
+  display: none;
+}
+
+/* pre .copy-to-clipboard {
+  right: -10px;
+  top: 4px;
+} */
+
+.highlight table tr td:last-child pre {
+  padding-right: 3rem;
+}
+
+pre {
+  margin: 0;
+}

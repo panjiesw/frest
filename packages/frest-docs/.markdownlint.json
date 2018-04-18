@@ -1,5 +1,8 @@
 {
   "first-header-h1": false,
   "first-line-h1": false,
-  "line-length": false
+  "line-length": false,
+  "ul-start-left": false,
+  "ul-style": { "style": "dash" },
+  "ol-prefix": { "style": "one_or_ordered" }
 }
