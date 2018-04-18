@@ -14,6 +14,6 @@
  *    limitations under the License.
  */
 
-export const ID_BEFORE = 'json:before';
-export const ID_AFTER = 'json:after';
+export const ID_REQUEST = 'json:request';
+export const ID_RESPONSE = 'json:response';
 export const ID_ERROR = 'json:error';

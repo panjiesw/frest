@@ -17,10 +17,10 @@
 import test from 'ava';
 import sinon from 'sinon';
 import { instances } from 'frest/lib/__tests__/fixtures';
-import { error /* scheme, ID_ERROR */ } from '../..';
+import { errorInterceptor } from '../..';
 
 test('default to throw', async t => {
-  const int = error();
+  const int = errorInterceptor();
   const { frest, fm, url, path } = instances({
     interceptors: { error: [int] },
   });
@@ -33,7 +33,7 @@ test('default to throw', async t => {
 test('default retry', async t => {
   const count = 3;
   // fast delay for test
-  const int = error({ count, delay: 10 });
+  const int = errorInterceptor({ count, delay: 10 });
   const { frest, fm, url, path } = instances({
     interceptors: { error: [int] },
   });
@@ -51,7 +51,7 @@ test('retry condition', async t => {
     .callsFake(
       (_, req, res) => res.origin.status === 401 && req.action !== 'skip',
     );
-  const int = error({ condition, count: 1 });
+  const int = errorInterceptor({ condition, count: 1 });
   frest.mergeConfig({ interceptors: { error: [int] } });
   fm.mock(url, { status: 401 }, { method: 'PUT', name: path });
 

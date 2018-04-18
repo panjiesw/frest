@@ -1,7 +1,9 @@
 {
-  "lerna": "2.8.0",
-  "packages": ["packages/*"],
-  "version": "independent",
+  "lerna": "2.10.1",
+  "packages": [
+    "packages/*"
+  ],
+  "version": "0.8.0",
   "npmClient": "yarn",
   "useWorkspaces": true,
   "command": {
@@ -9,7 +11,10 @@
       "stream": true
     },
     "publish": {
-      "allowBranch": ["master", "release/*"]
+      "allowBranch": [
+        "master",
+        "release/*"
+      ]
     }
   }
 }

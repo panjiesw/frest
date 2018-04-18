@@ -30,7 +30,7 @@ export const DEFAULT_CONFIG: t.IConfig & {
   base: '',
   fetch,
   headers: new Headers(),
-  interceptors: { after: [], before: [], error: [] },
+  interceptors: { response: [], request: [], error: [] },
   method: 'GET',
 };
 
@@ -76,28 +76,54 @@ class Frest implements t.IFrest {
     return this._config.fetch;
   }
 
-  public addAfterInterceptor(interceptor: t.IAfterInterceptor) {
-    this._config.interceptors.after.push(interceptor);
+  public addResponseInterceptor(interceptor: t.IResponseInterceptor) {
+    this._config.interceptors.response.push(interceptor);
   }
 
-  public addBeforeInterceptor(interceptor: t.IBeforeInterceptor) {
-    this._config.interceptors.before.push(interceptor);
+  public addRequestInterceptor(interceptor: t.IRequestInterceptor) {
+    this._config.interceptors.request.push(interceptor);
   }
 
   public addErrorInterceptor(interceptor: t.IErrorInterceptor) {
     this._config.interceptors.error.push(interceptor);
   }
 
-  public removeAfterInterceptor(idv: string | t.IAfterInterceptor) {
-    this.removeInterceptor('after', idv);
+  public addInterceptors(interceptors: t.IInterceptors): void {
+    const { error, request, response } = interceptors;
+    if (error) {
+      this.addErrorInterceptor(error);
+    }
+    if (request) {
+      this.addRequestInterceptor(request);
+    }
+    if (response) {
+      this.addResponseInterceptor(response);
+    }
   }
 
-  public removeBeforeInterceptor(idv: string | t.IBeforeInterceptor) {
-    this.removeInterceptor('before', idv);
+  public removeResponseInterceptor(idv: string | t.IResponseInterceptor) {
+    this.removeInterceptor('response', idv);
+  }
+
+  public removeRequestInterceptor(idv: string | t.IRequestInterceptor) {
+    this.removeInterceptor('request', idv);
   }
 
   public removeErrorInterceptor(idv: string | t.IErrorInterceptor) {
     this.removeInterceptor('error', idv);
+  }
+
+  public removeInterceptors(interceptors: t.IInterceptors): void {
+    const { error, request, response } = interceptors;
+    if (error) {
+      this.removeErrorInterceptor(error);
+    }
+    if (request) {
+      this.removeRequestInterceptor(request);
+    }
+    if (response) {
+      this.removeResponseInterceptor(response);
+    }
   }
 
   public hasInterceptor(id: string): boolean {
@@ -176,11 +202,11 @@ class Frest implements t.IFrest {
   }
 
   private removeInterceptor(
-    i: 'after' | 'before' | 'error',
+    i: 'response' | 'request' | 'error',
     idv:
       | string
-      | t.IAfterInterceptor
-      | t.IBeforeInterceptor
+      | t.IResponseInterceptor
+      | t.IRequestInterceptor
       | t.IErrorInterceptor,
   ) {
     if (typeof idv === 'string') {
@@ -267,7 +293,7 @@ class Frest implements t.IFrest {
   private doBefore(request: t.IRequest) {
     return new Promise<t.IRequest>((resolve, reject) => {
       let requestPromise = Promise.resolve<t.IRequest>(request);
-      for (const requestInterceptor of this._config.interceptors.before) {
+      for (const requestInterceptor of this._config.interceptors.request) {
         requestPromise = requestPromise.then(requestConfig => {
           if (!requestConfig) {
             throw new Error(
@@ -287,7 +313,7 @@ class Frest implements t.IFrest {
         const cause = typeof e === 'string' ? e : e.message ? e.message : e;
         reject(
           new FrestError(
-            `Error in before request interceptor: ${cause}`,
+            `Error in request interceptor: ${cause}`,
             this,
             request,
           ),
@@ -331,7 +357,7 @@ class Frest implements t.IFrest {
     let responsePromise: Promise<t.IResponse<T>> = Promise.resolve({
       origin,
     });
-    for (const responseInterceptor of this._config.interceptors.after) {
+    for (const responseInterceptor of this._config.interceptors.response) {
       responsePromise = responsePromise.then(response => {
         if (!response) {
           throw new Error(
@@ -349,7 +375,7 @@ class Frest implements t.IFrest {
       const cause = typeof e === 'string' ? e : e.message ? e.message : e;
       return Promise.reject(
         new FrestError(
-          `Error in after response interceptor: ${cause}`,
+          `Error in response interceptor: ${cause}`,
           this,
           request,
           { origin },

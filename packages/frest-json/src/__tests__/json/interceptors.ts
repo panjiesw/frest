@@ -14,5 +14,29 @@
  *    limitations under the License.
  */
 
-export const ID_REQUEST = 'auth:request';
-export const ID_ERROR = 'auth:error';
+import test from 'ava';
+import { interceptors } from '../../';
+
+test('only create defined options', t => {
+  const case1 = interceptors();
+  t.deepEqual(case1, {
+    error: undefined,
+    request: undefined,
+    response: undefined,
+  });
+
+  const case2 = interceptors({ error: {} });
+  t.truthy(case2.error);
+  t.falsy(case2.request);
+  t.falsy(case2.response);
+
+  const case3 = interceptors({ request: {} });
+  t.truthy(case3.request);
+  t.falsy(case3.error);
+  t.falsy(case3.response);
+
+  const case4 = interceptors({ response: {} });
+  t.truthy(case4.response);
+  t.falsy(case4.request);
+  t.falsy(case4.error);
+});

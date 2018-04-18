@@ -31,11 +31,13 @@
 		"**/node_modules/**"
   ],
 	"typescript.tsdk": "./node_modules/typescript/lib",
-	"typescript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
-	"javascript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
 	"xo.enable": false,
 	"prettier.singleQuote": true,
 	"prettier.useTabs": false,
 	"prettier.trailingComma": "all",
-	"prettier.printWidth": 80
+	"prettier.printWidth": 80,
+	"docthis.includeAuthorTag": false,
+	"docthis.includeMemberOfOnClassMembers": false,
+	"docthis.includeMemberOfOnInterfaceMembers": false,
+	"docthis.includeTypes": false
 }

@@ -17,14 +17,14 @@
 import test from 'ava';
 import sinon from 'sinon';
 import { instances } from 'frest/lib/__tests__/fixtures';
-import { before, scheme, ID_BEFORE, IAuthScheme } from '../..';
+import { requestInterceptor, scheme, ID_REQUEST, IAuthScheme } from '../..';
 
 test('scheme Basic', async t => {
   const getToken = sinon.stub().returns('token');
   const sc = scheme.basicAuth(getToken);
-  const int = before(sc);
+  const int = requestInterceptor(sc);
   const { frest, fm, url, path } = instances({
-    interceptors: { before: [int] },
+    interceptors: { request: [int] },
   });
   fm.once(url, {}, { method: 'GET', name: path });
 
@@ -40,9 +40,9 @@ test('scheme Basic', async t => {
 test('scheme Bearer', async t => {
   const getToken = sinon.stub().returns('token');
   const sc = scheme.basicAuth(getToken);
-  const int = before(sc);
+  const int = requestInterceptor(sc);
   const { frest, fm, url, path } = instances({
-    interceptors: { before: [int] },
+    interceptors: { request: [int] },
   });
   fm.once(url, {}, { method: 'GET', name: path });
 
@@ -58,13 +58,13 @@ test('scheme Bearer', async t => {
 test('scheme Basic skip', async t => {
   const getToken = sinon.stub().returns('token');
   const sc = scheme.basicAuth(getToken);
-  const int = before(sc);
+  const int = requestInterceptor(sc);
   const { frest, fm, url, path } = instances({
-    interceptors: { before: [int] },
+    interceptors: { request: [int] },
   });
   fm.once(url, {}, { method: 'GET', name: path });
 
-  const res = await frest.request(path, { skip: [ID_BEFORE] });
+  const res = await frest.request(path, { skip: [ID_REQUEST] });
   t.true(res.origin.ok);
   t.true(fm.called(path));
   t.not(
@@ -75,9 +75,9 @@ test('scheme Basic skip', async t => {
 
 test('scheme no token', async t => {
   const sc = scheme.basicAuth();
-  const int = before(sc);
+  const int = requestInterceptor(sc);
   const { frest, fm, url, path } = instances({
-    interceptors: { before: [int] },
+    interceptors: { request: [int] },
   });
   fm.once(url, {}, { method: 'GET', name: path });
 
@@ -92,9 +92,9 @@ test('scheme no name', async t => {
     token: sinon.stub().returns('token'),
     attach: 'header',
   };
-  const int = before(sc);
+  const int = requestInterceptor(sc);
   const { frest, fm, url, path } = instances({
-    interceptors: { before: [int] },
+    interceptors: { request: [int] },
   });
   fm.once(url, {}, { method: 'GET', name: path });
 
@@ -113,9 +113,9 @@ test('scheme query', async t => {
     token: sinon.stub().returns(token),
     attach: 'query',
   };
-  const int = before(sc);
+  const int = requestInterceptor(sc);
   const { frest, fm, url, path } = instances({
-    interceptors: { before: [int] },
+    interceptors: { request: [int] },
   });
   fm.once(`${url}${query}`, {}, { method: 'GET', name: path });
 
@@ -133,9 +133,9 @@ test('scheme query existing object', async t => {
     token: sinon.stub().returns(token),
     attach: 'query',
   };
-  const int = before(sc);
+  const int = requestInterceptor(sc);
   const { frest, fm, url, path } = instances({
-    interceptors: { before: [int] },
+    interceptors: { request: [int] },
   });
   fm.once(`${url}${query}`, {}, { method: 'GET', name: path });
 
@@ -153,9 +153,9 @@ test('scheme query existing string', async t => {
     token: sinon.stub().returns(token),
     attach: 'query',
   };
-  const int = before(sc);
+  const int = requestInterceptor(sc);
   const { frest, fm, url, path } = instances({
-    interceptors: { before: [int] },
+    interceptors: { request: [int] },
   });
   fm.once(`${url}${query}`, {}, { method: 'GET', name: path });
 
@@ -173,9 +173,9 @@ test('scheme query existing string empty', async t => {
     token: sinon.stub().returns(token),
     attach: 'query',
   };
-  const int = before(sc);
+  const int = requestInterceptor(sc);
   const { frest, fm, url, path } = instances({
-    interceptors: { before: [int] },
+    interceptors: { request: [int] },
   });
   fm.once(`${url}${query}`, {}, { method: 'GET', name: path });
 

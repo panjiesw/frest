@@ -14,6 +14,9 @@
  *    limitations under the License.
  */
 
+/**
+ * Supported HTTP Method
+ */
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'OPTION';
 
 export interface IConfigBase extends RequestInit {
@@ -33,8 +36,17 @@ export type ConfigMergeType = Partial<IConfigBase> & {
   interceptors?: Partial<IInterceptorSet>;
 };
 
+/**
+ * Frest configuration
+ */
 export type ConfigType = string | ConfigMergeType;
 
+/**
+ * The Request configuration
+ *
+ * @export
+ * @interface IRequest
+ */
 export interface IRequest extends RequestInit {
   [key: string]: any;
   path: string | string[];
@@ -62,12 +74,14 @@ export interface IFrest {
   readonly config: IConfig;
   readonly fetchFn: typeof fetch;
   mergeConfig(config: Partial<IConfig>): void;
-  addAfterInterceptor(interceptor: IAfterInterceptor): void;
-  addBeforeInterceptor(interceptor: IBeforeInterceptor): void;
+  addResponseInterceptor(interceptor: IResponseInterceptor): void;
+  addRequestInterceptor(interceptor: IRequestInterceptor): void;
   addErrorInterceptor(interceptor: IErrorInterceptor): void;
-  removeAfterInterceptor(idv: string | IAfterInterceptor): void;
-  removeBeforeInterceptor(idv: string | IBeforeInterceptor): void;
+  addInterceptors(interceptors: IInterceptors): void;
+  removeResponseInterceptor(idv: string | IResponseInterceptor): void;
+  removeRequestInterceptor(idv: string | IRequestInterceptor): void;
   removeErrorInterceptor(idv: string | IErrorInterceptor): void;
+  removeInterceptors(interceptors: IInterceptors): void;
   hasInterceptor(id: string): boolean;
   parsePath(path: string | string[], query?: any): string;
   parseQuery(query: any): string;
@@ -92,12 +106,12 @@ export interface IFrestError {
   response?: IResponse;
 }
 
-export interface IBeforeInterceptorArg {
+export interface IRequestInterceptorArg {
   frest: IFrest;
   request: IRequest;
 }
 
-export interface IAfterInterceptorArg {
+export interface IResponseInterceptorArg {
   frest: IFrest;
   request: IRequest;
   response: IResponse;
@@ -107,12 +121,12 @@ export interface ICommonInterceptor {
   id?: string;
 }
 
-export interface IBeforeInterceptor extends ICommonInterceptor {
-  (input: IBeforeInterceptorArg): Promise<IRequest>;
+export interface IRequestInterceptor extends ICommonInterceptor {
+  (input: IRequestInterceptorArg): Promise<IRequest>;
 }
 
-export interface IAfterInterceptor extends ICommonInterceptor {
-  (input: IAfterInterceptorArg): Promise<IResponse>;
+export interface IResponseInterceptor extends ICommonInterceptor {
+  (input: IResponseInterceptorArg): Promise<IResponse>;
 }
 
 export interface IErrorInterceptor extends ICommonInterceptor {
@@ -120,7 +134,13 @@ export interface IErrorInterceptor extends ICommonInterceptor {
 }
 
 export interface IInterceptorSet {
-  after: IAfterInterceptor[];
-  before: IBeforeInterceptor[];
+  response: IResponseInterceptor[];
+  request: IRequestInterceptor[];
   error: IErrorInterceptor[];
+}
+
+export interface IInterceptors {
+  response?: IResponseInterceptor;
+  request?: IRequestInterceptor;
+  error?: IErrorInterceptor;
 }
