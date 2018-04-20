@@ -76,15 +76,33 @@ class Frest implements t.IFrest {
     return this._config.fetch;
   }
 
-  public addResponseInterceptor(interceptor: t.IResponseInterceptor) {
+  public addResponseInterceptor(
+    interceptor: t.IResponseInterceptor,
+    idx?: number,
+  ) {
+    if (idx != null) {
+      this._config.interceptors.response.splice(idx, 0, interceptor);
+      return;
+    }
     this._config.interceptors.response.push(interceptor);
   }
 
-  public addRequestInterceptor(interceptor: t.IRequestInterceptor) {
+  public addRequestInterceptor(
+    interceptor: t.IRequestInterceptor,
+    idx?: number,
+  ) {
+    if (idx != null) {
+      this._config.interceptors.request.splice(idx, 0, interceptor);
+      return;
+    }
     this._config.interceptors.request.push(interceptor);
   }
 
-  public addErrorInterceptor(interceptor: t.IErrorInterceptor) {
+  public addErrorInterceptor(interceptor: t.IErrorInterceptor, idx?: number) {
+    if (idx != null) {
+      this._config.interceptors.error.splice(idx, 0, interceptor);
+      return;
+    }
     this._config.interceptors.error.push(interceptor);
   }
 

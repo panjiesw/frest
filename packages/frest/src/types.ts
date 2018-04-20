@@ -74,9 +74,9 @@ export interface IFrest {
   readonly config: IConfig;
   readonly fetchFn: typeof fetch;
   mergeConfig(config: Partial<IConfig>): void;
-  addResponseInterceptor(interceptor: IResponseInterceptor): void;
-  addRequestInterceptor(interceptor: IRequestInterceptor): void;
-  addErrorInterceptor(interceptor: IErrorInterceptor): void;
+  addResponseInterceptor(interceptor: IResponseInterceptor, idx?: number): void;
+  addRequestInterceptor(interceptor: IRequestInterceptor, idx?: number): void;
+  addErrorInterceptor(interceptor: IErrorInterceptor, idx?: number): void;
   addInterceptors(interceptors: IInterceptors): void;
   removeResponseInterceptor(idv: string | IResponseInterceptor): void;
   removeRequestInterceptor(idv: string | IRequestInterceptor): void;
