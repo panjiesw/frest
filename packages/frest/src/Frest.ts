@@ -1,4 +1,7 @@
 /**
+ * @module frest
+ */
+/**
  *    Copyright 2018 Panjie Setiawan Wicaksono
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -71,7 +74,7 @@ export default class Frest {
 
   /**
    * Creates an instance of Frest.
-   * @param config - _Optional_ Configuration for this instance.
+   * @param config - Configuration for this instance.
    * Can be string or array of string (in which it'll be the `base` URL for
    * every requests), or a {@link IConfig} object. Defaults to `DEFAULT_CONFIG`
    */
@@ -129,7 +132,7 @@ export default class Frest {
    * Add a response interceptor function to this instance.
    *
    * @param interceptor - The response interceptor function.
-   * @param idx - _Optional_ The index position where this interceptor will be put.
+   * @param idx - The index position where this interceptor will be put.
    * Interceptors will get executed from lower to higher index.
    */
   public addResponseInterceptor(
@@ -147,7 +150,7 @@ export default class Frest {
    * Add a request interceptor function to this instance.
    *
    * @param interceptor - The request interceptor function.
-   * @param idx - _Optional_ The index position where this interceptor will be put.
+   * @param idx - The index position where this interceptor will be put.
    * Interceptors will get executed from lower to higher index.
    */
   public addRequestInterceptor(interceptor: IRequestInterceptor, idx?: number) {
@@ -162,7 +165,7 @@ export default class Frest {
    * Add an error interceptor function to this instance.
    *
    * @param interceptor - The error interceptor function.
-   * @param idx - _Optional_ The index position where this interceptor will be put.
+   * @param idx - The index position where this interceptor will be put.
    * Interceptors will get executed from lower to higher index.
    */
   public addErrorInterceptor(interceptor: IErrorInterceptor, idx?: number) {
@@ -262,7 +265,7 @@ export default class Frest {
    * URL to the provided arguments.
    *
    * @param path - Endpoint path
-   * @param query - _Optional_ query object/string to include
+   * @param query - query object/string to include
    * @returns Full URL to the provided arguments.
    */
   public parsePath(path: string | string[], query?: any): string {
@@ -296,7 +299,7 @@ export default class Frest {
    * Make a request to an endpoint.
    *
    * @param init - A string, string array, or request configuration object.
-   * @param request - _Optional_ request configuration if the first arg is string
+   * @param request - request configuration if the first arg is string
    * or string array
    * @returns Response promise which will be resolved when the request is successful.
    * The promise will throws in case of error in any request life-cycle.
@@ -317,7 +320,7 @@ export default class Frest {
    * Make a request to an endpoint with HTTP `POST` method.
    *
    * @param init - A string, string array, or request configuration object.
-   * @param request - _Optional_ request configuration if the first arg is string
+   * @param request - request configuration if the first arg is string
    * or string array
    * @returns Response promise which will be resolved when the request is successful.
    * The promise will throws in case of error in any request life-cycle.
@@ -338,7 +341,7 @@ export default class Frest {
    * Make a request to an endpoint with HTTP `GET` method.
    *
    * @param init - A string, string array, or request configuration object.
-   * @param request - _Optional_ request configuration if the first arg is string
+   * @param request - request configuration if the first arg is string
    * or string array
    * @returns Response promise which will be resolved when the request is successful.
    * The promise will throws in case of error in any request life-cycle.
@@ -359,7 +362,7 @@ export default class Frest {
    * Make a request to an endpoint with HTTP `PUT` method.
    *
    * @param init - A string, string array, or request configuration object.
-   * @param request - _Optional_ request configuration if the first arg is string
+   * @param request - request configuration if the first arg is string
    * or string array
    * @returns Response promise which will be resolved when the request is successful.
    * The promise will throws in case of error in any request life-cycle.
@@ -380,7 +383,7 @@ export default class Frest {
    * Make a request to an endpoint with HTTP `PATCH` method.
    *
    * @param init - A string, string array, or request configuration object.
-   * @param request - _Optional_ request configuration if the first arg is string
+   * @param request - request configuration if the first arg is string
    * or string array
    * @returns Response promise which will be resolved when the request is successful.
    * The promise will throws in case of error in any request life-cycle.
@@ -401,7 +404,7 @@ export default class Frest {
    * Make a request to an endpoint with HTTP `DELETE` method.
    *
    * @param init - A string, string array, or request configuration object.
-   * @param request - _Optional_ request configuration if the first arg is string
+   * @param request - request configuration if the first arg is string
    * or string array
    * @returns Response promise which will be resolved when the request is successful.
    * The promise will throws in case of error in any request life-cycle.
@@ -422,7 +425,7 @@ export default class Frest {
    * Make a request to an endpoint with HTTP `OPTION` method.
    *
    * @param init - A string, string array, or request configuration object.
-   * @param request - _Optional_ request configuration if the first arg is string
+   * @param request - request configuration if the first arg is string
    * or string array
    * @returns Response promise which will be resolved when the request is successful.
    * The promise will throws in case of error in any request life-cycle.
@@ -447,7 +450,7 @@ export default class Frest {
    * support request body of `FormData` object.
    *
    * @param init - A string, string array, or request configuration object.
-   * @param request - _Optional_ request configuration if the first arg is string
+   * @param request - request configuration if the first arg is string
    * or string array
    * @returns Response promise which will be resolved when the request is successful.
    * The promise will throws in case of error in any request life-cycle.
@@ -476,7 +479,7 @@ export default class Frest {
    * download progress. By default the HTTP method used is `GET`.
    *
    * @param init - A string, string array, or request configuration object.
-   * @param request - _Optional_ request configuration if the first arg is string
+   * @param request - request configuration if the first arg is string
    * or string array
    * @returns Response promise which will be resolved when the request is successful.
    * The promise will throws in case of error in any request life-cycle.

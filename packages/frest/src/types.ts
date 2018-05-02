@@ -1,4 +1,7 @@
 /**
+ * @module frest
+ */
+/**
  *    Copyright 2018 Panjie Setiawan Wicaksono
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +29,7 @@ export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'OPTION';
  * Base config for Frest instance
  * @public
  */
-export interface IConfigBase extends RequestInit {
+export interface IConfigBase {
   /**
    * The base url for this instance. Defaults to empty string.
    * @public
@@ -53,6 +56,32 @@ export interface IConfigBase extends RequestInit {
    * @public
    */
   headers: Headers;
+  body?:
+    | Blob
+    | Int8Array
+    | Int16Array
+    | Int32Array
+    | Uint8Array
+    | Uint16Array
+    | Uint32Array
+    | Uint8ClampedArray
+    | Float32Array
+    | Float64Array
+    | DataView
+    | ArrayBuffer
+    | FormData
+    | string
+    | null;
+  cache?: RequestCache;
+  credentials?: RequestCredentials;
+  integrity?: string;
+  keepalive?: boolean;
+  mode?: RequestMode;
+  redirect?: RequestRedirect;
+  referrer?: string;
+  referrerPolicy?: ReferrerPolicy;
+  signal?: AbortSignal;
+  window?: any;
 }
 
 /**

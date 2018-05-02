@@ -1,4 +1,10 @@
 /**
+ * @module frest
+ * @preferred
+ *
+ * Main frest module.
+ */
+/**
  *    Copyright 2018 Panjie Setiawan Wicaksono
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
