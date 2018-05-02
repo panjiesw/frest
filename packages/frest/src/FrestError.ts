@@ -14,23 +14,24 @@
  *    limitations under the License.
  */
 
-import * as t from './types';
+import { IRequest, IResponse, IFrestError } from './types';
+import Frest from './Frest';
 
 export interface FrestErrorConstructor {
   new (
     message: string,
-    frest: t.IFrest,
-    request: t.IRequest,
-    response?: t.IResponse<any>,
+    frest: Frest,
+    request: IRequest,
+    response?: IResponse<any>,
   ): FrestError;
 }
 
-export class FrestError extends Error implements t.IFrestError {
+export default class FrestError extends Error implements IFrestError {
   constructor(
     message: string,
-    public frest: t.IFrest,
-    public request: t.IRequest,
-    public response?: t.IResponse<any>,
+    public frest: Frest,
+    public request: IRequest,
+    public response?: IResponse<any>,
   ) {
     super(message);
   }

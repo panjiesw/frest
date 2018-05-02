@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-import * as f from 'frest';
+import Frest, { IRequest, IResponse } from 'frest';
 
 export type AuthAttach = 'header' | 'query' | 'cookie';
 
@@ -26,16 +26,16 @@ export interface IAuthScheme {
 }
 
 export type RetryConditionFn = (
-  frest: f.IFrest,
-  request: f.IRequest,
-  response: f.IResponse,
+  frest: Frest,
+  request: IRequest,
+  response: IResponse,
 ) => boolean;
 
 export type RetryFn = (
-  frest: f.IFrest,
-  request: f.IRequest,
-  response: f.IResponse,
-) => Promise<f.IResponse>;
+  frest: Frest,
+  request: IRequest,
+  response: IResponse,
+) => Promise<IResponse>;
 
 export interface IRetry {
   count?: number;

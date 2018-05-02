@@ -14,8 +14,6 @@
  *    limitations under the License.
  */
 
-import { Frest } from './Frest';
-
 export * from './types';
-export { FrestError } from './FrestError';
-export default Frest;
+export { default as FrestError, FrestErrorConstructor } from './FrestError';
+export { default, DEFAULT_CONFIG, FrestConstructor } from './Frest';

@@ -14,22 +14,22 @@
  *    limitations under the License.
  */
 
-import * as t from './types';
+import { IAuthScheme } from './types';
 
-export const basicAuth = (token?: () => string): t.IAuthScheme => ({
+export const basicAuth = (token?: () => string): IAuthScheme => ({
   name: 'Authorization',
   attach: 'header',
   prefix: 'Basic ',
   token,
 });
 
-export const bearerAuth = (token?: () => string): t.IAuthScheme => ({
+export const bearerAuth = (token?: () => string): IAuthScheme => ({
   name: 'Authorization',
   attach: 'header',
   prefix: 'Bearer ',
   token,
 });
 
-export const cookieAuth = (): t.IAuthScheme => ({
+export const cookieAuth = (): IAuthScheme => ({
   attach: 'cookie',
 });

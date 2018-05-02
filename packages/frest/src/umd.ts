@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-import { Frest, FrestConstructor } from './Frest';
-import { FrestError, FrestErrorConstructor } from './FrestError';
+import Frest, { FrestConstructor } from './Frest';
+import FrestError, { FrestErrorConstructor } from './FrestError';
 
 declare global {
   interface Window {
