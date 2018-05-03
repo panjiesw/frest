@@ -298,6 +298,7 @@ export default class Frest {
   /**
    * Make a request to an endpoint.
    *
+   * @template T - The type of response's body, if any. Defaults to `any`.
    * @param init - A string, string array, or request configuration object.
    * @param request - request configuration if the first arg is string
    * or string array
@@ -319,6 +320,7 @@ export default class Frest {
   /**
    * Make a request to an endpoint with HTTP `POST` method.
    *
+   * @template T - The type of response's body, if any. Defaults to `any`.
    * @param init - A string, string array, or request configuration object.
    * @param request - request configuration if the first arg is string
    * or string array
@@ -340,6 +342,7 @@ export default class Frest {
   /**
    * Make a request to an endpoint with HTTP `GET` method.
    *
+   * @template T - The type of response's body, if any. Defaults to `any`.
    * @param init - A string, string array, or request configuration object.
    * @param request - request configuration if the first arg is string
    * or string array
@@ -361,6 +364,7 @@ export default class Frest {
   /**
    * Make a request to an endpoint with HTTP `PUT` method.
    *
+   * @template T - The type of response's body, if any. Defaults to `any`.
    * @param init - A string, string array, or request configuration object.
    * @param request - request configuration if the first arg is string
    * or string array
@@ -382,6 +386,7 @@ export default class Frest {
   /**
    * Make a request to an endpoint with HTTP `PATCH` method.
    *
+   * @template T - The type of response's body, if any. Defaults to `any`.
    * @param init - A string, string array, or request configuration object.
    * @param request - request configuration if the first arg is string
    * or string array
@@ -403,6 +408,7 @@ export default class Frest {
   /**
    * Make a request to an endpoint with HTTP `DELETE` method.
    *
+   * @template T - The type of response's body, if any. Defaults to `any`.
    * @param init - A string, string array, or request configuration object.
    * @param request - request configuration if the first arg is string
    * or string array
@@ -424,6 +430,7 @@ export default class Frest {
   /**
    * Make a request to an endpoint with HTTP `OPTION` method.
    *
+   * @template T - The type of response's body, if any. Defaults to `any`.
    * @param init - A string, string array, or request configuration object.
    * @param request - request configuration if the first arg is string
    * or string array
@@ -449,6 +456,7 @@ export default class Frest {
    * upload progress. By default the HTTP method used is `POST`. Currently only
    * support request body of `FormData` object.
    *
+   * @template T - The type of response's body, if any. Defaults to `any`.
    * @param init - A string, string array, or request configuration object.
    * @param request - request configuration if the first arg is string
    * or string array
@@ -478,6 +486,7 @@ export default class Frest {
    * This is a special request function which will use `XMLHTTPRequest` to support
    * download progress. By default the HTTP method used is `GET`.
    *
+   * @template T - The type of response's body, if any. Defaults to `any`.
    * @param init - A string, string array, or request configuration object.
    * @param request - request configuration if the first arg is string
    * or string array

@@ -20,6 +20,12 @@
 import { IRequest, IResponse, IFrestError } from './types';
 import Frest from './Frest';
 
+/**
+ * FrestError constructor/class signature.
+ * @remarks
+ * This is only used for UMD build.
+ * @public
+ */
 export interface FrestErrorConstructor {
   new (
     message: string,
@@ -29,6 +35,10 @@ export interface FrestErrorConstructor {
   ): FrestError;
 }
 
+/**
+ * Error representation class when there is any failure during request life-cycle.
+ * @public
+ */
 export default class FrestError extends Error implements IFrestError {
   constructor(
     message: string,

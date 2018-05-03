@@ -53,35 +53,74 @@ export interface IConfigBase {
    * Default {@link https://developer.mozilla.org/en-US/docs/Web/API/Headers | Headers} to include in each request.
    * @remarks
    * If this Headers contain key which is supplied in request, it will get overridden.
+   * In native `fetch` API, this can also be a key-value object, but for Frest
+   * it's **required** to be an instance of `Headers` class.
    * @public
    */
   headers: Headers;
-  body?:
-    | Blob
-    | Int8Array
-    | Int16Array
-    | Int32Array
-    | Uint8Array
-    | Uint16Array
-    | Uint32Array
-    | Uint8ClampedArray
-    | Float32Array
-    | Float64Array
-    | DataView
-    | ArrayBuffer
-    | FormData
-    | string
-    | null;
+  /**
+   * Default cache mode you want to use for each request: `default`, `no-store`, `reload`, `no-cache`, `force-cache`, or `only-if-cached`.
+   * @remarks
+   * See {@link https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch | fetch}
+   * request init for more.
+   * @public
+   */
   cache?: RequestCache;
+  /**
+   * Default request credentials you want to use for each request: `omit`, `same-origin`, or `include`.
+   * @remarks
+   * See {@link https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch | fetch}
+   * request init for more.
+   * @public
+   */
   credentials?: RequestCredentials;
-  integrity?: string;
+  /**
+   * The `keepalive` option can be used to allow the request to outlive the page.
+   * @remarks
+   * See {@link https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch | fetch}
+   * request init for more.
+   * @public
+   */
   keepalive?: boolean;
+  /**
+   * Default mode you want to use for each request, e.g., `cors`, `no-cors`, or `same-origin`.
+   * @remarks
+   * See {@link https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch | fetch}
+   * request init for more.
+   * @public
+   */
   mode?: RequestMode;
+  /**
+   * Default redirect mode to use for each request.
+   * @remarks
+   * See {@link https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch | fetch}
+   * request init for more.
+   * @public
+   */
   redirect?: RequestRedirect;
+  /**
+   * A {@link https://developer.mozilla.org/en-US/docs/Web/API/USVString | USVString} specifying `no-referrer`, `client`, or a URL for each request
+   * @remarks
+   * See {@link https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch | fetch}
+   * request init for more.
+   * @public
+   */
   referrer?: string;
+  /**
+   * Specifies the value of the referer HTTP header for each request.
+   * @remarks
+   * See {@link https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch | fetch}
+   * request init for more.
+   * @public
+   */
   referrerPolicy?: ReferrerPolicy;
+  /**
+   * @remarks
+   * See {@link https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch | fetch}
+   * request init for more.
+   * @public
+   */
   signal?: AbortSignal;
-  window?: any;
 }
 
 /**
@@ -131,11 +170,15 @@ export type ConfigType = string | ConfigMergeType;
 /**
  * Request configuration object.
  * @remarks
- * The request configuration accept any properties. This can be useful for
+ * The request configuration extends from native `fetch` request init options
+ * and also accept any properties outside those. This can be useful for
  * debugging, interceptor, etc. to identify originating request.
+ *
+ * See {@link https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch | fetch}
+ * request init for more.
  * @public
  */
-export interface IRequest extends RequestInit {
+export interface IRequest {
   [key: string]: any;
   /**
    * Path relative to {@link IConfigBase.base}.
@@ -220,6 +263,9 @@ export interface IRequest extends RequestInit {
    * Note that a request using the GET or HEAD method cannot have a body.
    * Also for `upload` method of Frest instance, it's required to use
    * `FormData` as body.
+   *
+   * See {@link https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch | fetch}
+   * request init for more.
    * @public
    */
   body?: any;
@@ -233,6 +279,69 @@ export interface IRequest extends RequestInit {
    * @public
    */
   onDownloadProgress?: (ev: ProgressEvent) => any;
+  /**
+   * The cache mode you want to use for the request: `default`, `no-store`, `reload`, `no-cache`, `force-cache`, or `only-if-cached`.
+   * @remarks
+   * See {@link https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch | fetch}
+   * request init for more.
+   * @public
+   */
+  cache?: RequestCache;
+  /**
+   * The request credentials you want to use for the request: `omit`, `same-origin`, or `include`.
+   * @remarks
+   * See {@link https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch | fetch}
+   * request init for more.
+   * @public
+   */
+  credentials?: RequestCredentials;
+  /**
+   * The `keepalive` option can be used to allow the request to outlive the page.
+   * @remarks
+   * See {@link https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch | fetch}
+   * request init for more.
+   * @public
+   */
+  keepalive?: boolean;
+  /**
+   * The mode you want to use for the request, e.g., `cors`, `no-cors`, or `same-origin`.
+   * @remarks
+   * See {@link https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch | fetch}
+   * request init for more.
+   * @public
+   */
+  mode?: RequestMode;
+  /**
+   * The redirect mode to use for the request.
+   * @remarks
+   * See {@link https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch | fetch}
+   * request init for more.
+   * @public
+   */
+  redirect?: RequestRedirect;
+  /**
+   * A {@link https://developer.mozilla.org/en-US/docs/Web/API/USVString | USVString} specifying `no-referrer`, `client`, or a URL for the request
+   * @remarks
+   * See {@link https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch | fetch}
+   * request init for more.
+   * @public
+   */
+  referrer?: string;
+  /**
+   * Specifies the value of the referer HTTP header for the request.
+   * @remarks
+   * See {@link https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch | fetch}
+   * request init for more.
+   * @public
+   */
+  referrerPolicy?: ReferrerPolicy;
+  /**
+   * @remarks
+   * See {@link https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch | fetch}
+   * request init for more.
+   * @public
+   */
+  signal?: AbortSignal;
 }
 
 /**
@@ -249,7 +358,9 @@ export type RequestType = string | string[] | Partial<IRequest>;
  * @remarks
  * Every successful request will return a promise of this object. `T` is
  * type parameter of the `body` property.
+ *
  * @public
+ * @template T - The type of `body` property. Defaults to `any`
  */
 export interface IResponse<T = any> {
   /**
