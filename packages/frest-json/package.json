@@ -43,6 +43,7 @@
     "d:b": "del-cli es/**/__tests__ lib/**/__tests__ es/**/*.map lib/**/*.map",
     "d:unit": "del-cli lib .nyc_output coverage",
     "del": "del-cli es lib umd .nyc_output coverage node_modules/.cache",
+    "doc": "typedoc src",
     "lint": "tslint -c ../../tslint.json -p tsconfig.json",
     "prep": "yarn b:lib --sourceMap",
     "report": "nyc report",

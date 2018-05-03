@@ -11,7 +11,7 @@
   ],
   "typedocOptions": {
     "exclude": "**/__tests__/**",
-    "out": "../../docs/frest",
+    "out": "../frest-docs/static/api/frest",
     "excludePrivate": true,
     "excludeExternals": true,
     "externalPattern": "**/node_modules/**",
