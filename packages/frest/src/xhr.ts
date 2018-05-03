@@ -1,4 +1,8 @@
 /**
+ * @module frest
+ * @hidden
+ */
+/**
  *    Copyright 2018 Panjie Setiawan Wicaksono
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");

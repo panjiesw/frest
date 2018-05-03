@@ -1,4 +1,7 @@
 /**
+ * @module frest-json
+ */
+/**
  *    Copyright 2018 Panjie Setiawan Wicaksono
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +17,15 @@
  *    limitations under the License.
  */
 
+/**
+ * Identifier of JSON request interceptor function.
+ */
 export const ID_REQUEST = 'json:request';
+/**
+ * Identifier of JSON response interceptor function.
+ */
 export const ID_RESPONSE = 'json:response';
+/**
+ * Identifier of JSON error interceptor function.
+ */
 export const ID_ERROR = 'json:error';

@@ -1,4 +1,10 @@
 /**
+ * @module frest
+ * @preferred
+ *
+ * Main frest module.
+ */
+/**
  *    Copyright 2018 Panjie Setiawan Wicaksono
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,8 +20,6 @@
  *    limitations under the License.
  */
 
-import { Frest } from './Frest';
-
 export * from './types';
-export { FrestError } from './FrestError';
-export default Frest;
+export { default as FrestError, FrestErrorConstructor } from './FrestError';
+export { default, DEFAULT_CONFIG, FrestConstructor } from './Frest';

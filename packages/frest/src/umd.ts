@@ -1,4 +1,8 @@
 /**
+ * @module frest
+ * @hidden
+ */
+/**
  *    Copyright 2018 Panjie Setiawan Wicaksono
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,8 +18,8 @@
  *    limitations under the License.
  */
 
-import { Frest, FrestConstructor } from './Frest';
-import { FrestError, FrestErrorConstructor } from './FrestError';
+import Frest, { FrestConstructor } from './Frest';
+import FrestError, { FrestErrorConstructor } from './FrestError';
 
 declare global {
   interface Window {

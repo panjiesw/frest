@@ -14,19 +14,19 @@
  *    limitations under the License.
  */
 
-import * as f from 'frest';
-import * as t from './types';
+import { IErrorInterceptor, IResponse } from 'frest';
+import { RetryFn, RetryConditionFn, IAuthErrorOption } from './types';
 import { ID_ERROR } from './ids';
 
 export default function errorInterceptor(
-  opts: t.IAuthErrorOption = {},
-): f.IErrorInterceptor {
-  const defaultCondition: t.RetryConditionFn = (_, __, res) =>
+  opts: IAuthErrorOption = {},
+): IErrorInterceptor {
+  const defaultCondition: RetryConditionFn = (_, __, res) =>
     res.origin.status === 401;
-  const defaultRetry: t.RetryFn = (fr, req) => fr.request(req);
+  const defaultRetry: RetryFn = (fr, req) => fr.request(req);
 
-  const authErrorInterceptor: f.IErrorInterceptor = err =>
-    new Promise<f.IResponse | null>((resolve, reject) => {
+  const authErrorInterceptor: IErrorInterceptor = err =>
+    new Promise<IResponse | null>((resolve, reject) => {
       const {
         count = 0,
         delay = 1000,

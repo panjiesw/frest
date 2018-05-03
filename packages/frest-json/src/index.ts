@@ -1,4 +1,10 @@
 /**
+ * @module frest-json
+ * @preferred
+ *
+ * A set of JSON processing interceptors for Frest.
+ */
+/**
  *    Copyright 2018 Panjie Setiawan Wicaksono
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");

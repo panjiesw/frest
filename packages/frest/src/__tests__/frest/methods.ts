@@ -17,9 +17,9 @@
 import test from 'ava';
 import { instances } from '../fixtures';
 
-test('post & create', async t => {
+test('post', async t => {
   const { frest, fm, path, url } = instances();
-  fm.mock(
+  fm.once(
     (u, o) =>
       u === url &&
       ((o as any).action === 'post' || (o as any).action === 'create'),
@@ -28,16 +28,14 @@ test('post & create', async t => {
   );
 
   const res1 = await frest.post(path);
-  const res2 = await frest.create(path);
 
   t.true(res1.origin.ok);
-  t.true(res2.origin.ok);
-  t.is(fm.calls(path).length, 2);
+  t.true(fm.called(path));
 });
 
-test('get & read', async t => {
+test('get', async t => {
   const { frest, fm, path, url } = instances();
-  fm.get(
+  fm.once(
     (u, o) =>
       u === url &&
       ((o as any).action === 'get' || (o as any).action === 'read'),
@@ -46,16 +44,14 @@ test('get & read', async t => {
   );
 
   const res1 = await frest.get(path);
-  const res2 = await frest.read(path);
 
   t.true(res1.origin.ok);
-  t.true(res2.origin.ok);
-  t.is(fm.calls(path).length, 2);
+  t.true(fm.called(path));
 });
 
 test('put & update', async t => {
   const { frest, fm, path, url } = instances();
-  fm.put(
+  fm.once(
     (u, o) =>
       u === url &&
       ((o as any).action === 'put' || (o as any).action === 'update'),
@@ -64,16 +60,14 @@ test('put & update', async t => {
   );
 
   const res1 = await frest.put(path);
-  const res2 = await frest.update(path);
 
   t.true(res1.origin.ok);
-  t.true(res2.origin.ok);
-  t.is(fm.calls(path).length, 2);
+  t.true(fm.called(path));
 });
 
-test('delete & destroy', async t => {
+test('delete', async t => {
   const { frest, fm, path, url } = instances();
-  fm.delete(
+  fm.once(
     (u, o) =>
       u === url &&
       ((o as any).action === 'delete' || (o as any).action === 'destroy'),
@@ -82,17 +76,15 @@ test('delete & destroy', async t => {
   );
 
   const res1 = await frest.delete(path);
-  const res2 = await frest.destroy(path);
 
   t.true(res1.origin.ok);
-  t.true(res2.origin.ok);
-  t.is(fm.calls(path).length, 2);
+  t.true(fm.called(path));
 });
 
 test('patch', async t => {
   const { frest, fm, path, url } = instances();
   const opts: any = { method: 'PATCH', name: path };
-  fm.patchOnce(url, {}, opts);
+  fm.once(url, {}, opts);
 
   const res1 = await frest.patch(path);
 
