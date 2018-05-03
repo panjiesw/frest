@@ -1,4 +1,5 @@
-baseURL = "https://frest.surge.sh/"
+author = "Panjie Setiawan Wicaksono"
+baseURL = "https://frest.netlify.com/"
 languageCode = "en-us"
 defaultContentLanguage = "en"
 
@@ -7,11 +8,16 @@ theme = "hugo-theme-learn"
 metaDataFormat = "yaml"
 defaultContentLanguageInSubdir= true
 
+pygmentsCodeFences = true
+pygmentsOptions = "linenos=table"
+pygmentsStyle = "dracula"
+
 [params]
+description = "Frest is easy to use browser REST client wrapper for Fetch API with interceptor feature and XMLHttpRequest fallback for download, upload and when Fetch API is not available."
 editURL = "https://github.com/panjiesw/frest/edit/master/packages/frest-docs/content/"
-description = "Documentation for Frest"
 author = "Panjie Setiawan Wicaksono"
 showVisitedLinks = true
+themeVariant = "frest"
 
 [outputs]
 home = [ "HTML", "RSS", "JSON"]
@@ -21,3 +27,9 @@ home = [ "HTML", "RSS", "JSON"]
 title = "Documentation for Frest"
 weight = 1
 languageName = "English"
+
+[[Languages.en.menu.shortcuts]]
+name = "<i class='fa fa-github'></i> Github repo"
+identifier = "ds"
+url = "https://github.com/panjiesw/frest"
+weight = 10

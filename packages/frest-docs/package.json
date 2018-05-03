@@ -5,9 +5,18 @@
   "version": "0.6.2",
   "license": "Apache-2.0",
   "scripts": {
+    "doc": "run-s del:p doc:d",
+    "doc:d": "hugo && echo frest.surge.sh > public/CNAME",
+    "del": "run-p del:*",
+    "del:a": "del-cli static/api",
+    "del:p": "del-cli public",
     "serve": "hugo server -w"
   },
   "devDependencies": {
+    "del-cli": "^1.1.0",
+    "frest": "^0.8.0",
+    "frest-auth": "^0.8.0",
+    "frest-json": "^0.8.0",
     "hugo-bin": "^0.23.0"
   }
 }
