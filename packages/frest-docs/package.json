@@ -2,12 +2,21 @@
   "private": true,
   "name": "frest-docs",
   "description": "Frest documentation site using hugo",
-  "version": "0.6.2",
+  "version": "0.9.0",
   "license": "Apache-2.0",
   "scripts": {
+    "doc": "run-s del:p doc:d",
+    "doc:d": "hugo && echo frest.surge.sh > public/CNAME",
+    "del": "run-p del:*",
+    "del:a": "del-cli static/api",
+    "del:p": "del-cli public",
     "serve": "hugo server -w"
   },
   "devDependencies": {
+    "del-cli": "^1.1.0",
+    "frest": "^0.9.0",
+    "frest-auth": "^0.9.0",
+    "frest-json": "^0.9.0",
     "hugo-bin": "^0.23.0"
   }
 }

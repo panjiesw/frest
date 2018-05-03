@@ -8,5 +8,13 @@
     "es",
     "lib",
     "umd"
-  ]
+  ],
+  "typedocOptions": {
+    "exclude": "**/__tests__/**",
+    "out": "../frest-docs/static/api/frest",
+    "excludePrivate": true,
+    "excludeExternals": true,
+    "externalPattern": "**/node_modules/**",
+    "includeDeclarations": false
+  }
 }

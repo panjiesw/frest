@@ -1,4 +1,7 @@
 /**
+ * @module frest-json
+ */
+/**
  *    Copyright 2018 Panjie Setiawan Wicaksono
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,15 +17,24 @@
  *    limitations under the License.
  */
 
-import * as f from 'frest';
-import * as t from './types';
+import { IInterceptors } from 'frest';
+import { IJSONInterceptorsOptions } from './types';
 import errorInterceptor from './error';
 import requestInterceptor from './request';
 import responseInterceptor from './response';
 
+/**
+ * Create JSON interceptors set.
+ *
+ * @remarks
+ * Specify an option for each type of interceptor to enable them. Unspecified
+ * option will make the interceptor not created.
+ *
+ * @param opts - Options for each type of JSON interceptors.
+ */
 export default function jsonInterceptors(
-  opts: t.IJSONInterceptorsOptions = {},
-): f.IInterceptors {
+  opts: IJSONInterceptorsOptions = {},
+): IInterceptors {
   return {
     error: opts.error ? errorInterceptor(opts.error) : undefined,
     request: opts.request ? requestInterceptor(opts.request) : undefined,

@@ -1,4 +1,7 @@
 /**
+ * @module frest
+ */
+/**
  *    Copyright 2018 Panjie Setiawan Wicaksono
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,23 +17,34 @@
  *    limitations under the License.
  */
 
-import * as t from './types';
+import { IRequest, IResponse, IFrestError } from './types';
+import Frest from './Frest';
 
+/**
+ * FrestError constructor/class signature.
+ * @remarks
+ * This is only used for UMD build.
+ * @public
+ */
 export interface FrestErrorConstructor {
   new (
     message: string,
-    frest: t.IFrest,
-    request: t.IRequest,
-    response?: t.IResponse<any>,
+    frest: Frest,
+    request: IRequest,
+    response?: IResponse<any>,
   ): FrestError;
 }
 
-export class FrestError extends Error implements t.IFrestError {
+/**
+ * Error representation class when there is any failure during request life-cycle.
+ * @public
+ */
+export default class FrestError extends Error implements IFrestError {
   constructor(
     message: string,
-    public frest: t.IFrest,
-    public request: t.IRequest,
-    public response?: t.IResponse<any>,
+    public frest: Frest,
+    public request: IRequest,
+    public response?: IResponse<any>,
   ) {
     super(message);
   }

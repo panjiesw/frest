@@ -1,4 +1,7 @@
 /**
+ * @module frest-json
+ */
+/**
  *    Copyright 2018 Panjie Setiawan Wicaksono
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,15 +17,29 @@
  *    limitations under the License.
  */
 
-import * as f from 'frest';
-import * as t from './types';
+import { IResponseInterceptor, IResponse } from 'frest';
+import { IJSONResponseInterceptorOption } from './types';
 import { ID_RESPONSE } from './ids';
 
+/**
+ * Create a JSON response interceptor.
+ *
+ * @remarks
+ * This interceptor will try to parse response's body if the response's
+ * `Content-Type` header is compatible with the one provided in
+ * {@link IJSONResponseInterceptorOption.headerContent} option.
+ * If {@link IJSONResponseInterceptorOption.transform} is provided, it'll
+ * call the function before parsing it.
+ *
+ * @param opts - Options for this response interceptor
+ *
+ * @returns JSON response interceptor
+ */
 export default function responseInterceptor(
-  opts: t.IJSONResponseInterceptorOption = {},
-): f.IResponseInterceptor {
-  const jsonResponseInterceptor: f.IResponseInterceptor = input =>
-    new Promise<f.IResponse<any>>((resolve, reject) => {
+  opts: IJSONResponseInterceptorOption = {},
+): IResponseInterceptor {
+  const jsonResponseInterceptor: IResponseInterceptor = input =>
+    new Promise<IResponse<any>>((resolve, reject) => {
       const { force, headerContent, transform } = opts;
       const { skip } = input.request;
       const { origin, body: originBody } = input.response;
@@ -46,6 +63,8 @@ export default function responseInterceptor(
           });
         }
 
+        // If the HTTP status is 201-204, assume it's empty intentionally
+        // and just resolve the origin, or reject it otherwise.
         promise.catch(err => {
           if (status >= 201 && status <= 204) {
             resolve({ origin });

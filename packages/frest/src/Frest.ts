@@ -1,4 +1,7 @@
 /**
+ * @module frest
+ */
+/**
  *    Copyright 2018 Panjie Setiawan Wicaksono
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,17 +18,35 @@
  */
 
 import qs from 'query-string';
-import { FrestError } from './FrestError';
-import * as t from './types';
+import FrestError from './FrestError';
+import {
+  ConfigMergeType,
+  ConfigType,
+  IConfig,
+  IErrorInterceptor,
+  IInterceptorSet,
+  IRequest,
+  IRequestInterceptor,
+  IResponseInterceptor,
+  IInterceptors,
+  IResponse,
+  ICommonInterceptor,
+  IFrestError,
+  RequestType,
+} from './types';
 import xhr from './xhr';
 
 interface IInternalAfterFetch {
   origin: Response;
-  request: t.IRequest;
+  request: IRequest;
 }
 
-export const DEFAULT_CONFIG: t.IConfig & {
-  interceptors: t.IInterceptorSet;
+/**
+ * Default configuration if Frest instance is created without any configuration.
+ * @public
+ */
+export const DEFAULT_CONFIG: IConfig & {
+  interceptors: IInterceptorSet;
 } = {
   base: '',
   fetch,
@@ -34,14 +55,30 @@ export const DEFAULT_CONFIG: t.IConfig & {
   method: 'GET',
 };
 
+/**
+ * Frest constructor/class signature.
+ * @remarks
+ * This is only used for UMD build.
+ * @public
+ */
 export interface FrestConstructor {
-  new (config?: t.ConfigType): Frest;
+  new (config?: ConfigType): Frest;
 }
 
-class Frest implements t.IFrest {
-  private _config: t.IConfig;
+/**
+ * The main Frest class.
+ * @public
+ */
+export default class Frest {
+  private _config: IConfig;
 
-  constructor(config?: t.ConfigType) {
+  /**
+   * Creates an instance of Frest.
+   * @param config - Configuration for this instance.
+   * Can be string or array of string (in which it'll be the `base` URL for
+   * every requests), or a {@link IConfig} object. Defaults to `DEFAULT_CONFIG`
+   */
+  constructor(config?: ConfigType) {
     if (config && typeof config === 'string') {
       this._config = { ...DEFAULT_CONFIG, base: config };
     } else if (config && typeof config === 'object') {
@@ -56,15 +93,25 @@ class Frest implements t.IFrest {
     this._config.base = this.trimSlashes(this._config.base);
   }
 
-  public get config(): t.IConfig {
+  /**
+   * Get configuration used in this instance.
+   */
+  public get config(): IConfig {
     return this._config;
   }
 
+  /**
+   * Get base URL used in this instance.
+   */
   public get base(): string {
     return this._config.base;
   }
 
-  public mergeConfig(config: t.ConfigMergeType) {
+  /**
+   * Merge this instance config with the one provided here.
+   * @param config - Configuration to be merged into this instance's configuration.
+   */
+  public mergeConfig(config: ConfigMergeType) {
     const interceptors = {
       ...this._config.interceptors,
       ...config.interceptors,
@@ -72,23 +119,69 @@ class Frest implements t.IFrest {
     this._config = { ...this._config, ...config, interceptors };
   }
 
+  /**
+   * Get `fetch` function used in this instance.
+   * @remarks
+   * This can be the native `fetch` API or any function with similar signature.
+   */
   public get fetchFn(): typeof window.fetch {
     return this._config.fetch;
   }
 
-  public addResponseInterceptor(interceptor: t.IResponseInterceptor) {
+  /**
+   * Add a response interceptor function to this instance.
+   *
+   * @param interceptor - The response interceptor function.
+   * @param idx - The index position where this interceptor will be put.
+   * Interceptors will get executed from lower to higher index.
+   */
+  public addResponseInterceptor(
+    interceptor: IResponseInterceptor,
+    idx?: number,
+  ) {
+    if (idx != null) {
+      this._config.interceptors.response.splice(idx, 0, interceptor);
+      return;
+    }
     this._config.interceptors.response.push(interceptor);
   }
 
-  public addRequestInterceptor(interceptor: t.IRequestInterceptor) {
+  /**
+   * Add a request interceptor function to this instance.
+   *
+   * @param interceptor - The request interceptor function.
+   * @param idx - The index position where this interceptor will be put.
+   * Interceptors will get executed from lower to higher index.
+   */
+  public addRequestInterceptor(interceptor: IRequestInterceptor, idx?: number) {
+    if (idx != null) {
+      this._config.interceptors.request.splice(idx, 0, interceptor);
+      return;
+    }
     this._config.interceptors.request.push(interceptor);
   }
 
-  public addErrorInterceptor(interceptor: t.IErrorInterceptor) {
+  /**
+   * Add an error interceptor function to this instance.
+   *
+   * @param interceptor - The error interceptor function.
+   * @param idx - The index position where this interceptor will be put.
+   * Interceptors will get executed from lower to higher index.
+   */
+  public addErrorInterceptor(interceptor: IErrorInterceptor, idx?: number) {
+    if (idx != null) {
+      this._config.interceptors.error.splice(idx, 0, interceptor);
+      return;
+    }
     this._config.interceptors.error.push(interceptor);
   }
 
-  public addInterceptors(interceptors: t.IInterceptors): void {
+  /**
+   * Add a set object (by its type) of interceptors
+   *
+   * @param interceptors - Interceptor object by its type.
+   */
+  public addInterceptors(interceptors: IInterceptors): void {
     const { error, request, response } = interceptors;
     if (error) {
       this.addErrorInterceptor(error);
@@ -101,19 +194,39 @@ class Frest implements t.IFrest {
     }
   }
 
-  public removeResponseInterceptor(idv: string | t.IResponseInterceptor) {
+  /**
+   * Remove a response interceptor from this instance.
+   *
+   * @param idv - String id of the interceptor or the interceptor function itself.
+   */
+  public removeResponseInterceptor(idv: string | IResponseInterceptor) {
     this.removeInterceptor('response', idv);
   }
 
-  public removeRequestInterceptor(idv: string | t.IRequestInterceptor) {
+  /**
+   * Remove a request interceptor from this instance.
+   *
+   * @param idv - String id of the interceptor or the interceptor function itself.
+   */
+  public removeRequestInterceptor(idv: string | IRequestInterceptor) {
     this.removeInterceptor('request', idv);
   }
 
-  public removeErrorInterceptor(idv: string | t.IErrorInterceptor) {
+  /**
+   * Remove an error interceptor from this instance.
+   *
+   * @param idv - String id of the interceptor or the interceptor function itself.
+   */
+  public removeErrorInterceptor(idv: string | IErrorInterceptor) {
     this.removeInterceptor('error', idv);
   }
 
-  public removeInterceptors(interceptors: t.IInterceptors): void {
+  /**
+   * Remove interceptors provided in the interceptors object.
+   *
+   * @param interceptors - Interceptors object.
+   */
+  public removeInterceptors(interceptors: IInterceptors): void {
     const { error, request, response } = interceptors;
     if (error) {
       this.removeErrorInterceptor(error);
@@ -126,6 +239,12 @@ class Frest implements t.IFrest {
     }
   }
 
+  /**
+   * Check whether an interceptor with `id` provided is exist in this instance.
+   *
+   * @param id - The interceptor's `id` to check.
+   * @returns true if the interceptor exist, false otherwise.
+   */
   public hasInterceptor(id: string): boolean {
     const interceptors = this._config.interceptors;
     for (const interceptor in interceptors) {
@@ -139,6 +258,16 @@ class Frest implements t.IFrest {
     return false;
   }
 
+  /**
+   * Get full URL from the provided path and query object/string.
+   * @remarks
+   * This will use the instance's `base` URL configuration and construct full
+   * URL to the provided arguments.
+   *
+   * @param path - Endpoint path
+   * @param query - query object/string to include
+   * @returns Full URL to the provided arguments.
+   */
   public parsePath(path: string | string[], query?: any): string {
     const paths: string[] = path
       ? path instanceof Array ? path : [path]
@@ -149,6 +278,12 @@ class Frest implements t.IFrest {
     );
   }
 
+  /**
+   * Utility function to parse a query object into string
+   *
+   * @param query - The query to parse. It can be object/string
+   * @returns Parsed query string
+   */
   public parseQuery(query: any): string {
     let q = query || '';
     if (typeof q === 'object') {
@@ -160,10 +295,20 @@ class Frest implements t.IFrest {
     return q;
   }
 
+  /**
+   * Make a request to an endpoint.
+   *
+   * @template T - The type of response's body, if any. Defaults to `any`.
+   * @param init - A string, string array, or request configuration object.
+   * @param request - request configuration if the first arg is string
+   * or string array
+   * @returns Response promise which will be resolved when the request is successful.
+   * The promise will throws in case of error in any request life-cycle.
+   */
   public request<T = any>(
-    init: t.RequestType,
-    request: Partial<t.IRequest> = {},
-  ): Promise<t.IResponse<T>> {
+    init: RequestType,
+    request: Partial<IRequest> = {},
+  ): Promise<IResponse<T>> {
     const conf = this.requestConfig(init, request);
     return this.internalRequest<T>({
       ...conf,
@@ -172,10 +317,156 @@ class Frest implements t.IFrest {
     });
   }
 
+  /**
+   * Make a request to an endpoint with HTTP `POST` method.
+   *
+   * @template T - The type of response's body, if any. Defaults to `any`.
+   * @param init - A string, string array, or request configuration object.
+   * @param request - request configuration if the first arg is string
+   * or string array
+   * @returns Response promise which will be resolved when the request is successful.
+   * The promise will throws in case of error in any request life-cycle.
+   */
+  public post<T = any>(
+    init: RequestType,
+    request: Partial<IRequest> = {},
+  ): Promise<IResponse<T>> {
+    const conf = this.requestConfig(init, request);
+    return this.internalRequest<T>({
+      ...conf,
+      method: 'POST',
+      action: conf.action || 'post',
+    });
+  }
+
+  /**
+   * Make a request to an endpoint with HTTP `GET` method.
+   *
+   * @template T - The type of response's body, if any. Defaults to `any`.
+   * @param init - A string, string array, or request configuration object.
+   * @param request - request configuration if the first arg is string
+   * or string array
+   * @returns Response promise which will be resolved when the request is successful.
+   * The promise will throws in case of error in any request life-cycle.
+   */
+  public get<T = any>(
+    init: RequestType,
+    request: Partial<IRequest> = {},
+  ): Promise<IResponse<T>> {
+    const conf = this.requestConfig(init, request);
+    return this.internalRequest<T>({
+      ...conf,
+      method: 'GET',
+      action: conf.action || 'get',
+    });
+  }
+
+  /**
+   * Make a request to an endpoint with HTTP `PUT` method.
+   *
+   * @template T - The type of response's body, if any. Defaults to `any`.
+   * @param init - A string, string array, or request configuration object.
+   * @param request - request configuration if the first arg is string
+   * or string array
+   * @returns Response promise which will be resolved when the request is successful.
+   * The promise will throws in case of error in any request life-cycle.
+   */
+  public put<T = any>(
+    init: RequestType,
+    request: Partial<IRequest> = {},
+  ): Promise<IResponse<T>> {
+    const conf = this.requestConfig(init, request);
+    return this.internalRequest<T>({
+      ...conf,
+      method: 'PUT',
+      action: conf.action || 'put',
+    });
+  }
+
+  /**
+   * Make a request to an endpoint with HTTP `PATCH` method.
+   *
+   * @template T - The type of response's body, if any. Defaults to `any`.
+   * @param init - A string, string array, or request configuration object.
+   * @param request - request configuration if the first arg is string
+   * or string array
+   * @returns Response promise which will be resolved when the request is successful.
+   * The promise will throws in case of error in any request life-cycle.
+   */
+  public patch<T = any>(
+    init: RequestType,
+    request: Partial<IRequest> = {},
+  ): Promise<IResponse<T>> {
+    const conf = this.requestConfig(init, request);
+    return this.internalRequest<T>({
+      ...conf,
+      method: 'PATCH',
+      action: conf.action || 'patch',
+    });
+  }
+
+  /**
+   * Make a request to an endpoint with HTTP `DELETE` method.
+   *
+   * @template T - The type of response's body, if any. Defaults to `any`.
+   * @param init - A string, string array, or request configuration object.
+   * @param request - request configuration if the first arg is string
+   * or string array
+   * @returns Response promise which will be resolved when the request is successful.
+   * The promise will throws in case of error in any request life-cycle.
+   */
+  public delete<T = any>(
+    init: RequestType,
+    request: Partial<IRequest> = {},
+  ): Promise<IResponse<T>> {
+    const conf = this.requestConfig(init, request);
+    return this.internalRequest<T>({
+      ...conf,
+      method: 'DELETE',
+      action: conf.action || 'delete',
+    });
+  }
+
+  /**
+   * Make a request to an endpoint with HTTP `OPTION` method.
+   *
+   * @template T - The type of response's body, if any. Defaults to `any`.
+   * @param init - A string, string array, or request configuration object.
+   * @param request - request configuration if the first arg is string
+   * or string array
+   * @returns Response promise which will be resolved when the request is successful.
+   * The promise will throws in case of error in any request life-cycle.
+   */
+  public option<T = any>(
+    init: RequestType,
+    request: Partial<IRequest> = {},
+  ): Promise<IResponse<T>> {
+    const conf = this.requestConfig(init, request);
+    return this.internalRequest<T>({
+      ...conf,
+      method: 'OPTION',
+      action: conf.action || 'option',
+    });
+  }
+
+  /**
+   * Upload something to an endpoint.
+   * @remarks
+   * This is a special request function which will use `XMLHTTPRequest` to support
+   * upload progress. By default the HTTP method used is `POST`. Currently only
+   * support request body of `FormData` object.
+   *
+   * @template T - The type of response's body, if any. Defaults to `any`.
+   * @param init - A string, string array, or request configuration object.
+   * @param request - request configuration if the first arg is string
+   * or string array
+   * @returns Response promise which will be resolved when the request is successful.
+   * The promise will throws in case of error in any request life-cycle.
+   */
   public upload<T = any>(
-    init: t.RequestType,
-    request: Partial<t.IRequest> = {},
-  ): Promise<t.IResponse<T>> {
+    init: RequestType,
+    request: Partial<IRequest> = {},
+  ): Promise<IResponse<T>> {
     const conf = this.requestConfig(init, request);
     if (!(conf.body instanceof FormData)) {
       return Promise.reject(
@@ -185,19 +476,32 @@ class Frest implements t.IFrest {
     return this.internalRequest<T>({
       ...conf,
       method: conf.method || 'POST',
-      action: conf.action || 'upload',
+      action: 'upload',
     });
   }
 
+  /**
+   * Download something from an endpoint.
+   * @remarks
+   * This is a special request function which will use `XMLHTTPRequest` to support
+   * download progress. By default the HTTP method used is `GET`.
+   *
+   * @template T - The type of response's body, if any. Defaults to `any`.
+   * @param init - A string, string array, or request configuration object.
+   * @param request - request configuration if the first arg is string
+   * or string array
+   * @returns Response promise which will be resolved when the request is successful.
+   * The promise will throws in case of error in any request life-cycle.
+   */
   public download<T = any>(
-    init: t.RequestType,
-    request: Partial<t.IRequest> = {},
-  ): Promise<t.IResponse<T>> {
+    init: RequestType,
+    request: Partial<IRequest> = {},
+  ): Promise<IResponse<T>> {
     const conf = this.requestConfig(init, request);
     return this.internalRequest<T>({
       ...conf,
       method: conf.method || 'GET',
-      action: conf.action || 'download',
+      action: 'download',
     });
   }
 
@@ -205,9 +509,9 @@ class Frest implements t.IFrest {
     i: 'response' | 'request' | 'error',
     idv:
       | string
-      | t.IResponseInterceptor
-      | t.IRequestInterceptor
-      | t.IErrorInterceptor,
+      | IResponseInterceptor
+      | IRequestInterceptor
+      | IErrorInterceptor,
   ) {
     if (typeof idv === 'string') {
       const idx = this.findInterceptor(this._config.interceptors[i], idv);
@@ -222,7 +526,7 @@ class Frest implements t.IFrest {
     }
   }
 
-  private findInterceptor(arr: t.ICommonInterceptor[], id?: string): number {
+  private findInterceptor(arr: ICommonInterceptor[], id?: string): number {
     let found = false;
     let i = 0;
     while (i < arr.length) {
@@ -235,9 +539,7 @@ class Frest implements t.IFrest {
     return -1;
   }
 
-  private internalRequest<T = any>(
-    request: t.IRequest,
-  ): Promise<t.IResponse<T>> {
+  private internalRequest<T = any>(request: IRequest): Promise<IResponse<T>> {
     return this.doBefore(request)
       .then(this.doRequest)
       .then(this.doAfter)
@@ -245,9 +547,9 @@ class Frest implements t.IFrest {
   }
 
   private requestConfig(
-    init: t.RequestType,
-    request: Partial<t.IRequest>,
-  ): t.IRequest {
+    init: RequestType,
+    request: Partial<IRequest>,
+  ): IRequest {
     if (typeof init === 'string' || init instanceof Array) {
       this.headers(request);
       return {
@@ -262,7 +564,7 @@ class Frest implements t.IFrest {
     } as any;
   }
 
-  private headers(request: Partial<t.IRequest>) {
+  private headers(request: Partial<IRequest>) {
     if (request.headers) {
       const headers = new Headers(this._config.headers);
       for (const header of request.headers.entries()) {
@@ -273,7 +575,7 @@ class Frest implements t.IFrest {
     }
   }
 
-  private getFetch(request: t.IRequest): typeof fetch {
+  private getFetch(request: IRequest): typeof fetch {
     if (request.action === 'upload' || request.action === 'download') {
       return xhr as any;
     }
@@ -290,9 +592,9 @@ class Frest implements t.IFrest {
     return xhr as any;
   }
 
-  private doBefore(request: t.IRequest) {
-    return new Promise<t.IRequest>((resolve, reject) => {
-      let requestPromise = Promise.resolve<t.IRequest>(request);
+  private doBefore(request: IRequest) {
+    return new Promise<IRequest>((resolve, reject) => {
+      let requestPromise = Promise.resolve<IRequest>(request);
       for (const requestInterceptor of this._config.interceptors.request) {
         requestPromise = requestPromise.then(requestConfig => {
           if (!requestConfig) {
@@ -322,7 +624,7 @@ class Frest implements t.IFrest {
     });
   }
 
-  private doRequest = (request: t.IRequest): Promise<IInternalAfterFetch> => {
+  private doRequest = (request: IRequest): Promise<IInternalAfterFetch> => {
     let fetchFn: typeof fetch;
 
     try {
@@ -340,7 +642,7 @@ class Frest implements t.IFrest {
 
   private doAfter = <T = any>(
     afterFetch: IInternalAfterFetch,
-  ): Promise<t.IResponse> => {
+  ): Promise<IResponse> => {
     const { origin, request } = afterFetch;
     if (!origin.ok) {
       return Promise.reject(
@@ -354,7 +656,7 @@ class Frest implements t.IFrest {
         ),
       );
     }
-    let responsePromise: Promise<t.IResponse<T>> = Promise.resolve({
+    let responsePromise: Promise<IResponse<T>> = Promise.resolve({
       origin,
     });
     for (const responseInterceptor of this._config.interceptors.response) {
@@ -384,18 +686,18 @@ class Frest implements t.IFrest {
     });
   };
 
-  private onError = (request: t.IRequest) => (e: any): any => {
-    let err: t.IFrestError = this.toFrestError(e, request);
+  private onError = (request: IRequest) => (e: any): any => {
+    let err: IFrestError = this.toFrestError(e, request);
 
     if (this._config.interceptors.error.length === 0) {
       return Promise.reject(err);
     }
 
     return new Promise<any>((resolve, reject) => {
-      let promise: Promise<t.IResponse | undefined | null> = Promise.resolve(
+      let promise: Promise<IResponse | undefined | null> = Promise.resolve(
         null,
       );
-      let recovery: t.IResponse | undefined | null = null;
+      let recovery: IResponse | undefined | null = null;
       for (const errorInterceptor of this._config.interceptors.error) {
         if (recovery != null) {
           break;
@@ -427,87 +729,9 @@ class Frest implements t.IFrest {
     return input.toString().replace(/(^\/+|\/+$)/g, '');
   }
 
-  private toFrestError(e: any, requestConfig: t.IRequest): t.IFrestError {
+  private toFrestError(e: any, requestConfig: IRequest): IFrestError {
     return !e.frest && !e.request
       ? new FrestError(e.message, this, requestConfig)
       : e;
   }
 }
-
-const methods: { [idx: string]: t.HttpMethod } = {
-  post: 'POST',
-  create: 'POST',
-  get: 'GET',
-  read: 'GET',
-  put: 'PUT',
-  update: 'PUT',
-  delete: 'DELETE',
-  destroy: 'DELETE',
-  patch: 'PATCH',
-  option: 'OPTION',
-};
-
-for (const action in methods) {
-  if (methods.hasOwnProperty(action)) {
-    const method = methods[action];
-    Object.defineProperty(Frest.prototype, action, {
-      // tslint:disable-next-line:object-literal-shorthand
-      value: function(
-        init: t.RequestType,
-        requestConfig: Partial<t.IRequest> = {},
-      ) {
-        const conf = this.requestConfig(init, requestConfig);
-        return this.internalRequest({
-          ...conf,
-          method: conf.method || method,
-          action: conf.action || action,
-        });
-      },
-    });
-  }
-}
-
-interface Frest extends t.IFrest {
-  post<T = any>(
-    init: t.RequestType,
-    requestConfig?: Partial<t.IRequest>,
-  ): Promise<t.IResponse<T>>;
-  create<T = any>(
-    init: t.RequestType,
-    requestConfig?: Partial<t.IRequest>,
-  ): Promise<t.IResponse<T>>;
-  get<T = any>(
-    init: t.RequestType,
-    requestConfig?: Partial<t.IRequest>,
-  ): Promise<t.IResponse<T>>;
-  read<T = any>(
-    init: t.RequestType,
-    requestConfig?: Partial<t.IRequest>,
-  ): Promise<t.IResponse<T>>;
-  put<T = any>(
-    init: t.RequestType,
-    requestConfig?: Partial<t.IRequest>,
-  ): Promise<t.IResponse<T>>;
-  update<T = any>(
-    init: t.RequestType,
-    requestConfig?: Partial<t.IRequest>,
-  ): Promise<t.IResponse<T>>;
-  patch<T = any>(
-    init: t.RequestType,
-    requestConfig?: Partial<t.IRequest>,
-  ): Promise<t.IResponse<T>>;
-  delete<T = any>(
-    init: t.RequestType,
-    requestConfig?: Partial<t.IRequest>,
-  ): Promise<t.IResponse<T>>;
-  destroy<T = any>(
-    init: t.RequestType,
-    requestConfig?: Partial<t.IRequest>,
-  ): Promise<t.IResponse<T>>;
-  option<T = any>(
-    init: t.RequestType,
-    requestConfig?: Partial<t.IRequest>,
-  ): Promise<t.IResponse<T>>;
-}
-
-export { Frest };

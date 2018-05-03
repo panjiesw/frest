@@ -14,11 +14,11 @@
  *    limitations under the License.
  */
 
-import * as f from 'frest';
-import * as t from './types';
+import { IRequest, IRequestInterceptor } from 'frest';
+import { IAuthScheme } from './types';
 import { ID_REQUEST } from './ids';
 
-const attachAuth = (req: f.IRequest, scheme: t.IAuthScheme, token: string) => {
+const attachAuth = (req: IRequest, scheme: IAuthScheme, token: string) => {
   const { attach, name: _name } = scheme;
   const name = _name || 'Authorization';
   const { headers } = req;
@@ -36,7 +36,7 @@ const attachAuth = (req: f.IRequest, scheme: t.IAuthScheme, token: string) => {
   return { ...req, headers, query };
 };
 
-const getToken = (scheme: t.IAuthScheme) => {
+const getToken = (scheme: IAuthScheme) => {
   const { prefix: _prefix, token: tokenFn } = scheme;
   const prefix = _prefix || '';
   if (tokenFn) {
@@ -49,10 +49,10 @@ const getToken = (scheme: t.IAuthScheme) => {
 };
 
 export default function requestInterceptor(
-  scheme: t.IAuthScheme,
-): f.IRequestInterceptor {
-  const authRequestInterceptor: f.IRequestInterceptor = input =>
-    new Promise<f.IRequest>(resolve => {
+  scheme: IAuthScheme,
+): IRequestInterceptor {
+  const authRequestInterceptor: IRequestInterceptor = input =>
+    new Promise<IRequest>(resolve => {
       const token = getToken(scheme);
       let { request } = input;
       const { credentials } = request;
