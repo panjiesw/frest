@@ -17,6 +17,6 @@
     "frest": "^0.9.0",
     "frest-auth": "^0.9.0",
     "frest-json": "^0.9.0",
-    "hugo-bin": "^0.23.0"
+    "hugo-bin": "^0.29.0"
   }
 }
