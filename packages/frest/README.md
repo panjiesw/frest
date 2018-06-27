@@ -78,12 +78,8 @@ api
 
 // available methods
 api.post(...) // HTTP POST
-api.create(...) // alias of api.post
-api.read(...) // alias of api.get
 api.put(...) // HTTP PUT
-api.update(...) // alias of api.put
 api.delete(...) // HTTP DELETE
-api.destroy(...) // alias of api.delete
 api.patch(...) // HTTP PATCH
 api.option(...) // HTTP OPTION
 api.download(...) // Download file, support onDownloadProgress event
