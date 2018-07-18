@@ -1,7 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 
-const banner = `frest-json 0.9.0 - https://github.com/panjiesw/frest
+const banner = `frest-json 0.11.0 - https://github.com/panjiesw/frest
 © 2018 Panjie Setiawan Wicaksono
 
 Licensed under the Apache License, Version 2.0 (the "License");
