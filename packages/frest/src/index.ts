@@ -20,6 +20,9 @@
  *    limitations under the License.
  */
 
+import * as utils from './utils';
+
 export * from './types';
 export { default as FrestError, FrestErrorConstructor } from './FrestError';
 export { default, DEFAULT_CONFIG, FrestConstructor } from './Frest';
+export { utils };

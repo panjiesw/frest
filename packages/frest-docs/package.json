@@ -2,7 +2,7 @@
   "private": true,
   "name": "frest-docs",
   "description": "Frest documentation site using hugo",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "license": "Apache-2.0",
   "scripts": {
     "doc": "run-s del:p doc:d",
@@ -14,9 +14,9 @@
   },
   "devDependencies": {
     "del-cli": "^1.1.0",
-    "frest": "^0.10.0",
-    "frest-auth": "^0.10.0",
-    "frest-json": "^0.10.0",
+    "frest": "^0.11.0",
+    "frest-auth": "^0.11.0",
+    "frest-json": "^0.11.0",
     "hugo-bin": "^0.29.0"
   }
 }
