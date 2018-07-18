@@ -16,14 +16,18 @@
 
 import { IAuthScheme } from './types';
 
-export const basicAuth = (token?: () => string): IAuthScheme => ({
+export const basicAuth = (
+  token?: () => string | undefined | null,
+): IAuthScheme => ({
   name: 'Authorization',
   attach: 'header',
   prefix: 'Basic ',
   token,
 });
 
-export const bearerAuth = (token?: () => string): IAuthScheme => ({
+export const bearerAuth = (
+  token?: () => string | undefined | null,
+): IAuthScheme => ({
   name: 'Authorization',
   attach: 'header',
   prefix: 'Bearer ',
