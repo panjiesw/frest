@@ -35,6 +35,7 @@ import {
   RequestType,
 } from './types';
 import xhr from './xhr';
+import * as utils from './utils';
 
 interface IInternalAfterFetch {
   origin: Response;
@@ -90,7 +91,7 @@ export default class Frest {
     } else {
       this._config = { ...DEFAULT_CONFIG };
     }
-    this._config.base = this.trimSlashes(this._config.base);
+    this._config.base = utils.trimSlashes(this._config.base);
   }
 
   /**
@@ -270,10 +271,12 @@ export default class Frest {
    */
   public parsePath(path: string | string[], query?: any): string {
     const paths: string[] = path
-      ? path instanceof Array ? path : [path]
+      ? path instanceof Array
+        ? path
+        : [path]
       : [''];
     query = this.parseQuery(query);
-    return this.trimSlashes(
+    return utils.trimSlashes(
       `${this._config.base}/${paths.map(encodeURI).join('/')}${query}`,
     );
   }
@@ -725,12 +728,8 @@ export default class Frest {
     });
   };
 
-  private trimSlashes(input: string): string {
-    return input.toString().replace(/(^\/+|\/+$)/g, '');
-  }
-
   private toFrestError(e: any, requestConfig: IRequest): IFrestError {
-    return !e.frest && !e.request
+    return utils.isFrestError(e)
       ? new FrestError(e.message, this, requestConfig)
       : e;
   }
