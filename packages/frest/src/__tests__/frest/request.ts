@@ -100,3 +100,17 @@ test('both arg', async t => {
   t.true(res.origin.ok);
   t.true(fm.called(path));
 });
+
+test('request & instance config merge', async t => {
+  const { frest, fm, path, url } = instances({
+    credentials: 'include',
+  });
+  fm.once(url, {}, { method: 'GET', name: path });
+
+  const res = await frest.request({ path, cache: 'default' });
+  const lastOptions = fm.lastOptions(path);
+  t.true(res.origin.ok);
+  t.true(fm.called(path));
+  t.is(lastOptions.cache, 'default');
+  t.is(lastOptions.credentials, 'include');
+});

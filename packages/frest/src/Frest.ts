@@ -553,16 +553,26 @@ export default class Frest {
     init: RequestType,
     request: Partial<IRequest>,
   ): IRequest {
+    const {
+      fetch,
+      base,
+      interceptors,
+      method,
+      headers,
+      ...rest
+    } = this._config;
     if (typeof init === 'string' || init instanceof Array) {
       this.headers(request);
       return {
         path: init,
+        ...rest,
         ...request,
       } as any;
     }
     this.headers(init);
     return {
       path: '',
+      ...rest,
       ...init,
     } as any;
   }
