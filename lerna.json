@@ -1,20 +1,8 @@
 {
-  "lerna": "2.10.1",
-  "packages": [
-    "packages/*"
-  ],
+  "lerna": "3.3.0",
   "version": "0.12.1",
-  "npmClient": "yarn",
-  "useWorkspaces": true,
-  "command": {
-    "run": {
-      "stream": true
-    },
-    "publish": {
-      "allowBranch": [
-        "master",
-        "release/*"
-      ]
-    }
-  }
+  "packages": [
+    "internal/*",
+    "packages/*"
+  ]
 }

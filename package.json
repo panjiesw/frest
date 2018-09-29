@@ -1,32 +1,7 @@
 {
-  "name": "frest",
   "private": true,
+  "name": "frest-root",
   "version": "0.0.0",
-  "description": "REST client for browser with Fetch",
-  "license": "Apache-2.0",
-  "workspaces": [
-    "packages/*"
-  ],
-  "homepage": "https://github.com/panjiesw/frest",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/panjiesw/frest.git"
-  },
-  "author": {
-    "name": "Panjie Setiawan Wicaksono",
-    "email": "panjie@panjiesw.com",
-    "url": "http://panjiesw.life"
-  },
-  "bugs": {
-    "url": "https://github.com/panjiesw/frest/issues"
-  },
-  "keywords": [
-    "rest",
-    "client",
-    "browser",
-    "fetch",
-    "whatwg-fetch"
-  ],
   "scripts": {
     "codecov": "codecov",
     "precommit": "lint-staged"
@@ -35,6 +10,19 @@
     "frest": "file:packages/frest"
   },
   "devDependencies": {
+    "@start/cli": "^0.3.2",
+    "@start/plugin": "^0.2.1",
+    "@start/plugin-assert": "^0.2.1",
+    "@start/plugin-env": "^0.4.0",
+    "@start/plugin-find": "^0.2.1",
+    "@start/plugin-parallel": "^0.2.1",
+    "@start/plugin-read": "^0.2.1",
+    "@start/plugin-remove": "^0.2.2",
+    "@start/plugin-rename": "^0.2.1",
+    "@start/plugin-sequence": "^0.2.2",
+    "@start/plugin-watch": "^0.2.1",
+    "@start/plugin-write": "^0.2.1",
+    "@start/plugin-xargs": "^0.2.1",
     "@types/fetch-mock": "^6.0.3",
     "@types/node": "^8.10.30",
     "@types/query-string": "^6.1.0",
@@ -47,6 +35,7 @@
     "lint-staged": "^7.3.0",
     "node-fetch": "^2.2.0",
     "prettier": "^1.14.3",
+    "start-reporter-ora": "^0.4.0",
     "tslint": "^5.11.0",
     "tslint-config-prettier": "^1.15.0",
     "tslint-eslint-rules": "^5.4.0",
