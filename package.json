@@ -28,62 +28,37 @@
     "whatwg-fetch"
   ],
   "scripts": {
-    "build": "lerna run build && lerna run d:b",
-    "cm": "git-cz",
     "codecov": "codecov",
-    "cover": "cross-env NODE_ENV=test nyc ava --tap | faucet",
-    "del": "del-cli .nyc_output coverage && lerna run del",
-    "format": "prettier --write \"packages/*/*.js\" \"packages/*/*.ts\" \"packages/*/src/**/*.{ts,tsx}\"",
-    "prepare": "lerna run prep",
-    "precommit": "lint-staged",
-    "start": "lerna run start",
-    "test": "lerna run test"
+    "precommit": "lint-staged"
+  },
+  "dependencies": {
+    "frest": "file:packages/frest"
   },
   "devDependencies": {
-    "ava": "^1.0.0-beta.3",
-    "codecov": "^3.0.2",
-    "commitizen": "^2.10.1",
-    "cross-env": "^5.2.0",
-    "cz-conventional-changelog": "^2.1.0",
-    "del-cli": "^1.1.0",
-    "husky": "^0.14.3",
-    "lerna": "^2.11.0",
-    "lint-staged": "^7.2.0",
-    "npm-run-all": "^4.1.3",
-    "nyc": "^12.0.2",
-    "prettier": "^1.13.6",
-    "tslint": "^5.10.0",
-    "tslint-config-prettier": "^1.13.0",
-    "typescript": "^2.9.2"
+    "@types/fetch-mock": "^6.0.3",
+    "@types/node": "^8.10.30",
+    "@types/query-string": "^6.1.0",
+    "@types/sinon": "^5.0.2",
+    "codecov": "^3.1.0",
+    "fetch-mock": "^7.0.6",
+    "hugo-bin": "^0.30.0",
+    "husky": "^1.0.1",
+    "lerna": "^3.4.0",
+    "lint-staged": "^7.3.0",
+    "node-fetch": "^2.2.0",
+    "prettier": "^1.14.3",
+    "tslint": "^5.11.0",
+    "tslint-config-prettier": "^1.15.0",
+    "tslint-eslint-rules": "^5.4.0",
+    "typedoc": "^0.12.0",
+    "typedoc-plugin-external-module-name": "^1.1.3",
+    "typescript": "^3.1.1"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
       "tslint -e **/*.d.ts --fix",
-      "prettier --trailing-comma all --single-quote --write",
+      "prettier --write",
       "git add"
-    ]
-  },
-  "config": {
-    "commitizen": {
-      "path": "cz-conventional-changelog"
-    }
-  },
-  "prettier": {
-    "singleQuote": true,
-    "trailingComma": "all"
-  },
-  "ava": {
-    "concurrency": 5,
-    "files": [
-      "packages/*/lib/__tests__/**/*.js"
-    ],
-    "require": [
-      "./packages/frest/src/__tests__/_helpers.js"
-    ]
-  },
-  "nyc": {
-    "reporter": [
-      "lcov"
     ]
   }
 }

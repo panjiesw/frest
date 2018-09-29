@@ -1,17 +1,17 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../config/tsconfig.base",
   "compilerOptions": {
-    "rootDir": "src"
+    "rootDir": "src",
+    "outDir": "es",
+    "baseUrl": ".",
+    "composite": true
   },
-  "exclude": [
-    "node_modules",
-    "es",
-    "lib",
-    "umd"
+  "include": [
+    "src"
   ],
   "typedocOptions": {
     "exclude": "**/__tests__/**",
-    "out": "../frest-docs/static/api/frest",
+    "out": "../../docs/api/frest",
     "excludePrivate": true,
     "excludeExternals": true,
     "externalPattern": "**/node_modules/**",
