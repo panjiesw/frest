@@ -1,23 +1,9 @@
 /**
  * @module frest
  */
-/**
- *    Copyright 2018 Panjie Setiawan Wicaksono
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
 
-import Frest from './Frest';
+import { Frest } from './Frest';
+import { InterceptorManager } from './InterceptorManager';
 
 /**
  * Supported HTTP Method
@@ -29,7 +15,7 @@ export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'OPTION';
  * Base config for Frest instance
  * @public
  */
-export interface IConfigBase {
+export interface IConfig {
   /**
    * The base url for this instance. Defaults to empty string.
    * @public
@@ -124,26 +110,6 @@ export interface IConfigBase {
 }
 
 /**
- * Interceptor configuration for Frest instance.
- * @public
- */
-export interface IConfigInterceptor {
-  /**
-   * The interceptors to include in this Frest instance.
-   * @remarks
-   * Provide each kind (request, response, error) as list in this property.
-   * @public
-   */
-  interceptors: IInterceptorSet;
-}
-
-/**
- * The configuration used in a Frest instance.
- * @public
- */
-export interface IConfig extends IConfigBase, IConfigInterceptor {}
-
-/**
  * Frest configuration used in constructor and config merge.
  * @remarks
  * Frest instance contains some default configurations, so all
@@ -152,12 +118,7 @@ export interface IConfig extends IConfigBase, IConfigInterceptor {}
  * the same as {@link IConfig}.
  * @public
  */
-export type ConfigMergeType = Partial<IConfigBase> & {
-  /**
-   * {@inheritdoc IConfigInterceptor}
-   */
-  interceptors?: Partial<IInterceptorSet>;
-};
+export type ConfigMergeType = Partial<IConfig>;
 
 /**
  * Frest configuration used in constructor.
@@ -483,42 +444,20 @@ export interface IErrorInterceptor extends ICommonInterceptor {
  * List of interceptors by its type.
  * @public
  */
-export interface IInterceptorSet {
+export interface IInterceptors {
   /**
    * List of response interceptor;
    * @public
    */
-  response: IResponseInterceptor[];
+  response: InterceptorManager<IResponseInterceptor>;
   /**
    * List of request interceptor;
    * @public
    */
-  request: IRequestInterceptor[];
+  request: InterceptorManager<IRequestInterceptor>;
   /**
    * List of error interceptor;
    * @public
    */
-  error: IErrorInterceptor[];
-}
-
-/**
- * Interceptor types.
- * @public
- */
-export interface IInterceptors {
-  /**
-   * Response interceptor.
-   * @public
-   */
-  response?: IResponseInterceptor;
-  /**
-   * Request interceptor.
-   * @public
-   */
-  request?: IRequestInterceptor;
-  /**
-   * Error interceptor.
-   * @public
-   */
-  error?: IErrorInterceptor;
+  error: InterceptorManager<IErrorInterceptor>;
 }

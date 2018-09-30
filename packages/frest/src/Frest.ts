@@ -1,41 +1,25 @@
 /**
  * @module frest
  */
-/**
- *    Copyright 2018 Panjie Setiawan Wicaksono
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
 
 import qs from 'query-string';
-import FrestError from './FrestError';
+import { FrestError } from './FrestError';
 import {
   ConfigMergeType,
   ConfigType,
   IConfig,
   IErrorInterceptor,
-  IInterceptorSet,
+  IInterceptors,
   IRequest,
   IRequestInterceptor,
   IResponseInterceptor,
-  IInterceptors,
   IResponse,
-  ICommonInterceptor,
   IFrestError,
   RequestType,
 } from './types';
 import xhr from './xhr';
 import * as utils from './utils';
+import { InterceptorManager } from './InterceptorManager';
 
 interface IInternalAfterFetch {
   origin: Response;
@@ -46,13 +30,10 @@ interface IInternalAfterFetch {
  * Default configuration if Frest instance is created without any configuration.
  * @public
  */
-export const DEFAULT_CONFIG: IConfig & {
-  interceptors: IInterceptorSet;
-} = {
+let DEFAULT_CONFIG: IConfig = {
   base: '',
   fetch,
   headers: new Headers(),
-  interceptors: { response: [], request: [], error: [] },
   method: 'GET',
 };
 
@@ -70,8 +51,13 @@ export interface FrestConstructor {
  * The main Frest class.
  * @public
  */
-export default class Frest {
-  private _config: IConfig;
+class Frest {
+  public config: IConfig;
+  public interceptors: IInterceptors = {
+    request: new InterceptorManager<IRequestInterceptor>(),
+    response: new InterceptorManager<IResponseInterceptor>(),
+    error: new InterceptorManager<IErrorInterceptor>(),
+  };
 
   /**
    * Creates an instance of Frest.
@@ -81,31 +67,32 @@ export default class Frest {
    */
   constructor(config?: ConfigType) {
     if (config && typeof config === 'string') {
-      this._config = { ...DEFAULT_CONFIG, base: config };
+      this.config = { ...DEFAULT_CONFIG, base: config };
     } else if (config && typeof config === 'object') {
-      const interceptors = {
-        ...DEFAULT_CONFIG.interceptors,
-        ...config.interceptors,
-      };
-      this._config = { ...DEFAULT_CONFIG, ...config, interceptors };
+      this.config = { ...DEFAULT_CONFIG, ...config };
     } else {
-      this._config = { ...DEFAULT_CONFIG };
+      this.config = { ...DEFAULT_CONFIG };
     }
-    this._config.base = utils.trimSlashes(this._config.base);
+    this.config.base = utils.trimSlashes(this.config.base);
   }
 
-  /**
-   * Get configuration used in this instance.
-   */
-  public get config(): IConfig {
-    return this._config;
+  public get defaults(): IConfig {
+    return DEFAULT_CONFIG;
+  }
+
+  public set defaults(defaults: IConfig) {
+    DEFAULT_CONFIG = { ...defaults };
   }
 
   /**
    * Get base URL used in this instance.
    */
   public get base(): string {
-    return this._config.base;
+    return this.config.base;
+  }
+
+  public create(config?: ConfigType) {
+    return new Frest(config);
   }
 
   /**
@@ -113,11 +100,7 @@ export default class Frest {
    * @param config - Configuration to be merged into this instance's configuration.
    */
   public mergeConfig(config: ConfigMergeType) {
-    const interceptors = {
-      ...this._config.interceptors,
-      ...config.interceptors,
-    };
-    this._config = { ...this._config, ...config, interceptors };
+    this.config = { ...this.config, ...config };
   }
 
   /**
@@ -126,137 +109,7 @@ export default class Frest {
    * This can be the native `fetch` API or any function with similar signature.
    */
   public get fetchFn(): typeof window.fetch {
-    return this._config.fetch;
-  }
-
-  /**
-   * Add a response interceptor function to this instance.
-   *
-   * @param interceptor - The response interceptor function.
-   * @param idx - The index position where this interceptor will be put.
-   * Interceptors will get executed from lower to higher index.
-   */
-  public addResponseInterceptor(
-    interceptor: IResponseInterceptor,
-    idx?: number,
-  ) {
-    if (idx != null) {
-      this._config.interceptors.response.splice(idx, 0, interceptor);
-      return;
-    }
-    this._config.interceptors.response.push(interceptor);
-  }
-
-  /**
-   * Add a request interceptor function to this instance.
-   *
-   * @param interceptor - The request interceptor function.
-   * @param idx - The index position where this interceptor will be put.
-   * Interceptors will get executed from lower to higher index.
-   */
-  public addRequestInterceptor(interceptor: IRequestInterceptor, idx?: number) {
-    if (idx != null) {
-      this._config.interceptors.request.splice(idx, 0, interceptor);
-      return;
-    }
-    this._config.interceptors.request.push(interceptor);
-  }
-
-  /**
-   * Add an error interceptor function to this instance.
-   *
-   * @param interceptor - The error interceptor function.
-   * @param idx - The index position where this interceptor will be put.
-   * Interceptors will get executed from lower to higher index.
-   */
-  public addErrorInterceptor(interceptor: IErrorInterceptor, idx?: number) {
-    if (idx != null) {
-      this._config.interceptors.error.splice(idx, 0, interceptor);
-      return;
-    }
-    this._config.interceptors.error.push(interceptor);
-  }
-
-  /**
-   * Add a set object (by its type) of interceptors
-   *
-   * @param interceptors - Interceptor object by its type.
-   */
-  public addInterceptors(interceptors: IInterceptors): void {
-    const { error, request, response } = interceptors;
-    if (error) {
-      this.addErrorInterceptor(error);
-    }
-    if (request) {
-      this.addRequestInterceptor(request);
-    }
-    if (response) {
-      this.addResponseInterceptor(response);
-    }
-  }
-
-  /**
-   * Remove a response interceptor from this instance.
-   *
-   * @param idv - String id of the interceptor or the interceptor function itself.
-   */
-  public removeResponseInterceptor(idv: string | IResponseInterceptor) {
-    this.removeInterceptor('response', idv);
-  }
-
-  /**
-   * Remove a request interceptor from this instance.
-   *
-   * @param idv - String id of the interceptor or the interceptor function itself.
-   */
-  public removeRequestInterceptor(idv: string | IRequestInterceptor) {
-    this.removeInterceptor('request', idv);
-  }
-
-  /**
-   * Remove an error interceptor from this instance.
-   *
-   * @param idv - String id of the interceptor or the interceptor function itself.
-   */
-  public removeErrorInterceptor(idv: string | IErrorInterceptor) {
-    this.removeInterceptor('error', idv);
-  }
-
-  /**
-   * Remove interceptors provided in the interceptors object.
-   *
-   * @param interceptors - Interceptors object.
-   */
-  public removeInterceptors(interceptors: IInterceptors): void {
-    const { error, request, response } = interceptors;
-    if (error) {
-      this.removeErrorInterceptor(error);
-    }
-    if (request) {
-      this.removeRequestInterceptor(request);
-    }
-    if (response) {
-      this.removeResponseInterceptor(response);
-    }
-  }
-
-  /**
-   * Check whether an interceptor with `id` provided is exist in this instance.
-   *
-   * @param id - The interceptor's `id` to check.
-   * @returns true if the interceptor exist, false otherwise.
-   */
-  public hasInterceptor(id: string): boolean {
-    const interceptors = this._config.interceptors;
-    for (const interceptor in interceptors) {
-      if (interceptors.hasOwnProperty(interceptor)) {
-        const idf = this.findInterceptor(interceptors[interceptor], id);
-        if (idf > -1) {
-          return true;
-        }
-      }
-    }
-    return false;
+    return this.config.fetch;
   }
 
   /**
@@ -277,7 +130,7 @@ export default class Frest {
       : [''];
     query = this.parseQuery(query);
     return utils.trimSlashes(
-      `${this._config.base}/${paths.map(encodeURI).join('/')}${query}`,
+      `${this.config.base}/${paths.map(encodeURI).join('/')}${query}`,
     );
   }
 
@@ -315,231 +168,9 @@ export default class Frest {
     const conf = this.requestConfig(init, request);
     return this.internalRequest<T>({
       ...conf,
-      method: conf.method || this._config.method,
+      method: conf.method || this.config.method,
       action: conf.action || 'request',
     });
-  }
-
-  /**
-   * Make a request to an endpoint with HTTP `POST` method.
-   *
-   * @template T - The type of response's body, if any. Defaults to `any`.
-   * @param init - A string, string array, or request configuration object.
-   * @param request - request configuration if the first arg is string
-   * or string array
-   * @returns Response promise which will be resolved when the request is successful.
-   * The promise will throws in case of error in any request life-cycle.
-   */
-  public post<T = any>(
-    init: RequestType,
-    request: Partial<IRequest> = {},
-  ): Promise<IResponse<T>> {
-    const conf = this.requestConfig(init, request);
-    return this.internalRequest<T>({
-      ...conf,
-      method: 'POST',
-      action: conf.action || 'post',
-    });
-  }
-
-  /**
-   * Make a request to an endpoint with HTTP `GET` method.
-   *
-   * @template T - The type of response's body, if any. Defaults to `any`.
-   * @param init - A string, string array, or request configuration object.
-   * @param request - request configuration if the first arg is string
-   * or string array
-   * @returns Response promise which will be resolved when the request is successful.
-   * The promise will throws in case of error in any request life-cycle.
-   */
-  public get<T = any>(
-    init: RequestType,
-    request: Partial<IRequest> = {},
-  ): Promise<IResponse<T>> {
-    const conf = this.requestConfig(init, request);
-    return this.internalRequest<T>({
-      ...conf,
-      method: 'GET',
-      action: conf.action || 'get',
-    });
-  }
-
-  /**
-   * Make a request to an endpoint with HTTP `PUT` method.
-   *
-   * @template T - The type of response's body, if any. Defaults to `any`.
-   * @param init - A string, string array, or request configuration object.
-   * @param request - request configuration if the first arg is string
-   * or string array
-   * @returns Response promise which will be resolved when the request is successful.
-   * The promise will throws in case of error in any request life-cycle.
-   */
-  public put<T = any>(
-    init: RequestType,
-    request: Partial<IRequest> = {},
-  ): Promise<IResponse<T>> {
-    const conf = this.requestConfig(init, request);
-    return this.internalRequest<T>({
-      ...conf,
-      method: 'PUT',
-      action: conf.action || 'put',
-    });
-  }
-
-  /**
-   * Make a request to an endpoint with HTTP `PATCH` method.
-   *
-   * @template T - The type of response's body, if any. Defaults to `any`.
-   * @param init - A string, string array, or request configuration object.
-   * @param request - request configuration if the first arg is string
-   * or string array
-   * @returns Response promise which will be resolved when the request is successful.
-   * The promise will throws in case of error in any request life-cycle.
-   */
-  public patch<T = any>(
-    init: RequestType,
-    request: Partial<IRequest> = {},
-  ): Promise<IResponse<T>> {
-    const conf = this.requestConfig(init, request);
-    return this.internalRequest<T>({
-      ...conf,
-      method: 'PATCH',
-      action: conf.action || 'patch',
-    });
-  }
-
-  /**
-   * Make a request to an endpoint with HTTP `DELETE` method.
-   *
-   * @template T - The type of response's body, if any. Defaults to `any`.
-   * @param init - A string, string array, or request configuration object.
-   * @param request - request configuration if the first arg is string
-   * or string array
-   * @returns Response promise which will be resolved when the request is successful.
-   * The promise will throws in case of error in any request life-cycle.
-   */
-  public delete<T = any>(
-    init: RequestType,
-    request: Partial<IRequest> = {},
-  ): Promise<IResponse<T>> {
-    const conf = this.requestConfig(init, request);
-    return this.internalRequest<T>({
-      ...conf,
-      method: 'DELETE',
-      action: conf.action || 'delete',
-    });
-  }
-
-  /**
-   * Make a request to an endpoint with HTTP `OPTION` method.
-   *
-   * @template T - The type of response's body, if any. Defaults to `any`.
-   * @param init - A string, string array, or request configuration object.
-   * @param request - request configuration if the first arg is string
-   * or string array
-   * @returns Response promise which will be resolved when the request is successful.
-   * The promise will throws in case of error in any request life-cycle.
-   */
-  public option<T = any>(
-    init: RequestType,
-    request: Partial<IRequest> = {},
-  ): Promise<IResponse<T>> {
-    const conf = this.requestConfig(init, request);
-    return this.internalRequest<T>({
-      ...conf,
-      method: 'OPTION',
-      action: conf.action || 'option',
-    });
-  }
-
-  /**
-   * Upload something to an endpoint.
-   * @remarks
-   * This is a special request function which will use `XMLHTTPRequest` to support
-   * upload progress. By default the HTTP method used is `POST`. Currently only
-   * support request body of `FormData` object.
-   *
-   * @template T - The type of response's body, if any. Defaults to `any`.
-   * @param init - A string, string array, or request configuration object.
-   * @param request - request configuration if the first arg is string
-   * or string array
-   * @returns Response promise which will be resolved when the request is successful.
-   * The promise will throws in case of error in any request life-cycle.
-   */
-  public upload<T = any>(
-    init: RequestType,
-    request: Partial<IRequest> = {},
-  ): Promise<IResponse<T>> {
-    const conf = this.requestConfig(init, request);
-    if (!(conf.body instanceof FormData)) {
-      return Promise.reject(
-        new TypeError('upload: body must be a FormData object'),
-      );
-    }
-    return this.internalRequest<T>({
-      ...conf,
-      method: conf.method || 'POST',
-      action: 'upload',
-    });
-  }
-
-  /**
-   * Download something from an endpoint.
-   * @remarks
-   * This is a special request function which will use `XMLHTTPRequest` to support
-   * download progress. By default the HTTP method used is `GET`.
-   *
-   * @template T - The type of response's body, if any. Defaults to `any`.
-   * @param init - A string, string array, or request configuration object.
-   * @param request - request configuration if the first arg is string
-   * or string array
-   * @returns Response promise which will be resolved when the request is successful.
-   * The promise will throws in case of error in any request life-cycle.
-   */
-  public download<T = any>(
-    init: RequestType,
-    request: Partial<IRequest> = {},
-  ): Promise<IResponse<T>> {
-    const conf = this.requestConfig(init, request);
-    return this.internalRequest<T>({
-      ...conf,
-      method: conf.method || 'GET',
-      action: 'download',
-    });
-  }
-
-  private removeInterceptor(
-    i: 'response' | 'request' | 'error',
-    idv:
-      | string
-      | IResponseInterceptor
-      | IRequestInterceptor
-      | IErrorInterceptor,
-  ) {
-    if (typeof idv === 'string') {
-      const idx = this.findInterceptor(this._config.interceptors[i], idv);
-      if (idx > -1) {
-        this._config.interceptors[i].splice(idx, 1);
-      }
-    } else {
-      const idx = this.findInterceptor(this._config.interceptors[i], idv.id);
-      if (idx > -1) {
-        this._config.interceptors[i].splice(idx, 1);
-      }
-    }
-  }
-
-  private findInterceptor(arr: ICommonInterceptor[], id?: string): number {
-    let found = false;
-    let i = 0;
-    while (i < arr.length) {
-      found = arr[i].id === id;
-      if (found) {
-        return i;
-      }
-      i++;
-    }
-    return -1;
   }
 
   private internalRequest<T = any>(request: IRequest): Promise<IResponse<T>> {
@@ -553,14 +184,7 @@ export default class Frest {
     init: RequestType,
     request: Partial<IRequest>,
   ): IRequest {
-    const {
-      fetch,
-      base,
-      interceptors,
-      method,
-      headers,
-      ...rest
-    } = this._config;
+    const { fetch, base, method, headers, ...rest } = this.config;
     if (typeof init === 'string' || init instanceof Array) {
       this.headers(request);
       return {
@@ -579,12 +203,12 @@ export default class Frest {
 
   private headers(request: Partial<IRequest>) {
     if (request.headers) {
-      const headers = new Headers(this._config.headers);
+      const headers = new Headers(this.config.headers);
       for (const header of request.headers.entries()) {
         headers.set(header[0], header[1]);
       }
     } else {
-      request.headers = new Headers(this._config.headers);
+      request.headers = new Headers(this.config.headers);
     }
   }
 
@@ -595,8 +219,8 @@ export default class Frest {
 
     if (typeof request.fetch === 'function') {
       return request.fetch;
-    } else if (typeof this._config.fetch === 'function') {
-      return this._config.fetch;
+    } else if (typeof this.config.fetch === 'function') {
+      return this.config.fetch;
     }
     if (process.env.NODE_ENV !== 'production') {
       // tslint:disable-next-line:no-console
@@ -608,7 +232,7 @@ export default class Frest {
   private doBefore(request: IRequest) {
     return new Promise<IRequest>((resolve, reject) => {
       let requestPromise = Promise.resolve<IRequest>(request);
-      for (const requestInterceptor of this._config.interceptors.request) {
+      for (const requestInterceptor of this.interceptors.request.handlers) {
         requestPromise = requestPromise.then(requestConfig => {
           if (!requestConfig) {
             throw new Error(
@@ -672,7 +296,7 @@ export default class Frest {
     let responsePromise: Promise<IResponse<T>> = Promise.resolve({
       origin,
     });
-    for (const responseInterceptor of this._config.interceptors.response) {
+    for (const responseInterceptor of this.interceptors.response.handlers) {
       responsePromise = responsePromise.then(response => {
         if (!response) {
           throw new Error(
@@ -702,7 +326,7 @@ export default class Frest {
   private onError = (request: IRequest) => (e: any): any => {
     let err: IFrestError = this.toFrestError(e, request);
 
-    if (this._config.interceptors.error.length === 0) {
+    if (this.interceptors.error.handlers.length === 0) {
       return Promise.reject(err);
     }
 
@@ -711,7 +335,7 @@ export default class Frest {
         null,
       );
       let recovery: IResponse | undefined | null = null;
-      for (const errorInterceptor of this._config.interceptors.error) {
+      for (const errorInterceptor of this.interceptors.error.handlers) {
         if (recovery != null) {
           break;
         }
@@ -744,3 +368,169 @@ export default class Frest {
       : e;
   }
 }
+
+const mth1 = [
+  'get',
+  'delete',
+  'options',
+  'post',
+  'put',
+  'patch',
+  'upload',
+  'download',
+];
+for (const method of mth1) {
+  const meth =
+    method === 'download'
+      ? 'GET'
+      : method === 'upload'
+        ? 'POST'
+        : method.toUpperCase();
+  Frest.prototype[method] = function(
+    this: any,
+    init: RequestType,
+    request: Partial<IRequest> = {},
+  ) {
+    const conf = this.requestConfig(init, request);
+    return this.internalRequest({
+      ...conf,
+      method: conf.method || meth,
+      action: conf.action || method,
+    });
+  };
+}
+
+interface Frest {
+  /**
+   * Make a request to an endpoint with HTTP `POST` method.
+   *
+   * @template T - The type of response's body, if any. Defaults to `any`.
+   * @param init - A string, string array, or request configuration object.
+   * @param request - request configuration if the first arg is string
+   * or string array
+   * @returns Response promise which will be resolved when the request is successful.
+   * The promise will throws in case of error in any request life-cycle.
+   */
+  post<T = any>(
+    init: RequestType,
+    body?: any,
+    request?: Partial<IRequest>,
+  ): Promise<IResponse<T>>;
+
+  /**
+   * Make a request to an endpoint with HTTP `GET` method.
+   *
+   * @template T - The type of response's body, if any. Defaults to `any`.
+   * @param init - A string, string array, or request configuration object.
+   * @param request - request configuration if the first arg is string
+   * or string array
+   * @returns Response promise which will be resolved when the request is successful.
+   * The promise will throws in case of error in any request life-cycle.
+   */
+  get<T = any>(
+    init: RequestType,
+    request?: Partial<IRequest>,
+  ): Promise<IResponse<T>>;
+
+  /**
+   * Make a request to an endpoint with HTTP `PUT` method.
+   *
+   * @template T - The type of response's body, if any. Defaults to `any`.
+   * @param init - A string, string array, or request configuration object.
+   * @param request - request configuration if the first arg is string
+   * or string array
+   * @returns Response promise which will be resolved when the request is successful.
+   * The promise will throws in case of error in any request life-cycle.
+   */
+  put<T = any>(
+    init: RequestType,
+    body?: any,
+    request?: Partial<IRequest>,
+  ): Promise<IResponse<T>>;
+
+  /**
+   * Make a request to an endpoint with HTTP `PATCH` method.
+   *
+   * @template T - The type of response's body, if any. Defaults to `any`.
+   * @param init - A string, string array, or request configuration object.
+   * @param request - request configuration if the first arg is string
+   * or string array
+   * @returns Response promise which will be resolved when the request is successful.
+   * The promise will throws in case of error in any request life-cycle.
+   */
+  patch<T = any>(
+    init: RequestType,
+    body?: any,
+    request?: Partial<IRequest>,
+  ): Promise<IResponse<T>>;
+
+  /**
+   * Make a request to an endpoint with HTTP `DELETE` method.
+   *
+   * @template T - The type of response's body, if any. Defaults to `any`.
+   * @param init - A string, string array, or request configuration object.
+   * @param request - request configuration if the first arg is string
+   * or string array
+   * @returns Response promise which will be resolved when the request is successful.
+   * The promise will throws in case of error in any request life-cycle.
+   */
+  delete<T = any>(
+    init: RequestType,
+    request?: Partial<IRequest>,
+  ): Promise<IResponse<T>>;
+
+  /**
+   * Make a request to an endpoint with HTTP `OPTIONS` method.
+   *
+   * @template T - The type of response's body, if any. Defaults to `any`.
+   * @param init - A string, string array, or request configuration object.
+   * @param request - request configuration if the first arg is string
+   * or string array
+   * @returns Response promise which will be resolved when the request is successful.
+   * The promise will throws in case of error in any request life-cycle.
+   */
+  options<T = any>(
+    init: RequestType,
+    request?: Partial<IRequest>,
+  ): Promise<IResponse<T>>;
+
+  /**
+   * Upload something to an endpoint.
+   * @remarks
+   * This is a special request function which will use `XMLHTTPRequest` to support
+   * upload progress. By default the HTTP method used is `POST`. Currently only
+   * support request body of `FormData` object.
+   *
+   * @template T - The type of response's body, if any. Defaults to `any`.
+   * @param init - A string, string array, or request configuration object.
+   * @param request - request configuration if the first arg is string
+   * or string array
+   * @returns Response promise which will be resolved when the request is successful.
+   * The promise will throws in case of error in any request life-cycle.
+   */
+  upload<T = any>(
+    init: RequestType,
+    body?: any,
+    request?: Partial<IRequest>,
+  ): Promise<IResponse<T>>;
+
+  /**
+   * Download something from an endpoint.
+   * @remarks
+   * This is a special request function which will use `XMLHTTPRequest` to support
+   * download progress. By default the HTTP method used is `GET`.
+   *
+   * @template T - The type of response's body, if any. Defaults to `any`.
+   * @param init - A string, string array, or request configuration object.
+   * @param request - request configuration if the first arg is string
+   * or string array
+   * @returns Response promise which will be resolved when the request is successful.
+   * The promise will throws in case of error in any request life-cycle.
+   */
+  download<T = any>(
+    init: RequestType,
+    request?: Partial<IRequest>,
+  ): Promise<IResponse<T>>;
+}
+
+export { Frest };
