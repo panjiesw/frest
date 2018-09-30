@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "name": "@test/helpers",
+  "description": "Test helpers for frest packages",
+  "main": "index.js",
+  "dependencies": {
+    "node-fetch": "^2.2.0"
+  }
+}

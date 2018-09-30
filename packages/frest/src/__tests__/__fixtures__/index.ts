@@ -15,12 +15,12 @@
  */
 
 import fetchMock from 'fetch-mock';
-import Frest, { ConfigMergeType } from '../../';
+import frest, { Frest, ConfigMergeType } from '../../';
 
 export const BASE = 'http://localhost';
 
 export interface Fixture {
-  frest: Frest;
+  instance: Frest;
   fm: typeof fetchMock;
   url: string;
   path: string;
@@ -29,16 +29,16 @@ export interface Fixture {
 export function instances(conf?: ConfigMergeType): Fixture {
   (fetchMock as any).config.fetch = fetch;
   const fm: any = (fetchMock as any).sandbox();
-  const frest = new Frest({
+  const instance = frest.create({
     base: BASE,
     fetch: fm,
   });
   if (conf) {
-    frest.mergeConfig(conf);
+    instance.mergeConfig(conf);
   }
   const path = randomStr();
   const url = `${BASE}/${path}`;
-  return { frest, fm, url, path };
+  return { instance, fm, url, path };
 }
 
 export const randomStr = (len: number = 6) =>
