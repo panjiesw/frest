@@ -9,4 +9,8 @@ module.exports = {
       tsConfig: '<rootDir>/tsconfig.cjs.json',
     },
   },
+  collectCoverageFrom: [
+    ...base.collectCoverageFrom,
+    '!<rootDir>/src/FrestError.ts',
+  ],
 };

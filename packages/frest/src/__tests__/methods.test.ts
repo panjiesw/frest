@@ -1,7 +1,7 @@
 import { instances } from './__fixtures__';
 
 describe('Request Method', () => {
-  test('post', async () => {
+  it('post', async () => {
     const { instance, fm, path, url } = instances();
     fm.once(
       (u, o) => u === url && (o as any).action === 'post',
@@ -11,11 +11,11 @@ describe('Request Method', () => {
 
     const res = await instance.post(path);
 
-    expect(res.origin.ok).toBe(true);
+    expect(res.raw.ok).toBe(true);
     expect(fm.calls(path).length).toBe(1);
   });
 
-  test('get', async () => {
+  it('get', async () => {
     const { instance, fm, path, url } = instances();
     fm.once(
       (u, o) => u === url && (o as any).action === 'get',
@@ -25,11 +25,11 @@ describe('Request Method', () => {
 
     const res = await instance.get(path);
 
-    expect(res.origin.ok).toBe(true);
+    expect(res.raw.ok).toBe(true);
     expect(fm.calls(path).length).toBe(1);
   });
 
-  test('put', async () => {
+  it('put', async () => {
     const { instance, fm, path, url } = instances();
     fm.once(
       (u, o) => u === url && (o as any).action === 'put',
@@ -39,11 +39,11 @@ describe('Request Method', () => {
 
     const res = await instance.put(path);
 
-    expect(res.origin.ok).toBe(true);
+    expect(res.raw.ok).toBe(true);
     expect(fm.calls(path).length).toBe(1);
   });
 
-  test('delete', async () => {
+  it('delete', async () => {
     const { instance, fm, path, url } = instances();
     fm.once(
       (u, o) => u === url && (o as any).action === 'delete',
@@ -53,11 +53,11 @@ describe('Request Method', () => {
 
     const res = await instance.delete(path);
 
-    expect(res.origin.ok).toBe(true);
+    expect(res.raw.ok).toBe(true);
     expect(fm.calls(path).length).toBe(1);
   });
 
-  test('patch', async () => {
+  it('patch', async () => {
     const { instance, fm, path, url } = instances();
     fm.once(
       (u, o) => u === url && (o as any).action === 'patch',
@@ -67,11 +67,11 @@ describe('Request Method', () => {
 
     const res = await instance.patch(path);
 
-    expect(res.origin.ok).toBe(true);
+    expect(res.raw.ok).toBe(true);
     expect(fm.calls(path).length).toBe(1);
   });
 
-  test('options', async () => {
+  it('options', async () => {
     const { instance, fm, path, url } = instances();
     fm.once(
       (u, o) => u === url && (o as any).action === 'options',
@@ -81,7 +81,7 @@ describe('Request Method', () => {
 
     const res = await instance.options(path);
 
-    expect(res.origin.ok).toBe(true);
+    expect(res.raw.ok).toBe(true);
     expect(fm.calls(path).length).toBe(1);
   });
 });

@@ -10,8 +10,10 @@ declare global {
   interface Window {
     Frest: FrestConstructor;
     FrestError: FrestErrorConstructor;
+    frest: Frest;
   }
 }
 
+self.frest = new Frest();
 self.Frest = Frest;
 self.FrestError = FrestError;

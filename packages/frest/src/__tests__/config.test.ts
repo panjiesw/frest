@@ -1,13 +1,13 @@
-import frest, { IConfig } from '../';
+import frest, { ConfigMergeType } from '../';
 import { BASE, instances } from './__fixtures__';
 
 describe('Config', () => {
-  test('merge', () => {
-    const config: Partial<IConfig> = {
+  it('merges default', () => {
+    const config: ConfigMergeType = {
       base: BASE,
       method: 'POST',
     };
-    const changed: Partial<IConfig> = {
+    const changed: ConfigMergeType = {
       credentials: 'include',
       method: 'GET',
     };
@@ -23,7 +23,7 @@ describe('Config', () => {
     expect(instance.config).toEqual(expected);
   });
 
-  test('fetch function', () => {
+  it('uses custom fetch function', () => {
     const { instance, fm } = instances();
 
     expect(instance.fetchFn).toBe(fm);

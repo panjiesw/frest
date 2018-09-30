@@ -24,5 +24,5 @@ export function trimSlashes(input: string): string {
  * completions of `FrestError` instance type.
  */
 export function isFrestError(e: any): e is IFrestError {
-  return !e.frest && !e.request;
+  return e.frest != null && e.request != null;
 }

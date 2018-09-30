@@ -9,18 +9,37 @@ import { InterceptorManager } from './InterceptorManager';
  * Supported HTTP Method
  * @public
  */
-export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'OPTION';
+export type HttpMethod =
+  | 'GET'
+  | 'POST'
+  | 'PUT'
+  | 'DELETE'
+  | 'PATCH'
+  | 'OPTIONS';
+
+export interface IHeaderConfig {
+  common: Headers;
+  post: Headers;
+  get: Headers;
+  put: Headers;
+  delete: Headers;
+  patch: Headers;
+  options: Headers;
+}
+
+export type ResponseTransformer = (raw: Response, data: any) => Promise<any>;
 
 /**
  * Base config for Frest instance
  * @public
  */
-export interface IConfig {
+export interface IConfigBase {
   /**
    * The base url for this instance. Defaults to empty string.
    * @public
    */
   base: string;
+  transformResponse: ResponseTransformer[];
   /**
    * {@link https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API | Fetch API} function implementation to use.
    * @remarks
@@ -35,15 +54,15 @@ export interface IConfig {
    * @public
    */
   method: HttpMethod;
-  /**
-   * Default {@link https://developer.mozilla.org/en-US/docs/Web/API/Headers | Headers} to include in each request.
-   * @remarks
-   * If this Headers contain key which is supplied in request, it will get overridden.
-   * In native `fetch` API, this can also be a key-value object, but for Frest
-   * it's **required** to be an instance of `Headers` class.
-   * @public
-   */
-  headers: Headers;
+  // /**
+  //  * Default {@link https://developer.mozilla.org/en-US/docs/Web/API/Headers | Headers} to include in each request.
+  //  * @remarks
+  //  * If this Headers contain key which is supplied in request, it will get overridden.
+  //  * In native `fetch` API, this can also be a key-value object, but for Frest
+  //  * it's **required** to be an instance of `Headers` class.
+  //  * @public
+  //  */
+  // headers: IHeaderConfig;
   /**
    * Default cache mode you want to use for each request: `default`, `no-store`, `reload`, `no-cache`, `force-cache`, or `only-if-cached`.
    * @remarks
@@ -109,6 +128,18 @@ export interface IConfig {
   signal?: AbortSignal;
 }
 
+export interface IConfig extends IConfigBase {
+  /**
+   * Default {@link https://developer.mozilla.org/en-US/docs/Web/API/Headers | Headers} to include in each request.
+   * @remarks
+   * If this Headers contain key which is supplied in request, it will get overridden.
+   * In native `fetch` API, this can also be a key-value object, but for Frest
+   * it's **required** to be an instance of `Headers` class.
+   * @public
+   */
+  headers: IHeaderConfig;
+}
+
 /**
  * Frest configuration used in constructor and config merge.
  * @remarks
@@ -118,7 +149,9 @@ export interface IConfig {
  * the same as {@link IConfig}.
  * @public
  */
-export type ConfigMergeType = Partial<IConfig>;
+export type ConfigMergeType = Partial<IConfigBase> & {
+  headers?: Partial<IHeaderConfig>;
+};
 
 /**
  * Frest configuration used in constructor.
@@ -168,6 +201,7 @@ export interface IRequest {
    * @public
    */
   headers: Headers;
+  transformResponse: ResponseTransformer[];
   /**
    * Specific action which this request called with.
    * @remarks
@@ -308,7 +342,7 @@ export interface IRequest {
 /**
  * Request configuration.
  * @remarks
- * This can be string/array of string as `path` of this request, or
+ * This can be string, array of string as `path` of this request, or
  * a request configuration object of {@link IRequest}
  * @public
  */
@@ -328,7 +362,7 @@ export interface IResponse<T = any> {
    * Original `fetch` response.
    * @public
    */
-  origin: Response;
+  raw: Response;
   /**
    * The body of this response, if any.
    * @remarks.
@@ -337,7 +371,15 @@ export interface IResponse<T = any> {
    * `fetch` response body and put it here for convenience.
    * @public
    */
-  body?: T;
+  data: T;
+  readonly headers: Headers;
+  readonly ok: boolean;
+  readonly redirected: boolean;
+  readonly status: number;
+  readonly statusText: string;
+  readonly trailer: Promise<Headers>;
+  readonly type: ResponseType;
+  readonly url: string;
 }
 
 /**
@@ -405,40 +447,28 @@ export interface IResponseInterceptorArg {
 }
 
 /**
- * Common signature all interceptors have
- * @public
- */
-export interface ICommonInterceptor {
-  /**
-   * This interceptor unique identifier
-   * @public
-   */
-  id?: string;
-}
-
-/**
  * Request interceptor function signature.
  * @public
  */
-export interface IRequestInterceptor extends ICommonInterceptor {
-  (input: IRequestInterceptorArg): Promise<IRequest>;
-}
+export type IRequestInterceptor = (
+  input: IRequestInterceptorArg,
+) => Promise<IRequest>;
 
 /**
  * Response interceptor function signature.
  * @public
  */
-export interface IResponseInterceptor extends ICommonInterceptor {
-  (input: IResponseInterceptorArg): Promise<IResponse>;
-}
+export type IResponseInterceptor = (
+  input: IResponseInterceptorArg,
+) => Promise<IResponse>;
 
 /**
  * Error interceptor function signature.
  * @public
  */
-export interface IErrorInterceptor extends ICommonInterceptor {
-  (error: IFrestError): Promise<IResponse | undefined | null>;
-}
+export type IErrorInterceptor = (
+  error: IFrestError,
+) => Promise<IResponse | undefined | null>;
 
 /**
  * List of interceptors by its type.

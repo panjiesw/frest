@@ -2,7 +2,7 @@ import frest from '../';
 import { instances } from './__fixtures__';
 
 describe('Interceptors', () => {
-  test('use/eject', () => {
+  it('correctly use/eject', () => {
     const req = jest.fn();
     const res = jest.fn();
     const err = jest.fn();
@@ -35,7 +35,7 @@ describe('Interceptors', () => {
     expect(frest.interceptors.error.handlers.length).toBe(0);
   });
 
-  test('request', async () => {
+  it('intercepts request', async () => {
     const { instance, fm, path, url } = instances();
     const order: string[] = [];
     const req1 = jest.fn(r => {
@@ -61,7 +61,7 @@ describe('Interceptors', () => {
     instance.interceptors.request.use(req2);
 
     const res = await instance.request(path);
-    expect(res.origin.ok).toBe(true);
+    expect(res.raw.ok).toBe(true);
     expect(fm.calls(path).length).toBe(1);
     expect(req1).toHaveBeenCalledTimes(1);
     expect(req2).toHaveBeenCalledTimes(1);

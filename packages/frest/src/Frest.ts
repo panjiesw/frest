@@ -16,15 +16,41 @@ import {
   IResponse,
   IFrestError,
   RequestType,
+  HttpMethod,
+  ResponseTransformer,
 } from './types';
 import xhr from './xhr';
 import * as utils from './utils';
 import { InterceptorManager } from './InterceptorManager';
 
 interface IInternalAfterFetch {
-  origin: Response;
+  raw: Response;
   request: IRequest;
 }
+
+const json: ResponseTransformer = raw => {
+  return raw
+    .clone()
+    .json()
+    .catch(_ => ({}));
+};
+
+const resp = <T = any>(
+  raw: Response,
+  // tslint:disable-next-line:no-object-literal-type-assertion
+  data: T = {} as T,
+): IResponse<T> => {
+  const { body, bodyUsed, ...rest } = raw;
+  return {
+    raw,
+    ...rest,
+    data,
+  };
+};
+
+const DEFAULT_CONTENT_TYPE = {
+  'Content-Type': 'application/json',
+};
 
 /**
  * Default configuration if Frest instance is created without any configuration.
@@ -33,8 +59,17 @@ interface IInternalAfterFetch {
 let DEFAULT_CONFIG: IConfig = {
   base: '',
   fetch,
-  headers: new Headers(),
+  headers: {
+    common: new Headers({ Accept: 'application/json, text/plain, */*' }),
+    post: new Headers(DEFAULT_CONTENT_TYPE),
+    get: new Headers(),
+    put: new Headers(DEFAULT_CONTENT_TYPE),
+    delete: new Headers(),
+    patch: new Headers(DEFAULT_CONTENT_TYPE),
+    options: new Headers(),
+  },
   method: 'GET',
+  transformResponse: [json],
 };
 
 /**
@@ -69,7 +104,11 @@ class Frest {
     if (config && typeof config === 'string') {
       this.config = { ...DEFAULT_CONFIG, base: config };
     } else if (config && typeof config === 'object') {
-      this.config = { ...DEFAULT_CONFIG, ...config };
+      const headers = {
+        ...DEFAULT_CONFIG.headers,
+        ...config.headers,
+      };
+      this.config = { ...DEFAULT_CONFIG, ...config, headers };
     } else {
       this.config = { ...DEFAULT_CONFIG };
     }
@@ -100,7 +139,11 @@ class Frest {
    * @param config - Configuration to be merged into this instance's configuration.
    */
   public mergeConfig(config: ConfigMergeType) {
-    this.config = { ...this.config, ...config };
+    const headers = {
+      ...this.config.headers,
+      ...config.headers,
+    };
+    this.config = { ...this.config, ...config, headers };
   }
 
   /**
@@ -165,51 +208,49 @@ class Frest {
     init: RequestType,
     request: Partial<IRequest> = {},
   ): Promise<IResponse<T>> {
-    const conf = this.requestConfig(init, request);
-    return this.internalRequest<T>({
-      ...conf,
-      method: conf.method || this.config.method,
-      action: conf.action || 'request',
-    });
+    const conf = {
+      action: 'request',
+      method: this.config.method,
+      ...this.requestConfig(init, request),
+    };
+    return this.internalRequest<T>({ ...conf, headers: this.headers(conf) });
   }
 
   private internalRequest<T = any>(request: IRequest): Promise<IResponse<T>> {
-    return this.doBefore(request)
-      .then(this.doRequest)
-      .then(this.doAfter)
+    return this.before(request)
+      .then(this.req)
+      .then(this.after)
       .catch(this.onError(request));
   }
 
-  private requestConfig(
-    init: RequestType,
-    request: Partial<IRequest>,
-  ): IRequest {
+  private requestConfig(init: RequestType, request: Partial<IRequest>) {
     const { fetch, base, method, headers, ...rest } = this.config;
     if (typeof init === 'string' || init instanceof Array) {
-      this.headers(request);
       return {
         path: init,
         ...rest,
         ...request,
-      } as any;
+      };
     }
-    this.headers(init);
     return {
       path: '',
       ...rest,
       ...init,
-    } as any;
+    };
   }
 
-  private headers(request: Partial<IRequest>) {
+  private headers(request: { method: HttpMethod; headers?: Headers }) {
+    const method = request.method.toLowerCase();
+    const headers = new Headers(this.config.headers.common);
+    for (const header of this.config.headers[method].entries()) {
+      headers.set(header[0], header[1]);
+    }
     if (request.headers) {
-      const headers = new Headers(this.config.headers);
       for (const header of request.headers.entries()) {
         headers.set(header[0], header[1]);
       }
-    } else {
-      request.headers = new Headers(this.config.headers);
     }
+    return headers;
   }
 
   private getFetch(request: IRequest): typeof fetch {
@@ -229,16 +270,14 @@ class Frest {
     return xhr as any;
   }
 
-  private doBefore(request: IRequest) {
+  private before(request: IRequest) {
     return new Promise<IRequest>((resolve, reject) => {
       let requestPromise = Promise.resolve<IRequest>(request);
       for (const requestInterceptor of this.interceptors.request.handlers) {
         requestPromise = requestPromise.then(requestConfig => {
           if (!requestConfig) {
             throw new Error(
-              `interceptor id ${
-                requestInterceptor.id
-              } didn't return request config`,
+              `interceptor ${requestInterceptor} didn't return request config`,
             );
           }
           return requestInterceptor({
@@ -261,7 +300,7 @@ class Frest {
     });
   }
 
-  private doRequest = (request: IRequest): Promise<IInternalAfterFetch> => {
+  private req = (request: IRequest): Promise<IInternalAfterFetch> => {
     let fetchFn: typeof fetch;
 
     try {
@@ -271,36 +310,39 @@ class Frest {
     }
 
     const fullPath = this.parsePath(request.path, request.query);
-    return fetchFn(fullPath, request).then<IInternalAfterFetch>(origin => ({
+    return fetchFn(fullPath, request).then<IInternalAfterFetch>(raw => ({
       request,
-      origin,
+      raw,
     }));
   };
 
-  private doAfter = <T = any>(
-    afterFetch: IInternalAfterFetch,
-  ): Promise<IResponse> => {
-    const { origin, request } = afterFetch;
-    if (!origin.ok) {
-      return Promise.reject(
-        new FrestError(
-          `Non OK HTTP response status: ${origin.status} - ${
-            origin.statusText
-          }`,
-          this,
-          request,
-          { origin },
+  private after = (afterFetch: IInternalAfterFetch): Promise<IResponse> => {
+    const { raw, request } = afterFetch;
+    let dataPromise = Promise.resolve<any>({});
+    for (const transform of request.transformResponse) {
+      dataPromise = dataPromise.then(data => transform(raw, data));
+    }
+
+    if (!raw.ok) {
+      return dataPromise.then(data =>
+        Promise.reject(
+          new FrestError(
+            `Non OK HTTP response status: ${raw.status} - ${raw.statusText}`,
+            this,
+            request,
+            resp(raw, data),
+          ),
         ),
       );
     }
-    let responsePromise: Promise<IResponse<T>> = Promise.resolve({
-      origin,
-    });
+
+    let responsePromise = dataPromise.then(data => resp(raw, data));
+
     for (const responseInterceptor of this.interceptors.response.handlers) {
       responsePromise = responsePromise.then(response => {
         if (!response) {
           throw new Error(
-            `interceptor id ${responseInterceptor.id} didn't return response`,
+            `interceptor ${responseInterceptor} didn't return response`,
           );
         }
         return responseInterceptor({
@@ -314,10 +356,10 @@ class Frest {
       const cause = typeof e === 'string' ? e : e.message ? e.message : e;
       return Promise.reject(
         new FrestError(
-          `Error in response interceptor: ${cause}`,
+          `Error in response transform/interceptor: ${cause}`,
           this,
           request,
-          { origin },
+          resp(raw),
         ),
       );
     });
@@ -364,7 +406,7 @@ class Frest {
 
   private toFrestError(e: any, requestConfig: IRequest): IFrestError {
     return utils.isFrestError(e)
-      ? new FrestError(e.message, this, requestConfig)
+      ? new FrestError(e.message, this, requestConfig, e.response)
       : e;
   }
 }
@@ -391,12 +433,12 @@ for (const method of mth1) {
     init: RequestType,
     request: Partial<IRequest> = {},
   ) {
-    const conf = this.requestConfig(init, request);
-    return this.internalRequest({
-      ...conf,
-      method: conf.method || meth,
-      action: conf.action || method,
-    });
+    const conf = {
+      action: method,
+      method: meth,
+      ...this.requestConfig(init, request),
+    };
+    return this.internalRequest({ ...conf, headers: this.headers(conf) });
   };
 }
 
