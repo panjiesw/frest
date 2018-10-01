@@ -16,10 +16,9 @@ jspm_packages
 .node_repl_history
 
 .awcache
-build
-es
-lib
-umd
+dist
+cjs
+esm
 tests.js.map
 netlify.toml
 packages/*/docs

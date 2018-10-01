@@ -3,10 +3,10 @@
   "version": "0.12.1",
   "description": "REST client for browser with Fetch",
   "license": "Apache-2.0",
-  "main": "lib/index.js",
-  "module": "es/index.js",
-  "unpkg": "umd/frest.umd.js",
-  "typings": "lib/index.d.ts",
+  "main": "cjs/index.js",
+  "module": "esm/index.js",
+  "unpkg": "dist/frest.min.js",
+  "typings": "esm/index.d.ts",
   "homepage": "https://github.com/panjiesw/frest/tree/master/packages/frest#readme",
   "repository": {
     "type": "git",
@@ -28,9 +28,9 @@
     "whatwg-fetch"
   ],
   "files": [
-    "es/",
-    "lib/",
-    "umd/"
+    "cjs/",
+    "esm/",
+    "dist/"
   ],
   "dependencies": {
     "query-string": "^6.1.0",
