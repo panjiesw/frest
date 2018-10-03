@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en" class="js csstransforms3d">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="generator" content="Hugo 0.42.2" />
+    <meta name="description" content="Frest is easy to use browser REST client wrapper for Fetch API with interceptor feature and XMLHttpRequest fallback for download, upload and when Fetch API is not available.">
+<meta name="author" content="Panjie Setiawan Wicaksono">
+
+    <link rel="shortcut icon" href="/images/favicon.png" type="image/x-icon" />
+<link rel="icon" href="/images/favicon.png" type="image/x-icon" />
+    <title>Using Frest :: Documentation for Frest</title>
+    
+    
+    <link href="/css/nucleus.css?1538595042" rel="stylesheet">
+    <link href="/css/font-awesome.min.css?1538595042" rel="stylesheet">
+    <link href="/css/hybrid.css?1538595042" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1538595042" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1538595042" rel="stylesheet">
+    <link href="/css/auto-complete.css?1538595042" rel="stylesheet">
+    <link href="/css/theme.css?1538595042" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1538595042" rel="stylesheet">
+    
+      <link href="/css/theme-frest.css?1538595042" rel="stylesheet">
+    
+
+    <script src="/js/jquery-2.x.min.js?1538595042"></script>
+    
+    <style type="text/css">
+      :root #header + #content > #left > #rlblock_left{ 
+          display:none !important;
+      }
+      
+    </style>
+    
+
+<meta name="google-site-verification" content="xEU-WeGanH8TZ7DXTh-TUWa65jKPk0gCq0zs_py3rko" />
+
+  </head>
+  <body class="" data-url="/using-frest/">
+    <nav id="sidebar" class="showVisitedLinks">
+
+
+
+  <div id="header-wrapper">
+    <div id="header">
+      <a href="/" id="logo">
+  <img src="/img/logo-wt-64.png" alt="FREST">
+</a>
+
+    </div>
+    
+        <div class="searchbox">
+    <label for="search-by"><i class="fa fa-search"></i></label>
+    <input data-search-input id="search-by" type="text" placeholder="Search...">
+    <span data-search-clear=""><i class="fa fa-close"></i></span>
+</div>
+
+<script type="text/javascript" src="/js/lunr.min.js?1538595042"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1538595042"></script>
+<script type="text/javascript">
+    
+        var baseurl = '\/';
+    
+</script>
+<script type="text/javascript" src="/js/search.js?1538595042"></script>
+
+    
+  </div>
+
+    <div class="highlightable">
+    <ul class="topics">
+
+        
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/using-frest/" title="Using Frest" class="dd-item 
+        parent
+        active
+        
+        ">
+      <a href="/using-frest/">
+          <b>1. </b>Using Frest
+          
+            <i class="fa fa-check read-icon"></i>
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/interceptor/" title="Interceptor" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/interceptor/">
+          <b>2. </b>Interceptor
+          
+            <i class="fa fa-check read-icon"></i>
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/interceptor/concept/" title="Concept" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/interceptor/concept/">
+          Concept
+          
+            <i class="fa fa-check read-icon"></i>
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/interceptor/using-interceptor/" title="Using Interceptor" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/interceptor/using-interceptor/">
+          Using Interceptor
+          
+            <i class="fa fa-check read-icon"></i>
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/interceptor/available-interceptor/" title="Available Interceptor" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/interceptor/available-interceptor/">
+          Available Interceptor
+          
+            <i class="fa fa-check read-icon"></i>
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/api/" title="API Reference" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/api/">
+          <b>3. </b>API Reference
+          
+            <i class="fa fa-check read-icon"></i>
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+          
+         
+    </ul>
+
+    
+    
+      <section id="shortcuts">
+        <h3>More</h3>
+        <ul>
+          
+              <li> 
+                  <a class="padding" href="https://github.com/panjiesw/frest"><i class='fa fa-github'></i> Github repo</a>
+              </li>
+          
+        </ul>
+      </section>
+    
+
+    
+    <section id="prefooter">
+      <hr/>
+      <ul>
+       
+      
+      
+        <li><a class="padding" href="#" data-clear-history-toggle=""><i class="fa fa-fw fa-history"></i> Clear History</a></li>         
+      
+      </ul>
+    </section>
+    
+    <section id="footer">
+      
+
+<center>
+  
+  <a class="github-button" href="https://github.com/panjiesw/frest" data-icon="octicon-star" data-show-count="true" aria-label="Star panjiesw/frest on GitHub">Star</a>
+
+  
+  <a class="github-button" href="https://github.com/panjiesw/frest/fork" data-icon="octicon-repo-forked" data-show-count="true" aria-label="Fork panjiesw/frest on GitHub">Fork</a>
+
+  <p>Built with <a href="https://github.com/matcornic/hugo-theme-learn"><i class="fa fa-heart"></i></a> from <a href="http://getgrav.org">Grav</a> and <a href="http://gohugo.io/">Hugo</a></p>
+</center>
+
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+
+    </section>
+  </div>
+</nav>
+
+
+
+
+
+        <section id="body">
+        <div id="overlay"></div>
+        <div class="padding highlightable">
+              
+              <div>
+                <div id="top-bar">
+                
+                  
+                  
+                  
+                  <div id="top-github-link">
+                    <a class="github-link" title='Edit this page' href="https://github.com/panjiesw/frest/edit/master/internal/docs/content/using-frest/_index.en.md" target="blank">
+                      <i class="fa fa-code-fork"></i>
+                      <span id="top-github-link-text">Edit this page</span>
+                    </a>
+                  </div>
+                  
+                
+                
+                <div id="breadcrumbs" itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb">
+                    <span id="sidebar-toggle-span">
+                        <a href="#" id="sidebar-toggle" data-sidebar-toggle="">
+                          <i class="fa fa-bars"></i>
+                        </a>
+                    </span>
+                  
+                  <span id="toc-menu"><i class="fa fa-list-alt"></i></span>
+                  
+                  <span class="links">
+                    
+          
+          
+            
+            
+          
+          
+            <a href='/'>Introduction</a> > Using Frest
+          
+         
+          
+           
+                  </span>
+                </div>
+                
+                    <div class="progress">
+    <div class="wrapper">
+<nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#the-frest-instance">The Frest Instance</a></li>
+<li><a href="#calling-api-endpoint">Calling API Endpoint</a></li>
+<li><a href="#response-processing">Response Processing</a></li>
+<li><a href="#async-await-style">Async Await Style</a></li>
+<li><a href="#using-typescript">Using TypeScript</a></li>
+</ul></li>
+</ul>
+</nav>
+    </div>
+</div>
+
+                
+              </div>
+            </div>
+            
+
+        
+        <div id="body-inner">
+          
+            <h1>Using Frest</h1>
+          
+
+        
+
+
+
+
+<!-- TOC -->
+
+<ul>
+<li><a href="#the-frest-instance">The Frest Instance</a></li>
+<li><a href="#calling-api-endpoint">Calling API Endpoint</a></li>
+<li><a href="#response-processing">Response Processing</a></li>
+<li><a href="#async-await-style">Async Await Style</a></li>
+<li><a href="#using-typescript">Using TypeScript</a></li>
+</ul>
+
+<!-- /TOC -->
+
+<p>After installation, import it your code. The <code>Frest</code> class is exported in default namespace</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-js" data-lang="js"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-js" data-lang="js"><span style="color:#ff79c6">import</span> Frest from <span style="color:#f1fa8c">&#39;frest&#39;</span>;
+</code></pre></td></tr></table>
+</div>
+</div>
+<h2 id="the-frest-instance">The Frest Instance</h2>
+
+<p>Now we can create an instance to communicate with an API URL. Suppose we want
+to call an API with base URL <a href="https://api.example.com">https://api.example.com</a></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-js" data-lang="js"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-js" data-lang="js"><span style="color:#ff79c6">const</span> api <span style="color:#ff79c6">=</span> <span style="color:#ff79c6">new</span> Frest(<span style="color:#f1fa8c">&#39;https://api.example.com&#39;</span>);
+</code></pre></td></tr></table>
+</div>
+</div>
+<div class="notices tip" ><p>If you are using the UMD build through a <code>script</code> tag, <code>Frest</code> class is available
+in global <code>window</code> and <code>self</code> object.</p>
+</div>
+
+
+<p>We can also configure the instance with some default parameter,
+which will be applied to all API call.
+In this example, we want all request to append a header <code>X-Foo</code> with value <code>bar</code></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-js" data-lang="js"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">7
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-js" data-lang="js"><span style="color:#ff79c6">const</span> api <span style="color:#ff79c6">=</span> <span style="color:#ff79c6">new</span> Frest({
+  base<span style="color:#ff79c6">:</span> <span style="color:#f1fa8c">&#39;https://api.example.com&#39;</span>,
+  headers<span style="color:#ff79c6">:</span> <span style="color:#ff79c6">new</span> Headers({
+    <span style="color:#f1fa8c">&#39;X-Foo&#39;</span><span style="color:#ff79c6">:</span> <span style="color:#f1fa8c">&#39;bar&#39;</span>,
+  }),
+});
+</code></pre></td></tr></table>
+</div>
+</div>
+<div class="notices info" ><p>The configuration object generally extends <a href="https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch">fetch init parameter</a>.
+Refer to <a href="/usage/configuration/">Configuration</a> page for more information of available properties</p>
+</div>
+
+
+<h2 id="calling-api-endpoint">Calling API Endpoint</h2>
+
+<p>With the instance configured, we can now use its methods to call an API endpoint.
+With native <code>fetch</code> you have to provide <code>{method: '&lt;HTTP METHOD&gt;'}</code> to call
+endpoint with certain HTTP Method. In <code>Frest</code> it&rsquo;s available directly as method
+in the instance.</p>
+
+<p>Here we want to call <code>GET</code> <a href="https://api.example.com/foo">https://api.example.com/foo</a>.</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-js" data-lang="js"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-js" data-lang="js">api.get(<span style="color:#f1fa8c">&#39;foo&#39;</span>).then(<span style="color:#6272a4">/*Do something with the response*/</span>);
+</code></pre></td></tr></table>
+</div>
+</div>
+<div class="notices warning" ><p>As with the native Fetch API, Frest also needs <code>Promise</code> to be available in the
+browser. If there is a browser of your target that doesn&rsquo;t support <code>Promise</code>,
+you need to include a polyfill before importing Frest, e.g. <a href="https://www.npmjs.com/package/es6-promise">es6-promise</a>.</p>
+</div>
+
+
+<p>Here is other available method of the instance, all correspond to HTTP Method
+as the name implies.</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-js" data-lang="js"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">11
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">12
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-js" data-lang="js">api.post(...) <span style="color:#6272a4">// HTTP POST
+</span><span style="color:#6272a4"></span>api.create(...) <span style="color:#6272a4">// alias of api.post
+</span><span style="color:#6272a4"></span>api.read(...) <span style="color:#6272a4">// alias of api.get
+</span><span style="color:#6272a4"></span>api.put(...) <span style="color:#6272a4">// HTTP PUT
+</span><span style="color:#6272a4"></span>api.update(...) <span style="color:#6272a4">// alias of api.put
+</span><span style="color:#6272a4"></span>api.<span style="color:#ff79c6">delete</span>(...) <span style="color:#6272a4">// HTTP DELETE
+</span><span style="color:#6272a4"></span>api.destroy(...) <span style="color:#6272a4">// alias of api.delete
+</span><span style="color:#6272a4"></span>api.patch(...) <span style="color:#6272a4">// HTTP PATCH
+</span><span style="color:#6272a4"></span>api.option(...) <span style="color:#6272a4">// HTTP OPTION
+</span><span style="color:#6272a4"></span>api.download(...) <span style="color:#6272a4">// Download file, support onDownloadProgress event
+</span><span style="color:#6272a4"></span>api.upload(...) <span style="color:#6272a4">// Upload file, support onUploadProgress event
+</span><span style="color:#6272a4"></span></code></pre></td></tr></table>
+</div>
+</div>
+<p>We can provide specific configuration to each request. It&rsquo;ll be <strong>merged</strong> with
+the default configuration we specified in the instance. Here we set the <code>X-Foo</code>
+header for this specific request with <code>foo</code> value.</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-js" data-lang="js"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">4
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-js" data-lang="js">api
+  .get(<span style="color:#f1fa8c">&#39;foo&#39;</span>, { headers<span style="color:#ff79c6">:</span> <span style="color:#ff79c6">new</span> Headers({ <span style="color:#f1fa8c">&#39;X-Foo&#39;</span><span style="color:#ff79c6">:</span> <span style="color:#f1fa8c">&#39;foo&#39;</span> }) })
+  .then(<span style="color:#6272a4">/*Do something with the response*/</span>);
+</code></pre></td></tr></table>
+</div>
+</div>
+<h2 id="response-processing">Response Processing</h2>
+
+<p>When the request is finished, the promise will be completed and we can do
+something with the response. <br>
+The resolved value is an object of <code>IResponse</code> interface, contains <code>origin</code>
+property which is the original <code>fetch</code> <a href="https://developer.mozilla.org/en-US/docs/Web/API/Response">Response</a>,
+and the <code>body</code> if any. <br>
+If there is any error during the request, we can catch it in the chain. The error
+is an instance of <code>FrestError</code>.</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-js" data-lang="js"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">11
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">12
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">13
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">14
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">15
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">16
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">17
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-js" data-lang="js">api
+  .get(<span style="color:#f1fa8c">&#39;foo&#39;</span>, { headers<span style="color:#ff79c6">:</span> <span style="color:#ff79c6">new</span> Headers({ <span style="color:#f1fa8c">&#39;X-Foo&#39;</span><span style="color:#ff79c6">:</span> <span style="color:#f1fa8c">&#39;foo&#39;</span> }) })
+  .then(res =&gt; {
+    <span style="color:#ff79c6">const</span> { origin, body } <span style="color:#ff79c6">=</span> res;
+    console.log(<span style="color:#f1fa8c">&#39;origin&#39;</span>, origin);
+    console.log(<span style="color:#f1fa8c">&#39;body&#39;</span>, body);
+    <span style="color:#6272a4">// We can safely omit the origin.ok check because Frest took care of it.
+</span><span style="color:#6272a4"></span>    <span style="color:#6272a4">// If origin.ok is false, it&#39;ll be thrown as an error and caught in the catch block below
+</span><span style="color:#6272a4"></span>    <span style="color:#ff79c6">return</span> origin.json();
+  })
+  .then(body =&gt; {
+    console.log(<span style="color:#f1fa8c">&#39;body&#39;</span>, body);
+  })
+  .<span style="color:#ff79c6">catch</span>(err =&gt; {
+    console.error(<span style="color:#f1fa8c">&#39;request failed&#39;</span>, err);
+  });
+</code></pre></td></tr></table>
+</div>
+</div>
+<div class="notices info" ><p>The <code>body</code> property above by default is <code>undefined</code>. It&rsquo;s meant for response interceptors
+to process and put value in there.<br>
+For example, the above task of parsing <code>application/json</code> response can be repetitive
+and a suitable candidate to put in a response interceptor.<br>
+In fact, there is <a href="https://www.npmjs.com/package/frest-json">frest-json</a>,
+an official interceptor package of <code>Frest</code> that do just that.<br><br>
+Find out more about <a href="/interceptor/concept">Interceptor Concept here</a>.</p>
+</div>
+
+
+<h2 id="async-await-style">Async Await Style</h2>
+
+<p>We can also use Frest api calling in <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function">async-await</a> fashion.</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style="border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-js" data-lang="js"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 2
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 3
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 4
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 5
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 7
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 8
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79"> 9
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">10
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">11
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">12
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-js" data-lang="js"><span style="color:#ff79c6">async</span> <span style="color:#8be9fd;font-style:italic">function</span> makeRequest() {
+  <span style="color:#ff79c6">try</span> {
+    <span style="color:#ff79c6">const</span> {origin} <span style="color:#ff79c6">=</span> <span style="color:#ff79c6">await</span> api.post(<span style="color:#f1fa8c">&#39;blah&#39;</span>);
+    <span style="color:#ff79c6">if</span> (origin.ok) {
+      <span style="color:#ff79c6">const</span> body <span style="color:#ff79c6">=</span> <span style="color:#ff79c6">await</span> origin.json();
+      console.log(<span style="color:#f1fa8c">&#39;body&#39;</span>, body);
+    }
+  } <span style="color:#ff79c6">catch</span> (err) {
+    console.error(<span style="color:#f1fa8c">&#39;request failed&#39;</span>, err);
+  }
+}
+</code></pre></td></tr></table>
+</div>
+</div>
+<h2 id="using-typescript">Using TypeScript</h2>
+
+<p>Frest is developed with <a href="https://www.typescriptlang.org/">TypeScript</a> and include
+its own definition files. We can comfortably import Frest and use the awesomeness
+of TypeScript altogether :)</p>
+
+
+<footer class=" footline" >
+	
+</footer>
+
+        
+        </div>
+        
+
+      </div>
+
+    <div id="navigation">
+        
+        
+
+        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                        
+                        
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+
+        
+
+
+        
+            <a class="nav nav-prev" href="/" title="Introduction"> <i class="fa fa-chevron-left"></i></a>
+        
+        
+            <a class="nav nav-next" href="/interceptor/" title="Interceptor" style="margin-right: 0px;"><i class="fa fa-chevron-right"></i></a>
+        
+    </div>
+
+    </section>
+
+    <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
+      <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
+    </div>
+    <script src="/js/clipboard.min.js?1538595042"></script>
+    <script src="/js/perfect-scrollbar.min.js?1538595042"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1538595042"></script>
+    <script src="/js/jquery.sticky.js?1538595042"></script>
+    <script src="/js/featherlight.min.js?1538595042"></script>
+    <script src="/js/html5shiv-printshiv.min.js?1538595042"></script>
+    
+    
+    <script src="/js/modernizr.custom.71422.js?1538595042"></script>
+    <script src="/js/learn.js?1538595042"></script>
+    <script src="/js/hugo-learn.js?1538595042"></script>
+
+    <link href="/mermaid/mermaid.css?1538595042" type="text/css" rel="stylesheet" />
+    <script src="/mermaid/mermaid.js?1538595042"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: true });
+    </script>
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-30473301-5"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-30473301-5');
+</script>
+
+  </body>
+</html>

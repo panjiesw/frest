@@ -4,5 +4,10 @@
   "packages": [
     "internal/*",
     "packages/*"
-  ]
+  ],
+  "command": {
+    "run": {
+      "stream": true
+    }
+  }
 }
