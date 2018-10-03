@@ -1,12 +1,12 @@
-<img src="docs/logo-256.png" alt="logo" height="120" align="right" />
+<img src="https://panjiesw.github.io/frest/img/logo-256.png" alt="logo" height="120" align="right" />
 
 # Frest
 
-[![Build Status](https://img.shields.io/travis/panjiesw/frest/develop.svg?style=flat-square)](https://travis-ci.org/panjiesw/frest) [![codecov](https://codecov.io/gh/panjiesw/frest/branch/develop/graph/badge.svg)](https://codecov.io/gh/panjiesw/frest)
+[![Build Status](https://img.shields.io/travis/panjiesw/frest/master.svg?style=flat-square)](https://travis-ci.org/panjiesw/frest) [![codecov](https://codecov.io/gh/panjiesw/frest/branch/master/graph/badge.svg)](https://codecov.io/gh/panjiesw/frest)
 
 > Browser REST client wrapper of [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) with XHR fallback and interceptor support
 
-[Go to full documentation](https://frest.netlify.com/).
+[Go to full documentation](https://https://panjiesw.github.io/frest/).
 
 ## Features
 
