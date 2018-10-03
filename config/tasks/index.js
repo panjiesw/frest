@@ -1,5 +1,6 @@
-import find from '@start/plugin-find';
+import codecov from '@start/plugin-lib-codecov';
 import env from '@start/plugin-env';
+import find from '@start/plugin-find';
 import parallel from '@start/plugin-parallel';
 import remove from '@start/plugin-remove';
 import sequence from '@start/plugin-sequence';
@@ -61,3 +62,5 @@ export const build = pkg => {
 };
 
 export const bundle = pkg => rollup(rollupConfigs[pkg]);
+
+export const cov = () => sequence(find('coverage/lcov.info'), read, codecov);

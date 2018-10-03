@@ -9,3 +9,4 @@ cache:
     - '$HOME/.npm'
 script:
   - npx jest
+  - npx start cov

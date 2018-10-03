@@ -14,6 +14,7 @@
     "@start/plugin-assert": "^0.2.1",
     "@start/plugin-env": "^0.4.0",
     "@start/plugin-find": "^0.2.1",
+    "@start/plugin-lib-codecov": "^0.2.1",
     "@start/plugin-parallel": "^0.2.1",
     "@start/plugin-read": "^0.2.1",
     "@start/plugin-remove": "^0.2.2",
