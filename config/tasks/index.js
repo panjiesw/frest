@@ -2,6 +2,7 @@ import codecov from '@start/plugin-lib-codecov';
 import env from '@start/plugin-env';
 import find from '@start/plugin-find';
 import parallel from '@start/plugin-parallel';
+import read from '@start/plugin-read';
 import remove from '@start/plugin-remove';
 import sequence from '@start/plugin-sequence';
 import watch from '@start/plugin-watch';
