@@ -6,7 +6,7 @@
 
 > Browser REST client wrapper of [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) with XHR fallback and interceptor support
 
-[Go to full documentation](https://https://panjiesw.github.io/frest/).
+[Go to full documentation](https://panjiesw.github.io/frest/).
 
 ## Features
 

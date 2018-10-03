@@ -2,12 +2,12 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Introduction on Documentation for Frest</title>
-    <link>https://frest.netlify.com/</link>
+    <link>https://panjiesw.github.io/frest/</link>
     <description>Recent content in Introduction on Documentation for Frest</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     
-	<atom:link href="https://frest.netlify.com/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://panjiesw.github.io/frest/index.xml" rel="self" type="application/rss+xml" />
     
     
   </channel>
