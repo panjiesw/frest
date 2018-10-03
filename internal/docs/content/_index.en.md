@@ -4,7 +4,7 @@ title: "Introduction"
 
 # Frest JavaScript REST Client
 
-![frest](/img/logo-128.png)
+![frest](/frest/img/logo-128.png)
 
 {{% notice warning %}}
 Documentation in progress! Keep track at the [pull request link](https://github.com/panjiesw/frest/pull/1)
