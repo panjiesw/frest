@@ -14,13 +14,31 @@ describe('Response', () => {
     expect(res.data).toEqual(expected);
   });
 
-  it('ignores JSON error', async () => {
+  it(`doesn't parse if content type header is non json`, async () => {
     const { fm, instance, path, url } = instances();
-    fm.once(url, { body: '', status: 201 }, { method: 'GET', name: path });
+    fm.once(url, 'foo', { method: 'GET', name: path });
 
     const res = await instance.request(path);
     expect(res.raw.ok).toBe(true);
-    expect(res.data).toEqual({});
+    expect(res.raw.bodyUsed).toBe(false);
+    expect(res.data).toBe('foo');
+  });
+
+  it('ignores JSON error', async () => {
+    const { fm, instance, path, url } = instances();
+    fm.once(
+      url,
+      {
+        body: 'foo',
+        status: 201,
+        headers: { 'content-type': 'application/json' },
+      },
+      { method: 'GET', name: path },
+    );
+
+    const res = await instance.request(path);
+    expect(res.raw.ok).toBe(true);
+    expect(res.data).toBe('foo');
   });
 
   it('handles non-ok status JSON', async () => {
@@ -44,5 +62,24 @@ describe('Response', () => {
         err.message.indexOf('Non OK HTTP response status: 400'),
       ).toBeGreaterThanOrEqual(0);
     }
+  });
+
+  it('handles multiple transformer', async () => {
+    const { fm, instance, path, url } = instances();
+    const expected = {
+      foo: 'bar',
+    };
+    const trf1 = jest.fn(() => ({ foo: '1' }));
+    const trf2 = jest.fn((_, data) => ({ ...data, foo: 'bar' }));
+    fm.once(url, {}, { method: 'GET', name: path });
+
+    const res = await instance.request<typeof expected>({
+      path,
+      transformResponse: [trf1, trf2],
+    });
+    expect(res.raw.ok).toBe(true);
+    expect(trf1).toHaveBeenCalledTimes(1);
+    expect(trf2).toHaveBeenCalledTimes(1);
+    expect(res.data).toEqual(expected);
   });
 });

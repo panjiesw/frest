@@ -1,4 +1,4 @@
-import frest, { ConfigMergeType } from '../';
+import frest, { DEFAULT_CONFIG, ConfigMergeType } from '../';
 import { BASE, instances } from './__fixtures__';
 
 describe('Config', () => {
@@ -12,7 +12,7 @@ describe('Config', () => {
       method: 'GET',
     };
     const expected = {
-      ...frest.defaults,
+      ...DEFAULT_CONFIG,
       ...changed,
       base: BASE,
     };

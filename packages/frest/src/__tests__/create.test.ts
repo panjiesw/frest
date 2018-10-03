@@ -1,9 +1,9 @@
-import frest, { IConfig } from '../';
+import frest, { DEFAULT_CONFIG, IConfig } from '../';
 import { BASE } from './__fixtures__';
 
 describe('Create', () => {
   // test('Default instance', () => {
-  //   expect(frest.config).toEqual(frest.defaults);
+  //   expect(frest.config).toEqual(DEFAULT_CONFIG);
   // });
 
   it('has correct config', () => {
@@ -14,7 +14,7 @@ describe('Create', () => {
     it('has correct config', () => {
       const instance = frest.create(BASE);
       const expected = {
-        ...frest.defaults,
+        ...DEFAULT_CONFIG,
         base: BASE,
       };
       expect(instance.config).toEqual(expected);
@@ -29,7 +29,7 @@ describe('Create', () => {
         method: 'POST',
       };
       const expected = {
-        ...frest.defaults,
+        ...DEFAULT_CONFIG,
         ...config,
       };
       const instance = frest.create(config);

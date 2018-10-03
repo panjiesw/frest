@@ -27,7 +27,8 @@ export interface IHeaderConfig {
   options: Headers;
 }
 
-export type ResponseTransformer = (raw: Response, data: any) => Promise<any>;
+export type ResponseTransformer = (raw: Response, data: any) => any;
+export type RequestTransformer = (req: IRequest, data?: any) => any;
 
 /**
  * Base config for Frest instance
@@ -40,6 +41,7 @@ export interface IConfigBase {
    */
   base: string;
   transformResponse: ResponseTransformer[];
+  transformRequest: RequestTransformer[];
   /**
    * {@link https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API | Fetch API} function implementation to use.
    * @remarks
@@ -202,6 +204,7 @@ export interface IRequest {
    */
   headers: Headers;
   transformResponse: ResponseTransformer[];
+  transformRequest: RequestTransformer[];
   /**
    * Specific action which this request called with.
    * @remarks

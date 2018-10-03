@@ -14,5 +14,5 @@ export default frest;
 
 export * from './types';
 export { FrestError, FrestErrorConstructor } from './FrestError';
-export { FrestConstructor } from './Frest';
+export { DEFAULT_CONFIG, FrestConstructor } from './Frest';
 export { Frest, utils };

@@ -18,6 +18,7 @@ import {
   RequestType,
   HttpMethod,
   ResponseTransformer,
+  RequestTransformer,
 } from './types';
 import xhr from './xhr';
 import * as utils from './utils';
@@ -28,11 +29,54 @@ interface IInternalAfterFetch {
   request: IRequest;
 }
 
+const methodsNoData: string[] = ['get', 'delete', 'options'];
+
+const methodsData: string[] = ['post', 'put', 'patch'];
+
+const methodsFall: string[] = ['upload', 'download'];
+
+const methods = [...methodsNoData, ...methodsData, ...methodsFall];
+
+const setCt = (headers: Headers, value: string) => {
+  if (!headers.has('Content-Type')) {
+    headers.set('Content-Type', value);
+  }
+};
+
 const json: ResponseTransformer = raw => {
-  return raw
-    .clone()
-    .json()
-    .catch(_ => ({}));
+  const ct = raw.headers.get('Content-Type');
+  if (ct && ct.indexOf('application/json') >= 0) {
+    return raw
+      .clone()
+      .json()
+      .catch(_ => raw.body);
+  }
+  return raw.body;
+};
+
+const req: RequestTransformer = ({ headers }, data) => {
+  if (
+    utils.isFormData(data) ||
+    utils.isArrayBuffer(data) ||
+    utils.isBuffer(data) ||
+    utils.isStream(data) ||
+    utils.isFile(data) ||
+    utils.isBlob(data)
+  ) {
+    return data;
+  }
+  if (utils.isArrayBufferView(data)) {
+    return data.buffer;
+  }
+  if (utils.isURLSearchParams(data)) {
+    setCt(headers, 'application/x-www-form-urlencoded;charset=utf-8');
+    return data.toString();
+  }
+  if (utils.isObject(data)) {
+    setCt(headers, 'application/json;charset=utf-8');
+    return JSON.stringify(data);
+  }
+  return data;
 };
 
 const resp = <T = any>(
@@ -48,28 +92,32 @@ const resp = <T = any>(
   };
 };
 
-const DEFAULT_CONTENT_TYPE = {
-  'Content-Type': 'application/json',
+const checkInt = (ret: any, type: 'response' | 'request') => {
+  if (!ret) {
+    const w = type === 'request' ? `${type} config` : type;
+    throw new Error(`one of interceptor didn't return ${w}`);
+  }
 };
 
 /**
  * Default configuration if Frest instance is created without any configuration.
  * @public
  */
-let DEFAULT_CONFIG: IConfig = {
+export const DEFAULT_CONFIG: IConfig = {
   base: '',
   fetch,
   headers: {
     common: new Headers({ Accept: 'application/json, text/plain, */*' }),
-    post: new Headers(DEFAULT_CONTENT_TYPE),
+    post: new Headers(),
     get: new Headers(),
-    put: new Headers(DEFAULT_CONTENT_TYPE),
+    put: new Headers(),
     delete: new Headers(),
-    patch: new Headers(DEFAULT_CONTENT_TYPE),
+    patch: new Headers(),
     options: new Headers(),
   },
   method: 'GET',
   transformResponse: [json],
+  transformRequest: [req],
 };
 
 /**
@@ -113,14 +161,6 @@ class Frest {
       this.config = { ...DEFAULT_CONFIG };
     }
     this.config.base = utils.trimSlashes(this.config.base);
-  }
-
-  public get defaults(): IConfig {
-    return DEFAULT_CONFIG;
-  }
-
-  public set defaults(defaults: IConfig) {
-    DEFAULT_CONFIG = { ...defaults };
   }
 
   /**
@@ -263,23 +303,31 @@ class Frest {
     } else if (typeof this.config.fetch === 'function') {
       return this.config.fetch;
     }
-    if (process.env.NODE_ENV !== 'production') {
-      // tslint:disable-next-line:no-console
-      console.warn('Frest: Fetch API is not available falling back to xhr');
-    }
-    return xhr as any;
+
+    throw new FrestError(
+      'Fetch API is not available in this browser',
+      this,
+      request,
+    );
   }
 
   private before(request: IRequest) {
     return new Promise<IRequest>((resolve, reject) => {
-      let requestPromise = Promise.resolve<IRequest>(request);
+      let dataPromise = Promise.resolve<any>(request.body);
+      for (const transform of request.transformRequest) {
+        if (methodsData.indexOf(request.method.toLowerCase()) >= 0) {
+          dataPromise = dataPromise.then(data => transform(request, data));
+        }
+      }
+
+      let requestPromise = dataPromise.then(body => {
+        request.body = body;
+        return request;
+      });
+
       for (const requestInterceptor of this.interceptors.request.handlers) {
         requestPromise = requestPromise.then(requestConfig => {
-          if (!requestConfig) {
-            throw new Error(
-              `interceptor ${requestInterceptor} didn't return request config`,
-            );
-          }
+          checkInt(requestConfig, 'request');
           return requestInterceptor({
             frest: this,
             request: requestConfig,
@@ -287,16 +335,21 @@ class Frest {
         });
       }
 
-      requestPromise.then(resolve).catch(e => {
-        const cause = typeof e === 'string' ? e : e.message ? e.message : e;
-        reject(
-          new FrestError(
-            `Error in request interceptor: ${cause}`,
-            this,
-            request,
-          ),
-        );
-      });
+      requestPromise
+        .then(requestConfig => {
+          checkInt(requestConfig, 'request');
+          resolve(requestConfig);
+        })
+        .catch(e => {
+          const cause = typeof e === 'string' ? e : e.message ? e.message : e;
+          reject(
+            new FrestError(
+              `Error in request transform/interceptor: ${cause}`,
+              this,
+              request,
+            ),
+          );
+        });
     });
   }
 
@@ -340,11 +393,7 @@ class Frest {
 
     for (const responseInterceptor of this.interceptors.response.handlers) {
       responsePromise = responsePromise.then(response => {
-        if (!response) {
-          throw new Error(
-            `interceptor ${responseInterceptor} didn't return response`,
-          );
-        }
+        checkInt(response, 'response');
         return responseInterceptor({
           frest: this,
           request,
@@ -352,17 +401,22 @@ class Frest {
         });
       });
     }
-    return responsePromise.catch(e => {
-      const cause = typeof e === 'string' ? e : e.message ? e.message : e;
-      return Promise.reject(
-        new FrestError(
-          `Error in response transform/interceptor: ${cause}`,
-          this,
-          request,
-          resp(raw),
-        ),
-      );
-    });
+    return responsePromise
+      .then(r => {
+        checkInt(r, 'response');
+        return r;
+      })
+      .catch(e => {
+        const cause = typeof e === 'string' ? e : e.message ? e.message : e;
+        return Promise.reject(
+          new FrestError(
+            `Error in response transform/interceptor: ${cause}`,
+            this,
+            request,
+            resp(raw),
+          ),
+        );
+      });
   };
 
   private onError = (request: IRequest) => (e: any): any => {
@@ -411,17 +465,7 @@ class Frest {
   }
 }
 
-const mth1 = [
-  'get',
-  'delete',
-  'options',
-  'post',
-  'put',
-  'patch',
-  'upload',
-  'download',
-];
-for (const method of mth1) {
+for (const method of methods) {
   const meth =
     method === 'download'
       ? 'GET'

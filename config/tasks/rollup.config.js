@@ -8,6 +8,7 @@ const frestPkg = require('../../packages/frest/package.json');
 export const frest = {
   input: 'packages/frest/esm/umd.js',
   output: {
+    sourcemap: true,
     file: 'packages/frest/dist/frest.min.js',
     format: 'iife',
     name: '__frest__',
