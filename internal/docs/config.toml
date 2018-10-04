@@ -1,7 +1,5 @@
-publishDir = "../../docs"
-
 author = "Panjie Setiawan Wicaksono"
-baseURL = "https://panjiesw.github.io/frest/"
+baseURL = "https://frest.netlify.com"
 languageCode = "en-us"
 defaultContentLanguage = "en"
 
