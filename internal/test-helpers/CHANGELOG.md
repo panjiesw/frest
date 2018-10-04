@@ -6,16 +6,4 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 <a name="0.13.0"></a>
 # [0.13.0](https://github.com/panjiesw/frest/compare/v0.12.1...v0.13.0) (2018-10-04)
 
-**Note:** Version bump only for package frest-docs
-
-
-
-
-
-<a name="0.6.2"></a>
-## 0.6.2 (2018-04-14)
-
-
-
-
-**Note:** Version bump only for package frest-docs
+**Note:** Version bump only for package @test/helpers
