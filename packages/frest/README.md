@@ -2,7 +2,7 @@
 
 # Frest
 
-[![Build Status](https://img.shields.io/travis/panjiesw/frest/master.svg?style=flat-square)](https://travis-ci.org/panjiesw/frest) [![codecov](https://img.shields.io/codecov/c/github/panjiesw/frest/master.svg?style=flat-square)](https://codecov.io/gh/panjiesw/frest)
+[![Build Status](https://img.shields.io/travis/panjiesw/frest/master.svg?style=flat-square)](https://travis-ci.org/panjiesw/frest) [![codecov](https://img.shields.io/codecov/c/github/panjiesw/frest/master.svg?style=flat-square)](https://codecov.io/gh/panjiesw/frest) [![npm](https://img.shields.io/npm/v/frest.svg?style=flat-square)](https://www.npmjs.com/package/frest) [![npm bundle size (minified + gzip)](https://img.shields.io/bundlephobia/minzip/frest.svg?style=flat-square)](https://bundlephobia.com/result?p=frest)
 
 > Browser REST client wrapper of [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) with XHR fallback and interceptor support
 
