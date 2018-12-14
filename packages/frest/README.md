@@ -6,7 +6,7 @@
 
 > Browser REST client wrapper of [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) with XHR fallback and interceptor support
 
-[Go to full documentation](https://frest.netlify.com).
+<!-- [Go to full documentation](https://frest.netlify.com). -->
 
 ## Features
 
@@ -38,24 +38,12 @@ Or include the UMD build directly in a script tag
 Basic examples.
 
 ```typescript
-import Frest from 'frest';
+import frest from 'frest';
+// in UMD build, frest, Frest and FrestError are included in Window object
 
-// create Frest instance
-// in UMD build, Frest and FrestError are included in Window object
-
-// with default config
-const api = new Frest('https://api.example.com');
-
-// config extends Fetch's init option
-const api = new Frest({
-  base: 'https://api.example.com',
-  headers: new Headers({
-    'X-Foo': 'bar',
-  }),
-});
-
+// with default instance
 // call HTTP method
-api
+frest
   // request config will override the default config of Frest instance
   .get('foo', { headers: new Headers({ 'X-Foo': 'foo' }) })
   .then(res => {
@@ -97,4 +85,15 @@ async function makeRequest() {
     console.error('request failed', err);
   }
 }
+
+// With custom instance
+const api = frest.create('https://api.example.com');
+
+// config extends Fetch's init option
+const api = frest.create({
+  base: 'https://api.example.com',
+  headers: new Headers({
+    'X-Foo': 'bar',
+  }),
+});
 ```
