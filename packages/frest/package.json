@@ -33,7 +33,6 @@
     "dist/"
   ],
   "dependencies": {
-    "query-string": "^6.1.0",
     "querystringify": "^2.1.0",
     "tslib": "^1.9.3"
   }
