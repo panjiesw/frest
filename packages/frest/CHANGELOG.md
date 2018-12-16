@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.14.1"></a>
+## [0.14.1](https://github.com/panjiesw/frest/compare/v0.14.0...v0.14.1) (2018-12-16)
+
+
+### Bug Fixes
+
+* remove unused deps ([9a33eac](https://github.com/panjiesw/frest/commit/9a33eac))
+
+
+
+
+
 <a name="0.14.0"></a>
 # [0.14.0](https://github.com/panjiesw/frest/compare/v0.13.0...v0.14.0) (2018-12-16)
 
