@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "frest-root",
-  "version": "0.14.0",
+  "version": "0.14.1",
   "scripts": {
     "codecov": "codecov"
   },
@@ -26,7 +26,7 @@
     "@test/helpers": "file:internal/test-helpers",
     "@types/fetch-mock": "^6.0.3",
     "@types/jest": "^23.3.2",
-    "@types/node": "^8.10.30",
+    "@types/node": "^10.12.15",
     "@types/query-string": "^6.1.0",
     "@types/querystringify": "^2.0.0",
     "@types/sinon": "^5.0.2",
