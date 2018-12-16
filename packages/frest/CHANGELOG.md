@@ -12,6 +12,11 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * response, error and xhr ([2a598fa](https://github.com/panjiesw/frest/commit/2a598fa))
 
 
+### Features
+
+* use `querystringify` as query encoder
+
+
 
 
 
