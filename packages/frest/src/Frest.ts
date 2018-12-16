@@ -2,7 +2,7 @@
  * @module frest
  */
 
-import qs from 'query-string';
+import qs from 'querystringify';
 import { FrestError } from './FrestError';
 import {
   ConfigMergeType,
@@ -29,13 +29,9 @@ interface IInternalAfterFetch {
   request: IRequest;
 }
 
-const methodsNoData: string[] = ['get', 'delete', 'options'];
+const methodsNoData: string[] = ['get', 'delete', 'options', 'download'];
 
-const methodsData: string[] = ['post', 'put', 'patch'];
-
-const methodsFall: string[] = ['upload', 'download'];
-
-const methods = [...methodsNoData, ...methodsData, ...methodsFall];
+const methodsData: string[] = ['post', 'put', 'patch', 'upload'];
 
 const setCt = (headers: Headers, value: string) => {
   if (!headers.has('Content-Type')) {
@@ -83,14 +79,18 @@ const resp = <T = any>(
   raw: Response,
   // tslint:disable-next-line:no-object-literal-type-assertion
   data: T = {} as T,
-): IResponse<T> => {
-  const { body, bodyUsed, ...rest } = raw;
-  return {
-    raw,
-    ...rest,
-    data,
-  };
-};
+): IResponse<T> => ({
+  raw,
+  data,
+  headers: raw.headers,
+  ok: raw.ok,
+  redirected: raw.redirected,
+  status: raw.status,
+  statusText: raw.statusText,
+  trailer: raw.trailer,
+  type: raw.type,
+  url: raw.url,
+});
 
 const checkInt = (ret: any, type: 'response' | 'request') => {
   if (!ret) {
@@ -226,8 +226,7 @@ class Frest {
   public parseQuery(query: any): string {
     let q = query || '';
     if (typeof q === 'object') {
-      const qq = qs.stringify(q);
-      q = qq.length > 0 ? `?${qq}` : '';
+      q = qs.stringify(q, '?');
     } else if (q !== '') {
       q = q.charAt(0) === '?' ? q : `?${q}`;
     }
@@ -465,13 +464,8 @@ class Frest {
   }
 }
 
-for (const method of methods) {
-  const meth =
-    method === 'download'
-      ? 'GET'
-      : method === 'upload'
-        ? 'POST'
-        : method.toUpperCase();
+for (const method of methodsNoData) {
+  const meth = method === 'download' ? 'GET' : method.toUpperCase();
   Frest.prototype[method] = function(
     this: any,
     init: RequestType,
@@ -483,6 +477,23 @@ for (const method of methods) {
       ...this.requestConfig(init, request),
     };
     return this.internalRequest({ ...conf, headers: this.headers(conf) });
+  };
+}
+
+for (const method of methodsData) {
+  const meth = method === 'upload' ? 'POST' : method.toUpperCase();
+  Frest.prototype[method] = function(
+    this: any,
+    init: RequestType,
+    body?: any,
+    request: Partial<IRequest> = {},
+  ) {
+    const conf = {
+      action: method,
+      method: meth,
+      ...this.requestConfig(init, request),
+    };
+    return this.internalRequest({ body, ...conf, headers: this.headers(conf) });
   };
 }
 

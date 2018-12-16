@@ -278,6 +278,14 @@ export interface IRequest {
    */
   onDownloadProgress?: (ev: ProgressEvent) => any;
   /**
+   * Response type in case of client is XMLHttpRequest.
+   *
+   * @remarks
+   * If using `download`, this is default to `blob`. Otherwise by default
+   * it's `text`.
+   */
+  responseType?: 'arraybuffer' | 'blob' | 'document' | 'json' | 'text';
+  /**
    * The cache mode you want to use for the request: `default`, `no-store`, `reload`, `no-cache`, `force-cache`, or `only-if-cached`.
    * @remarks
    * See {@link https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch | fetch}
@@ -368,10 +376,6 @@ export interface IResponse<T = any> {
   raw: Response;
   /**
    * The body of this response, if any.
-   * @remarks.
-   * Note by default, without any response interceptor, this won't exist. It's
-   * the responsibility and capability of response interceptor to transform
-   * `fetch` response body and put it here for convenience.
    * @public
    */
   data: T;

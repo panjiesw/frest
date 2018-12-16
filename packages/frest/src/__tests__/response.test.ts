@@ -9,7 +9,7 @@ describe('Response', () => {
     fm.once(url, expected, { method: 'GET', name: path });
 
     const res = await instance.request<typeof expected>(path);
-    expect(res.raw.ok).toBe(true);
+    expect(res.ok).toBe(true);
     expect(res.raw.bodyUsed).toBe(false);
     expect(res.data).toEqual(expected);
   });
@@ -19,7 +19,7 @@ describe('Response', () => {
     fm.once(url, 'foo', { method: 'GET', name: path });
 
     const res = await instance.request(path);
-    expect(res.raw.ok).toBe(true);
+    expect(res.ok).toBe(true);
     expect(res.raw.bodyUsed).toBe(false);
     expect(res.data).toBe('foo');
   });
@@ -37,7 +37,7 @@ describe('Response', () => {
     );
 
     const res = await instance.request(path);
-    expect(res.raw.ok).toBe(true);
+    expect(res.ok).toBe(true);
     expect(res.data).toBe('foo');
   });
 
@@ -77,7 +77,7 @@ describe('Response', () => {
       path,
       transformResponse: [trf1, trf2],
     });
-    expect(res.raw.ok).toBe(true);
+    expect(res.ok).toBe(true);
     expect(trf1).toHaveBeenCalledTimes(1);
     expect(trf2).toHaveBeenCalledTimes(1);
     expect(res.data).toEqual(expected);

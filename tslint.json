@@ -71,5 +71,5 @@
     "no-console": [false],
     "prefer-conditional-expression": false
   },
-  "defaultSeverity": "error"
+  "defaultSeverity": "warn"
 }

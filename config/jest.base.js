@@ -10,10 +10,15 @@ module.exports = {
     '!**/__fixtures__/**',
     '!**/node_modules/**',
   ],
-  testPathIgnorePatterns: [
+  coveragePathIgnorePatterns: [
+    '/__tests__/',
     '/__fixtures__/',
-    '/node_modules/'
+    '/node_modules/',
+    '/esm/',
+    '/cjs/',
+    '/dist/',
   ],
-  coveragePathIgnorePatterns: ['/__tests__/', '/node_modules/'],
   setupTestFrameworkScriptFile: '@test/helpers/index.js',
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
+  testMatch: ['**/src/**/*.test.(j|t)s?(x)'],
 };

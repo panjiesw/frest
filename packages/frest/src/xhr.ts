@@ -55,7 +55,10 @@ function xhrFetch(url: string, conf: IRequest): Promise<Response> {
         'responseURL' in xhr
           ? xhr.responseURL
           : options.headers.get('X-Request-URL');
-      const body = 'response' in xhr ? xhr.response : (xhr as any).responseText;
+      const body =
+        !conf.responseType || conf.responseType === 'text'
+          ? xhr.responseText
+          : xhr.response;
       resolve(new Response(body, options));
     };
 
@@ -81,8 +84,11 @@ function xhrFetch(url: string, conf: IRequest): Promise<Response> {
       xhr.withCredentials = true;
     }
 
-    if ('responseType' in xhr && supportBlob()) {
-      xhr.responseType = 'blob';
+    xhr.responseType = conf.responseType || 'text';
+    if (conf.action === 'download') {
+      if (!conf.responseType && supportBlob()) {
+        xhr.responseType = 'blob';
+      }
     }
 
     for (const [name, value] of conf.headers) {

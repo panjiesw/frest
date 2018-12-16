@@ -25,10 +25,7 @@ export interface FrestErrorConstructor {
  * @public
  */
 export class FrestError extends Error implements IFrestError {
-  // tslint:disable-next-line:variable-name
-  public __proto__: Error;
-  public name = 'FrestError';
-
+  /* istanbul ignore next */
   constructor(
     message: string,
     public frest: Frest,
@@ -36,8 +33,5 @@ export class FrestError extends Error implements IFrestError {
     public response?: IResponse<any>,
   ) {
     super(message);
-    // restore prototype chain
-    const actualProto = new.target.prototype;
-    this.__proto__ = actualProto;
   }
 }
