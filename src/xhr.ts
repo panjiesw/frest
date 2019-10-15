@@ -91,7 +91,7 @@ function xhrFetch(url: string, conf: IRequest): Promise<Response> {
       }
     }
 
-    conf.headers.forEach((name, value) => {
+    conf.headers.forEach((value, name) => {
       xhr.setRequestHeader(name, value);
     });
 
