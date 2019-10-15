@@ -2,11 +2,7 @@ sudo: false
 language: node_js
 node_js:
   - '10'
-install:
-  - npm ci
-cache:
-  directories:
-    - '$HOME/.npm'
+cache: yarn
 script:
-  - npx jest
-  - npx start cov
+  - yarn test
+  - yarn codecov

@@ -36,7 +36,8 @@
     "b:bundle": "cross-env NODE_ENV=production rollup -c",
     "b:ts": "tsc -p tsconfig.build.json",
     "codecov": "codecov",
-    "clean": "rimraf lib dist coverage *.tsbuildinfo"
+    "clean": "rimraf lib dist coverage *.tsbuildinfo",
+    "test": "jest --coverage"
   },
   "dependencies": {
     "querystringify": "^2.1.1"
