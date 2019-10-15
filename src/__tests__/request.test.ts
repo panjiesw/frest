@@ -78,8 +78,8 @@ describe('Request', () => {
 
     expect(res.raw.ok).toBe(true);
     expect(fm.calls(path).length).toBe(1);
-    expect(lastOptions.cache).toBe('default');
-    expect(lastOptions.credentials).toBe('include');
+    expect((lastOptions as any).cache).toBe('default');
+    expect((lastOptions as any).credentials).toBe('include');
   });
 
   it('accepts 2 arg', async () => {
@@ -143,7 +143,7 @@ describe('Request', () => {
 
     expect(res.raw.ok).toBe(true);
     expect(fm.calls(path).length).toBe(1);
-    expect(typeof fm.lastOptions(path).body).toBe('object');
+    expect(typeof (fm.lastOptions(path) as any).body).toBe('object');
   });
 
   it('processes URLSearchParams data', async () => {

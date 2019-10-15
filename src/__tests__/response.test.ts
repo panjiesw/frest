@@ -21,7 +21,9 @@ describe('Response', () => {
     const res = await instance.request(path);
     expect(res.ok).toBe(true);
     expect(res.raw.bodyUsed).toBe(false);
-    expect(res.data).toBe('foo');
+
+    const data = await res.raw.text();
+    expect(data).toBe('foo');
   });
 
   it('ignores JSON error', async () => {
@@ -38,7 +40,10 @@ describe('Response', () => {
 
     const res = await instance.request(path);
     expect(res.ok).toBe(true);
-    expect(res.data).toBe('foo');
+    expect(res.raw.bodyUsed).toBe(false);
+
+    const data = await res.raw.text();
+    expect(data).toBe('foo');
   });
 
   it('handles non-ok status JSON', async () => {

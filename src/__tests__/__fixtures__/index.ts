@@ -41,5 +41,8 @@ export function instances(conf?: ConfigMergeType): Fixture {
   return { instance, fm, url, path };
 }
 
-export const randomStr = (len: number = 6) =>
-  [...Array(len)].map(() => Math.random().toString(36)[3]).join('');
+export const randomStr = (len = 6) =>
+  Array(len)
+    .fill(0)
+    .map(() => Math.random().toString(36)[3])
+    .join('');
