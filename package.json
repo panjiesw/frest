@@ -1,58 +1,78 @@
 {
-  "private": true,
-  "name": "frest-root",
+  "name": "frest",
   "version": "0.14.1",
+  "description": "REST client for browser with Fetch",
+  "license": "Apache-2.0",
+  "main": "dist/frest.cjs.js",
+  "module": "dist/frest.esm.js",
+  "unpkg": "dist/frest.min.js",
+  "typings": "dist/frest.d.ts",
+  "homepage": "https://github.com/panjiesw/frest#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/panjiesw/frest.git"
+  },
+  "author": {
+    "name": "Panjie Setiawan Wicaksono",
+    "email": "panjie@panjiesw.com",
+    "url": "http://panjiesw.life"
+  },
+  "bugs": {
+    "url": "https://github.com/panjiesw/frest/issues"
+  },
+  "keywords": [
+    "rest",
+    "client",
+    "browser",
+    "fetch",
+    "whatwg-fetch"
+  ],
+  "files": [
+    "dist/",
+    "src/"
+  ],
   "scripts": {
     "codecov": "codecov"
   },
   "dependencies": {
-    "frest": "file:packages/frest"
+    "querystringify": "^2.1.1"
   },
   "devDependencies": {
-    "@start/cli": "^0.3.2",
-    "@start/plugin": "^0.2.1",
-    "@start/plugin-assert": "^0.2.1",
-    "@start/plugin-env": "^0.4.0",
-    "@start/plugin-find": "^0.2.1",
-    "@start/plugin-lib-codecov": "^0.2.1",
-    "@start/plugin-parallel": "^0.2.1",
-    "@start/plugin-read": "^0.2.1",
-    "@start/plugin-remove": "^0.2.2",
-    "@start/plugin-rename": "^0.2.1",
-    "@start/plugin-sequence": "^0.2.2",
-    "@start/plugin-watch": "^0.2.1",
-    "@start/plugin-write": "^0.2.1",
-    "@start/plugin-xargs": "^0.2.1",
-    "@test/helpers": "file:internal/test-helpers",
-    "@types/fetch-mock": "^6.0.3",
-    "@types/jest": "^23.3.2",
-    "@types/node": "^10.12.15",
-    "@types/query-string": "^6.1.0",
+    "@babel/cli": "^7.6.4",
+    "@babel/core": "^7.6.4",
+    "@babel/plugin-proposal-class-properties": "^7.5.5",
+    "@babel/preset-env": "^7.6.3",
+    "@babel/preset-typescript": "^7.6.0",
+    "@types/fetch-mock": "^7.3.1",
+    "@types/jest": "^24.0.19",
+    "@types/node": "^12.7.12",
     "@types/querystringify": "^2.0.0",
-    "@types/sinon": "^5.0.2",
-    "codecov": "^3.1.0",
-    "fetch-mock": "^7.0.6",
-    "hugo-bin": "^0.39.0",
-    "husky": "^1.0.1",
-    "jest": "^23.6.0",
-    "lerna": "^3.4.0",
-    "lint-staged": "^7.3.0",
-    "prettier": "^1.14.3",
-    "rimraf": "^2.6.2",
-    "rollup": "^0.66.2",
-    "rollup-plugin-commonjs": "^9.1.8",
-    "rollup-plugin-filesize": "^4.0.1",
-    "rollup-plugin-node-resolve": "^3.4.0",
-    "rollup-plugin-terser": "^3.0.0",
-    "start-reporter-ora": "^0.4.0",
-    "ts-jest": "^23.10.5",
-    "tslint": "^5.11.0",
-    "tslint-config-prettier": "^1.17.0",
-    "tslint-eslint-rules": "^5.4.0",
-    "typedoc": "^0.13.0",
-    "typedoc-plugin-external-module-name": "^1.1.3",
-    "typescript": "^3.2.2",
-    "xhr-mock": "^2.4.1"
+    "@typescript-eslint/eslint-plugin": "^2.4.0",
+    "@typescript-eslint/parser": "^2.4.0",
+    "babel-eslint": "^10.0.3",
+    "babel-jest": "^24.9.0",
+    "codecov": "^3.6.1",
+    "confusing-browser-globals": "^1.0.9",
+    "eslint": "^6.5.1",
+    "eslint-config-prettier": "^6.4.0",
+    "eslint-plugin-prettier": "^3.1.1",
+    "fetch-mock": "^7.5.1",
+    "husky": "^3.0.9",
+    "jest": "^24.9.0",
+    "lint-staged": "^9.4.2",
+    "node-fetch": "^2.6.0",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^1.18.2",
+    "rimraf": "^3.0.0",
+    "rollup": "^1.24.0",
+    "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-dts": "^1.1.10",
+    "rollup-plugin-filesize": "^6.2.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-terser": "^5.1.2",
+    "typescript": "^3.6.4",
+    "xhr-mock": "^2.5.0"
   },
   "husky": {
     "hooks": {
@@ -61,17 +81,18 @@
   },
   "lint-staged": {
     "*.{ts,tsx}": [
-      "tslint -e **/*.d.ts --fix",
       "prettier --write",
       "git add"
     ]
   },
+  "browserslist": [
+    "> 0.5%",
+    "last 2 versions",
+    "Firefox ESR",
+    "not dead"
+  ],
   "prettier": {
     "singleQuote": true,
     "trailingComma": "all"
-  },
-  "start": {
-    "file": "./config/tasks",
-    "reporter": "start-reporter-ora"
   }
 }

@@ -16,6 +16,6 @@ const frest = new Frest();
 export default frest;
 
 export * from './types';
-export { FrestError, FrestErrorConstructor } from './FrestError';
-export { DEFAULT_CONFIG, FrestConstructor } from './Frest';
-export { Frest, utils, xhrFetch };
+export * from './FrestError';
+export * from './Frest';
+export { utils, xhrFetch };

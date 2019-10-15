@@ -17,9 +17,11 @@ jspm_packages
 
 .awcache
 dist
+lib
 cjs
 esm
 tests.js.map
 netlify.toml
 packages/*/docs
 packages/*/temp
+*.tsbuildinfo

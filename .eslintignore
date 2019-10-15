@@ -1,0 +1,6 @@
+**/coverage/**
+**/node_modules/**
+*.d.ts
+**/lib/**
+**/es/**
+**/dist/**

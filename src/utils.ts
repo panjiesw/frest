@@ -115,7 +115,7 @@ export const isBlob = (val?: any): val is Blob =>
  * @param val The value to test
  * @returns True if value is a Function, otherwise false
  */
-export const isFunction = (val?: any): val is ((...args: any[]) => any) =>
+export const isFunction = (val?: any): val is (...args: any[]) => any =>
   toString.call(val) === '[object Function]';
 
 /**
