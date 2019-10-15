@@ -281,13 +281,13 @@ class Frest {
   private headers(request: { method: HttpMethod; headers?: Headers }) {
     const method = request.method.toLowerCase();
     const headers = new Headers(this.config.headers.common);
-    for (const header of this.config.headers[method].entries()) {
-      headers.set(header[0], header[1]);
-    }
+    this.config.headers[method].forEach((v: string, k: string) => {
+      headers.set(k, v);
+    });
     if (request.headers) {
-      for (const header of request.headers.entries()) {
-        headers.set(header[0], header[1]);
-      }
+      request.headers.forEach((v, k) => {
+        headers.set(k, v);
+      });
     }
     return headers;
   }
@@ -313,9 +313,11 @@ class Frest {
   private before(request: IRequest) {
     return new Promise<IRequest>((resolve, reject) => {
       let dataPromise = Promise.resolve<any>(request.body);
-      for (const transform of request.transformRequest) {
+      for (let i = 0; i < request.transformRequest.length; i++) {
         if (methodsData.indexOf(request.method.toLowerCase()) >= 0) {
-          dataPromise = dataPromise.then(data => transform(request, data));
+          dataPromise = dataPromise.then(data =>
+            request.transformRequest[i](request, data),
+          );
         }
       }
 
@@ -324,10 +326,10 @@ class Frest {
         return request;
       });
 
-      for (const requestInterceptor of this.interceptors.request.handlers) {
+      for (let i = 0; i < this.interceptors.request.handlers.length; i++) {
         requestPromise = requestPromise.then(requestConfig => {
           checkInt(requestConfig, 'request');
-          return requestInterceptor({
+          return this.interceptors.request.handlers[i]({
             frest: this,
             request: requestConfig,
           });
@@ -371,8 +373,10 @@ class Frest {
   private after = (afterFetch: IInternalAfterFetch): Promise<IResponse> => {
     const { raw, request } = afterFetch;
     let dataPromise = Promise.resolve<any>({});
-    for (const transform of request.transformResponse) {
-      dataPromise = dataPromise.then(data => transform(raw, data));
+    for (let i = 0; i < request.transformResponse.length; i++) {
+      dataPromise = dataPromise.then(data =>
+        request.transformResponse[i](raw, data),
+      );
     }
 
     if (!raw.ok) {
@@ -390,10 +394,10 @@ class Frest {
 
     let responsePromise = dataPromise.then(data => resp(raw, data));
 
-    for (const responseInterceptor of this.interceptors.response.handlers) {
+    for (let i = 0; i < this.interceptors.response.handlers.length; i++) {
       responsePromise = responsePromise.then(response => {
         checkInt(response, 'response');
-        return responseInterceptor({
+        return this.interceptors.response.handlers[i]({
           frest: this,
           request,
           response,
@@ -430,18 +434,20 @@ class Frest {
         null,
       );
       let recovery: IResponse | undefined | null = null;
-      for (const errorInterceptor of this.interceptors.error.handlers) {
+      for (let i = 0; i < this.interceptors.error.handlers.length; i++) {
         if (recovery != null) {
           break;
         }
         promise = promise
+          // eslint-disable-next-line no-loop-func
           .then(rec => {
             if (rec != null) {
               recovery = rec;
               return rec;
             }
-            return errorInterceptor(err);
+            return this.interceptors.error.handlers[i](err);
           })
+          // eslint-disable-next-line no-loop-func
           .catch(ee => {
             err = this.toFrestError(ee, request);
             return null;
@@ -464,7 +470,8 @@ class Frest {
   }
 }
 
-for (const method of methodsNoData) {
+for (let i = 0; i < methodsNoData.length; i++) {
+  const method = methodsNoData[i];
   const meth = method === 'download' ? 'GET' : method.toUpperCase();
   Frest.prototype[method] = function(
     this: any,
@@ -480,7 +487,8 @@ for (const method of methodsNoData) {
   };
 }
 
-for (const method of methodsData) {
+for (let i = 0; i < methodsData.length; i++) {
+  const method = methodsData[i];
   const meth = method === 'upload' ? 'POST' : method.toUpperCase();
   Frest.prototype[method] = function(
     this: any,
