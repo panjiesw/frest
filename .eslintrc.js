@@ -92,6 +92,7 @@ module.exports = {
         '@typescript-eslint/array-type': ['warn', { default: 'array-simple' }],
         '@typescript-eslint/no-non-null-assertion': 'off',
         '@typescript-eslint/no-empty-interface': 'warn',
+        '@typescript-eslint/interface-name-prefix': 'warn',
       },
     },
   ],
