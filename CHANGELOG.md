@@ -1,7 +1,29 @@
-# Change Log
+# Changelog
 
-All notable changes to this project will be documented in this file.
-See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+## [1.0.0](https://github.com/panjiesw/frest/compare/v0.14.1...v1.0.0) (2019-10-16)
+
+
+### ⚠ BREAKING CHANGES
+
+* The types and interfaces have been renamed, please check the implementations
+* frest now use babel to compile its sources. There are also changes internally in how async loops are done.
+* use babel instead of tsc
+
+### Features
+
+* use standard loop ([4af2782](https://github.com/panjiesw/frest/commit/4af27824899a7ff0e4430917f26258e43b7e63ca))
+
+
+### Bug Fixes
+
+* invalid xhr header iteration ([34ea387](https://github.com/panjiesw/frest/commit/34ea3877239e73ca352701ee4b744b3d0c1f756d))
+
+
+* remove monorepo files ([26944a9](https://github.com/panjiesw/frest/commit/26944a9fea0ba8f5f0251301d33b992e4ea7c21c))
+* rename interfaces ([752d290](https://github.com/panjiesw/frest/commit/752d290a238443011701482f670e0c94614127b6))
+* use babel instead of tsc ([f6fea8c](https://github.com/panjiesw/frest/commit/f6fea8cfaeb78668f86662110bbf3ddc622315a0))
 
 <a name="0.14.1"></a>
 ## [0.14.1](https://github.com/panjiesw/frest/compare/v0.14.0...v0.14.1) (2018-12-16)
