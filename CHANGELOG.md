@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](https://github.com/panjiesw/frest/compare/v1.0.1...v1.1.0) (2019-10-16)
+
+
+### Features
+
+* expose `parseQuery` as utils function ([db84c9a](https://github.com/panjiesw/frest/commit/db84c9a2b339feb5dcc6ff00e493e4b2e0439bf4))
+
 ### [1.0.1](https://github.com/panjiesw/frest/compare/v1.0.0...v1.0.1) (2019-10-16)
 
 
