@@ -1,4 +1,4 @@
-import frest, { DEFAULT_CONFIG, IConfig } from '../';
+import frest, { DEFAULT_CONFIG, Config } from '../';
 import { BASE } from './__fixtures__';
 
 describe('Create', () => {
@@ -24,7 +24,7 @@ describe('Create', () => {
 
   describe('arg is config object', () => {
     it('has correct config', () => {
-      const config: Partial<IConfig> = {
+      const config: Partial<Config> = {
         base: BASE,
         method: 'POST',
       };

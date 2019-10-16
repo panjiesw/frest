@@ -7,14 +7,14 @@ import { FrestError } from './FrestError';
 import {
   ConfigMergeType,
   ConfigType,
-  IConfig,
-  IErrorInterceptor,
-  IInterceptors,
-  IRequest,
-  IRequestInterceptor,
-  IResponseInterceptor,
-  IResponse,
-  IFrestError,
+  Config,
+  ErrorInterceptor,
+  Interceptors,
+  FrestRequest,
+  RequestInterceptor,
+  ResponseInterceptor,
+  FrestResponse,
+  FrestErrorType,
   RequestType,
   HttpMethod,
   ResponseTransformer,
@@ -24,9 +24,9 @@ import xhr from './xhr';
 import * as utils from './utils';
 import { InterceptorManager } from './InterceptorManager';
 
-interface IInternalAfterFetch {
+interface InternalAfterFetch {
   raw: Response;
-  request: IRequest;
+  request: FrestRequest;
 }
 
 const methodsNoData: string[] = ['get', 'delete', 'options', 'download'];
@@ -79,7 +79,7 @@ const resp = <T = any>(
   raw: Response,
   // tslint:disable-next-line:no-object-literal-type-assertion
   data: T = {} as T,
-): IResponse<T> => ({
+): FrestResponse<T> => ({
   raw,
   data,
   headers: raw.headers,
@@ -103,7 +103,7 @@ const checkInt = (ret: any, type: 'response' | 'request') => {
  * Default configuration if Frest instance is created without any configuration.
  * @public
  */
-export const DEFAULT_CONFIG: IConfig = {
+export const DEFAULT_CONFIG: Config = {
   base: '',
   fetch,
   headers: {
@@ -135,18 +135,18 @@ export interface FrestConstructor {
  * @public
  */
 class Frest {
-  public config: IConfig;
-  public interceptors: IInterceptors = {
-    request: new InterceptorManager<IRequestInterceptor>(),
-    response: new InterceptorManager<IResponseInterceptor>(),
-    error: new InterceptorManager<IErrorInterceptor>(),
+  public config: Config;
+  public interceptors: Interceptors = {
+    request: new InterceptorManager<RequestInterceptor>(),
+    response: new InterceptorManager<ResponseInterceptor>(),
+    error: new InterceptorManager<ErrorInterceptor>(),
   };
 
   /**
    * Creates an instance of Frest.
    * @param config - Configuration for this instance.
    * Can be string or array of string (in which it'll be the `base` URL for
-   * every requests), or a {@link IConfig} object. Defaults to `DEFAULT_CONFIG`
+   * every requests), or a {@link Config} object. Defaults to `DEFAULT_CONFIG`
    */
   constructor(config?: ConfigType) {
     if (config && typeof config === 'string') {
@@ -245,8 +245,8 @@ class Frest {
    */
   public request<T = any>(
     init: RequestType,
-    request: Partial<IRequest> = {},
-  ): Promise<IResponse<T>> {
+    request: Partial<FrestRequest> = {},
+  ): Promise<FrestResponse<T>> {
     const conf = {
       action: 'request',
       method: this.config.method,
@@ -255,14 +255,16 @@ class Frest {
     return this.internalRequest<T>({ ...conf, headers: this.headers(conf) });
   }
 
-  private internalRequest<T = any>(request: IRequest): Promise<IResponse<T>> {
+  private internalRequest<T = any>(
+    request: FrestRequest,
+  ): Promise<FrestResponse<T>> {
     return this.before(request)
       .then(this.req)
       .then(this.after)
       .catch(this.onError(request));
   }
 
-  private requestConfig(init: RequestType, request: Partial<IRequest>) {
+  private requestConfig(init: RequestType, request: Partial<FrestRequest>) {
     const { fetch, base, method, headers, ...rest } = this.config;
     if (typeof init === 'string' || init instanceof Array) {
       return {
@@ -292,7 +294,7 @@ class Frest {
     return headers;
   }
 
-  private getFetch(request: IRequest): typeof fetch {
+  private getFetch(request: FrestRequest): typeof fetch {
     if (request.action === 'upload' || request.action === 'download') {
       return xhr as any;
     }
@@ -310,8 +312,8 @@ class Frest {
     );
   }
 
-  private before(request: IRequest) {
-    return new Promise<IRequest>((resolve, reject) => {
+  private before(request: FrestRequest) {
+    return new Promise<FrestRequest>((resolve, reject) => {
       let dataPromise = Promise.resolve<any>(request.body);
       for (let i = 0; i < request.transformRequest.length; i++) {
         if (methodsData.indexOf(request.method.toLowerCase()) >= 0) {
@@ -354,7 +356,7 @@ class Frest {
     });
   }
 
-  private req = (request: IRequest): Promise<IInternalAfterFetch> => {
+  private req = (request: FrestRequest): Promise<InternalAfterFetch> => {
     let fetchFn: typeof fetch;
 
     try {
@@ -364,13 +366,13 @@ class Frest {
     }
 
     const fullPath = this.parsePath(request.path, request.query);
-    return fetchFn(fullPath, request).then<IInternalAfterFetch>(raw => ({
+    return fetchFn(fullPath, request).then<InternalAfterFetch>(raw => ({
       request,
       raw,
     }));
   };
 
-  private after = (afterFetch: IInternalAfterFetch): Promise<IResponse> => {
+  private after = (afterFetch: InternalAfterFetch): Promise<FrestResponse> => {
     const { raw, request } = afterFetch;
     let dataPromise = Promise.resolve<any>({});
     for (let i = 0; i < request.transformResponse.length; i++) {
@@ -422,18 +424,18 @@ class Frest {
       });
   };
 
-  private onError = (request: IRequest) => (e: any): any => {
-    let err: IFrestError = this.toFrestError(e, request);
+  private onError = (request: FrestRequest) => (e: any): any => {
+    let err: FrestErrorType = this.toFrestError(e, request);
 
     if (this.interceptors.error.handlers.length === 0) {
       return Promise.reject(err);
     }
 
     return new Promise<any>((resolve, reject) => {
-      let promise: Promise<IResponse | undefined | null> = Promise.resolve(
+      let promise: Promise<FrestResponse | undefined | null> = Promise.resolve(
         null,
       );
-      let recovery: IResponse | undefined | null = null;
+      let recovery: FrestResponse | undefined | null = null;
       for (let i = 0; i < this.interceptors.error.handlers.length; i++) {
         if (recovery != null) {
           break;
@@ -463,7 +465,7 @@ class Frest {
     });
   };
 
-  private toFrestError(e: any, requestConfig: IRequest): IFrestError {
+  private toFrestError(e: any, requestConfig: FrestRequest): FrestErrorType {
     return utils.isFrestError(e)
       ? new FrestError(e.message, this, requestConfig, e.response)
       : e;
@@ -476,7 +478,7 @@ for (let i = 0; i < methodsNoData.length; i++) {
   Frest.prototype[method] = function(
     this: any,
     init: RequestType,
-    request: Partial<IRequest> = {},
+    request: Partial<FrestRequest> = {},
   ) {
     const conf = {
       action: method,
@@ -494,7 +496,7 @@ for (let i = 0; i < methodsData.length; i++) {
     this: any,
     init: RequestType,
     body?: any,
-    request: Partial<IRequest> = {},
+    request: Partial<FrestRequest> = {},
   ) {
     const conf = {
       action: method,
@@ -519,8 +521,8 @@ interface Frest {
   post<T = any>(
     init: RequestType,
     body?: any,
-    request?: Partial<IRequest>,
-  ): Promise<IResponse<T>>;
+    request?: Partial<FrestRequest>,
+  ): Promise<FrestResponse<T>>;
 
   /**
    * Make a request to an endpoint with HTTP `GET` method.
@@ -534,8 +536,8 @@ interface Frest {
    */
   get<T = any>(
     init: RequestType,
-    request?: Partial<IRequest>,
-  ): Promise<IResponse<T>>;
+    request?: Partial<FrestRequest>,
+  ): Promise<FrestResponse<T>>;
 
   /**
    * Make a request to an endpoint with HTTP `PUT` method.
@@ -550,8 +552,8 @@ interface Frest {
   put<T = any>(
     init: RequestType,
     body?: any,
-    request?: Partial<IRequest>,
-  ): Promise<IResponse<T>>;
+    request?: Partial<FrestRequest>,
+  ): Promise<FrestResponse<T>>;
 
   /**
    * Make a request to an endpoint with HTTP `PATCH` method.
@@ -566,8 +568,8 @@ interface Frest {
   patch<T = any>(
     init: RequestType,
     body?: any,
-    request?: Partial<IRequest>,
-  ): Promise<IResponse<T>>;
+    request?: Partial<FrestRequest>,
+  ): Promise<FrestResponse<T>>;
 
   /**
    * Make a request to an endpoint with HTTP `DELETE` method.
@@ -581,8 +583,8 @@ interface Frest {
    */
   delete<T = any>(
     init: RequestType,
-    request?: Partial<IRequest>,
-  ): Promise<IResponse<T>>;
+    request?: Partial<FrestRequest>,
+  ): Promise<FrestResponse<T>>;
 
   /**
    * Make a request to an endpoint with HTTP `OPTIONS` method.
@@ -596,8 +598,8 @@ interface Frest {
    */
   options<T = any>(
     init: RequestType,
-    request?: Partial<IRequest>,
-  ): Promise<IResponse<T>>;
+    request?: Partial<FrestRequest>,
+  ): Promise<FrestResponse<T>>;
 
   /**
    * Upload something to an endpoint.
@@ -616,8 +618,8 @@ interface Frest {
   upload<T = any>(
     init: RequestType,
     body?: any,
-    request?: Partial<IRequest>,
-  ): Promise<IResponse<T>>;
+    request?: Partial<FrestRequest>,
+  ): Promise<FrestResponse<T>>;
 
   /**
    * Download something from an endpoint.
@@ -634,8 +636,8 @@ interface Frest {
    */
   download<T = any>(
     init: RequestType,
-    request?: Partial<IRequest>,
-  ): Promise<IResponse<T>>;
+    request?: Partial<FrestRequest>,
+  ): Promise<FrestResponse<T>>;
 }
 
 export { Frest };

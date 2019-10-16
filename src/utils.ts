@@ -1,4 +1,4 @@
-import { IFrestError } from './types';
+import { FrestErrorType } from './types';
 
 const toString = Object.prototype.toString;
 
@@ -24,7 +24,7 @@ export const trimSlashes = (input: string) =>
  * @returns true if `e` is an instance of `FrestError`. TypeScript will then provide
  * completions of `FrestError` instance type.
  */
-export const isFrestError = (e: any): e is IFrestError =>
+export const isFrestError = (e: any): e is FrestErrorType =>
   e.frest != null && e.request != null;
 
 /**

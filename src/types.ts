@@ -17,7 +17,7 @@ export type HttpMethod =
   | 'PATCH'
   | 'OPTIONS';
 
-export interface IHeaderConfig {
+export interface HeaderConfig {
   common: Headers;
   post: Headers;
   get: Headers;
@@ -28,13 +28,13 @@ export interface IHeaderConfig {
 }
 
 export type ResponseTransformer = (raw: Response, data: any) => any;
-export type RequestTransformer = (req: IRequest, data?: any) => any;
+export type RequestTransformer = (req: FrestRequest, data?: any) => any;
 
 /**
  * Base config for Frest instance
  * @public
  */
-export interface IConfigBase {
+export interface ConfigBase {
   /**
    * The base url for this instance. Defaults to empty string.
    * @public
@@ -130,7 +130,7 @@ export interface IConfigBase {
   signal?: AbortSignal;
 }
 
-export interface IConfig extends IConfigBase {
+export interface Config extends ConfigBase {
   /**
    * Default {@link https://developer.mozilla.org/en-US/docs/Web/API/Headers | Headers} to include in each request.
    * @remarks
@@ -139,7 +139,7 @@ export interface IConfig extends IConfigBase {
    * it's **required** to be an instance of `Headers` class.
    * @public
    */
-  headers: IHeaderConfig;
+  headers: HeaderConfig;
 }
 
 /**
@@ -151,8 +151,8 @@ export interface IConfig extends IConfigBase {
  * the same as {@link IConfig}.
  * @public
  */
-export type ConfigMergeType = Partial<IConfigBase> & {
-  headers?: Partial<IHeaderConfig>;
+export type ConfigMergeType = Partial<ConfigBase> & {
+  headers?: Partial<HeaderConfig>;
 };
 
 /**
@@ -174,7 +174,7 @@ export type ConfigType = string | ConfigMergeType;
  * request init for more.
  * @public
  */
-export interface IRequest {
+export interface FrestRequest {
   [key: string]: any;
   /**
    * Path relative to {@link IConfigBase.base}.
@@ -357,7 +357,7 @@ export interface IRequest {
  * a request configuration object of {@link IRequest}
  * @public
  */
-export type RequestType = string | string[] | Partial<IRequest>;
+export type RequestType = string | string[] | Partial<FrestRequest>;
 
 /**
  * Response object as a result of successful endpoint call.
@@ -368,7 +368,7 @@ export type RequestType = string | string[] | Partial<IRequest>;
  * @public
  * @template T - The type of `body` property. Defaults to `any`
  */
-export interface IResponse<T = any> {
+export interface FrestResponse<T = any> {
   /**
    * Original `fetch` response.
    * @public
@@ -396,7 +396,7 @@ export interface IResponse<T = any> {
  * will have this signature.
  * @public
  */
-export interface IFrestError {
+export interface FrestErrorType {
   /**
    * The message describing this error.
    * @public
@@ -411,7 +411,7 @@ export interface IFrestError {
    * The request config used when this error happened.
    * @public
    */
-  request: IRequest;
+  request: FrestRequest;
   /**
    * The response when this error happened, if any.
    * @remarks
@@ -419,14 +419,14 @@ export interface IFrestError {
    * is made.
    * @public
    */
-  response?: IResponse;
+  response?: FrestResponse;
 }
 
 /**
  * Argument object passed to a request interceptor function.
  * @public
  */
-export interface IRequestInterceptorArg {
+export interface RequestInterceptorArg {
   /**
    * Frest instance which the request is made with.
    * @public
@@ -436,10 +436,10 @@ export interface IRequestInterceptorArg {
    * The request configuration used in this request.
    * @public
    */
-  request: IRequest;
+  request: FrestRequest;
 }
 
-export interface IResponseInterceptorArg {
+export interface ResponseInterceptorArg {
   /**
    * Frest instance which the request is made with.
    * @public
@@ -449,52 +449,52 @@ export interface IResponseInterceptorArg {
    * The request configuration used in this request.
    * @public
    */
-  request: IRequest;
-  response: IResponse;
+  request: FrestRequest;
+  response: FrestResponse;
 }
 
 /**
  * Request interceptor function signature.
  * @public
  */
-export type IRequestInterceptor = (
-  input: IRequestInterceptorArg,
-) => Promise<IRequest>;
+export type RequestInterceptor = (
+  input: RequestInterceptorArg,
+) => Promise<FrestRequest>;
 
 /**
  * Response interceptor function signature.
  * @public
  */
-export type IResponseInterceptor = (
-  input: IResponseInterceptorArg,
-) => Promise<IResponse>;
+export type ResponseInterceptor = (
+  input: ResponseInterceptorArg,
+) => Promise<FrestResponse>;
 
 /**
  * Error interceptor function signature.
  * @public
  */
-export type IErrorInterceptor = (
-  error: IFrestError,
-) => Promise<IResponse | undefined | null>;
+export type ErrorInterceptor = (
+  error: FrestErrorType,
+) => Promise<FrestResponse | undefined | null>;
 
 /**
  * List of interceptors by its type.
  * @public
  */
-export interface IInterceptors {
+export interface Interceptors {
   /**
    * List of response interceptor;
    * @public
    */
-  response: InterceptorManager<IResponseInterceptor>;
+  response: InterceptorManager<ResponseInterceptor>;
   /**
    * List of request interceptor;
    * @public
    */
-  request: InterceptorManager<IRequestInterceptor>;
+  request: InterceptorManager<RequestInterceptor>;
   /**
    * List of error interceptor;
    * @public
    */
-  error: InterceptorManager<IErrorInterceptor>;
+  error: InterceptorManager<ErrorInterceptor>;
 }

@@ -3,7 +3,7 @@
  * @hidden
  */
 
-import { IRequest } from './types';
+import { FrestRequest } from './types';
 
 // These were taken from somewhere, made by someone.
 // I adopted it to frest but forgot to put any reference to original source.
@@ -40,7 +40,7 @@ function parseHeaders(rawHeaders: any) {
   return headers;
 }
 
-function xhrFetch(url: string, conf: IRequest): Promise<Response> {
+function xhrFetch(url: string, conf: FrestRequest): Promise<Response> {
   return new Promise<Response>((resolve, reject) => {
     // const request = new Request(url, conf);
     const xhr = new XMLHttpRequest();
