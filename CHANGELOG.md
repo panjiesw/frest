@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.1](https://github.com/panjiesw/frest/compare/v1.0.0...v1.0.1) (2019-10-16)
+
+
+### Features
+
+* mark package as side effect free ([359076b](https://github.com/panjiesw/frest/commit/359076bc064d24af727fea13cd157180a5032329))
+
 ## [1.0.0](https://github.com/panjiesw/frest/compare/v0.14.1...v1.0.0) (2019-10-16)
 
 
