@@ -2,7 +2,6 @@
  * @module frest
  */
 
-import qs from 'querystringify';
 import { FrestError } from './FrestError';
 import {
   ConfigMergeType,
@@ -218,19 +217,16 @@ class Frest {
   }
 
   /**
-   * Utility function to parse a query object into string
+   * Utility function to parse a query object into string.
+   *
+   * @remarks
+   * This is a shortcut to the `utils.parseQuery` function.
    *
    * @param query - The query to parse. It can be object/string
    * @returns Parsed query string
    */
   public parseQuery(query: any): string {
-    let q = query || '';
-    if (typeof q === 'object') {
-      q = qs.stringify(q, '?');
-    } else if (q !== '') {
-      q = q.charAt(0) === '?' ? q : `?${q}`;
-    }
-    return q;
+    return utils.parseQuery(query);
   }
 
   /**

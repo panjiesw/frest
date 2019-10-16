@@ -1,3 +1,4 @@
+import qs from 'querystringify';
 import { FrestErrorType } from './types';
 
 const toString = Object.prototype.toString;
@@ -14,6 +15,27 @@ const toString = Object.prototype.toString;
  */
 export const trimSlashes = (input: string) =>
   input.toString().replace(/([^:]\/)\/+/g, '$1');
+
+/**
+ * Utility function to parse a query object into string.
+ *
+ * @remarks
+ * This will only do simple and dumb stringify according to `querystringify`
+ * package. If you want more control use the package directly instead.
+ *
+ * @public
+ * @param query The query to parse. It can be object/string
+ * @returns Parsed query string
+ */
+export const parseQuery = (query: any) => {
+  let q = query || '';
+  if (typeof q === 'object') {
+    q = qs.stringify(q, '?');
+  } else if (q !== '') {
+    q = q.charAt(0) === '?' ? q : `?${q}`;
+  }
+  return q;
+};
 
 /**
  * A TypeScript utility to determine if a potential error is an instance of
