@@ -3,6 +3,7 @@
  * @hidden
  */
 
+/* eslint-disable no-restricted-globals */
 import { Frest, FrestConstructor } from './Frest';
 import { FrestError, FrestErrorConstructor } from './FrestError';
 
