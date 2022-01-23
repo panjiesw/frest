@@ -17,9 +17,10 @@ module.exports = {
     '/dist/',
     '/lib/',
   ],
+  testEnvironment: 'jsdom',
   coverageReporters: ['json', 'lcov', 'text', 'cobertura'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  setupFiles: ['./test-setup.js'],
+  setupFilesAfterEnv: ['./test-setup.js'],
   testMatch: ['**/*.test.(j|t)s?(x)'],
   transform: {
     '^.+\\.(j|t)sx?$': 'babel-jest',
