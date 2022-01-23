@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/panjiesw/frest/compare/v1.1.0...v1.2.0) (2022-01-23)
+
+
+### Features
+
+* upgrade dev deps ([bae1502](https://github.com/panjiesw/frest/commit/bae1502e27f64eb21dcc3ce8291cd94c87c448b0))
+* upgrade jest ([f3064fc](https://github.com/panjiesw/frest/commit/f3064fc46a3b5ce9d6e47da7b26127ac94dd61ed))
+
+
+### Bug Fixes
+
+* update node-fetch ([fc01ba3](https://github.com/panjiesw/frest/commit/fc01ba3f72e992412cdc97c0092606004e06a54a))
+
 ## [1.1.0](https://github.com/panjiesw/frest/compare/v1.0.1...v1.1.0) (2019-10-16)
 
 
